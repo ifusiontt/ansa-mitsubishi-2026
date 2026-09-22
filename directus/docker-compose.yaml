@@ -1,0 +1,51 @@
+services:
+  database:
+    image: postgis/postgis:15-3.3
+    container_name: directus-mitsubishi-db
+    environment:
+      POSTGRES_USER: directus
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in directus/.env}"
+      POSTGRES_DB: directus
+    volumes:
+      - directus-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  cache:
+    image: redis:7-alpine
+    container_name: directus-mitsubishi-redis
+    restart: unless-stopped
+
+  directus:
+    image: directus/directus:12
+    container_name: directus-mitsubishi-cms
+    ports:
+      - "8055:8055"
+    environment:
+      # Secrets are interpolated from directus/.env (gitignored) — see directus/.env.example
+      LICENSE_KEY: "${LICENSE_KEY:?set LICENSE_KEY in directus/.env}"
+      KEY: "${KEY:?set KEY in directus/.env}"
+      SECRET: "${SECRET:?set SECRET in directus/.env}"
+      ADMIN_TOKEN: "${ADMIN_TOKEN:?set ADMIN_TOKEN in directus/.env}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@example.com}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:?set ADMIN_PASSWORD in directus/.env}"
+      DB_CLIENT: "pg"
+      DB_HOST: "database"
+      DB_PORT: "5432"
+      DB_DATABASE: "directus"
+      DB_USER: "directus"
+      DB_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in directus/.env}"
+      CACHE_ENABLED: "true"
+      CACHE_STORE: "redis"
+      REDIS_HOST: "cache"
+      REDIS_PORT: "6379"
+      REDIS: "redis://cache:6379"
+      PUBLIC_URL: "http://localhost:8055"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "true"
+    depends_on:
+      - database
+      - cache
+    restart: unless-stopped
+
+volumes:
+  directus-data:

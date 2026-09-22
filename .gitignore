@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Nuxt / Nitro build output
+.nuxt/
+.nitro/
+.output/
+dist/
+
+# Environment files with real secrets (keep committed *.example templates)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Logs & OS cruft
+*.log
+.DS_Store

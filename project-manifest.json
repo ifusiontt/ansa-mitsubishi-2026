@@ -1,0 +1,44 @@
+{
+  "project_name": "ANSA Motors Mitsubishi Trinidad Showroom",
+  "last_updated": "2026-09-22T00:00:00Z",
+  "system_state": {
+    "directus_version": "12.x",
+    "nuxt_version": "4.x",
+    "directus_endpoint": "http://localhost:8055",
+    "nuxt_endpoint": "http://localhost:3000",
+    "auth_method": "Static Token (ADMIN_TOKEN in directus/.env)",
+    "license_status": "Active (Innovation Grant)",
+    "docker_stack": "directus-mitsubishi-cms, directus-mitsubishi-db, directus-mitsubishi-redis"
+  },
+  "database_stats": {
+    "total_collections": 38,
+    "total_fields": 393,
+    "total_relations": 84,
+    "core_collections": [
+      "vehicles",
+      "vehicle_trims",
+      "dealers",
+      "globals",
+      "pages",
+      "block_hero_custom",
+      "block_layout_wrapper",
+      "block_cta_simple"
+    ]
+  },
+  "architecture_patterns": {
+    "branding_color": "#C3002F (Mitsubishi Red)",
+    "page_builder": "Dynamic PageBuilder Block Architecture via Directus M2A",
+    "permissions": "Public read enabled for vehicles, vehicle_trims, dealers, pages, globals",
+    "vehicle_slug_route": "/showroom/[slug].vue"
+  },
+  "active_sprint": {
+    "phase": "Vehicle Detail Page Template & Schema Population",
+    "current_task": "Build out /showroom/[slug].vue Nuxt template based on 8-part Jamaica reference layout and populate vehicle catalog records in Directus",
+    "reference_url": "https://mitsubishi-motors.com.jm/vehicle/2025-outlander-sport/"
+  },
+  "known_gotchas": [
+    "NEVER run 'docker-compose down -v' — it deletes the persistent Postgres volume.",
+    "ADMIN_TOKEN is only used on first bootstrap; admin static token is set directly on the user row.",
+    "Directus 12 schema apply requires unwrapped payload with hash or via diff endpoint."
+  ]
+}
