@@ -1,0 +1,42 @@
+========================================================================
+IMAGE OPTIMIZATION REPORT
+========================================================================
+Source root : /home/ifusion/development/Mitsubishi_Ansa_Mitsubishi_2026/content-raw
+Output root : /home/ifusion/development/Mitsubishi_Ansa_Mitsubishi_2026/content-raw/optimized
+Max width   : 2560px (aspect ratio preserved)
+Quality     : JPEG 82 (TIFF->JPEG 85), WebP 82 (method 4)
+Metadata    : EXIF/XMP stripped, EXIF orientation baked in
+
+Input files (source)     : 202  (3.45 GB)
+Output files (optimized) : 343  (1.72 GB)
+Resized to 2560px wide   : 142
+Errors / skipped-out     : 0 / 0
+Elapsed                  : 0.0 min
+
+Per source format:
+  ext       in files      in size  out files     out size
+  .tif            40      1.55 GB         80     14.13 MB
+  .psd            47      1.48 GB         47      1.48 GB
+  .png            14    241.45 MB         28     61.09 MB
+  .pdf             5     60.58 MB          5     60.58 MB
+  .jpeg           88     56.52 MB        176     34.79 MB
+  .mp4             2     30.51 MB          2     30.51 MB
+  .pptx            1     29.47 MB          1     29.47 MB
+  .mov             1     18.67 MB          1     18.67 MB
+  .svg             2     16.36 KB          2     16.36 KB
+  .xlsx            1     10.34 KB          1     10.34 KB
+
+By processing kind:
+  tiff            40 src ->    80 out files  (14.13 MB)
+  jpeg            88 src ->   176 out files  (34.79 MB)
+  png             14 src ->    28 out files  (61.09 MB)
+  passthrough     59 src ->    59 out files  (1.62 GB)
+  passthrough exts: .movx1, .mp4x2, .pdfx5, .pptxx1, .psdx47, .svgx2, .xlsxx1
+
+------------------------------------------------------------------------
+ORIGINAL  total : 3.45 GB
+OPTIMIZED total : 1.72 GB
+SPACE SAVED     : 1.73 GB  (50.1%)
+
+Images only:  1.84 GB -> 110.01 MB  (saved 94.2%)
+Non-image passthrough: 1.62 GB (unchanged)

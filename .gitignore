@@ -16,3 +16,6 @@ dist/
 # Logs & OS cruft
 *.log
 .DS_Store
+
+# Seed script local state (uploaded asset ids)
+scripts/.seed-outlander-assets.json
