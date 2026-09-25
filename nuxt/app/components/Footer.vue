@@ -21,7 +21,7 @@ export interface FooterProps {
 		logo?: string | null;
 		logo_dark_mode?: string | null;
 		description?: string | null;
-		social_links?: SocialLink[];
+		social_links?: SocialLink[] | null;
 	};
 }
 
@@ -104,6 +104,30 @@ const darkLogoUrl = computed(() =>
 					</nav>
 				</div>
 			</div>
+
+				<!-- Dealer contact + copyright -->
+				<div
+					class="mt-12 pt-8 border-t border-gray-muted/40 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4"
+				>
+					<address class="not-italic text-sm leading-relaxed text-gray-dark dark:text-gray-muted">
+						<span
+							class="block font-heading font-semibold tracking-wider uppercase text-xs text-foreground dark:text-white mb-1"
+						>
+							ANSA Motors Trinidad &amp; Tobago
+						</span>
+						Corner Richmond &amp; Duke Streets, Port of Spain, Trinidad &amp; Tobago
+						<span class="block">
+							<a href="tel:+18686257231" class="hover:text-accent">+1 (868) 625-7231</a>
+							<span aria-hidden="true" class="mx-2">·</span>
+							<a href="mailto:mitsubishi.pos@ansamcl.com" class="hover:text-accent">mitsubishi.pos@ansamcl.com</a>
+						</span>
+						<span class="block">Mon–Fri 8:00 AM – 4:30 PM · Sat 8:30 AM – 12:30 PM</span>
+					</address>
+
+					<p class="text-xs text-gray-dark/80 dark:text-gray-muted md:text-right">
+						&copy; 2026 ANSA Motors Trinidad &amp; Tobago. All rights reserved.
+					</p>
+				</div>
 		</Container>
 	</footer>
 </template>

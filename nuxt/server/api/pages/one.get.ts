@@ -1,14 +1,162 @@
 import { withoutTrailingSlash, withLeadingSlash } from 'ufo';
-import type { Page, PageBlock, BlockPost, Post } from '#shared/types/schema';
+import type { Page, PageBlock, BlockPost, Post, BlockContentBlock, BlockLayoutWrapper } from '#shared/types/schema';
 
 /**
- * Page fields configuration for Directus queries
+ * Shared sub-schemas for the ANSA page-builder block system.
+ *
+ * M2A deep-fetch convention (Directus 12 + @directus/sdk v22):
+ * an object entry inside a fields array marks the M2A junction, and its keys
+ * are the allowed target collections — serialized as `parent.m2aField:collection.field`
+ * (e.g. `blocks.item:block_cta_simple.buttons.item:block_button.label`).
+ * Only collections listed here are resolved; others stay raw UUIDs.
+ *
+ * ── URL-size constraint (HTTP 431) ─────────────────────────────────────────
+ * Directus serves items via GET, so the serialized `fields` list lives in the
+ * query string. Node's HTTP server rejects request lines above ~16KB
+ * (HTTP 431, no body). The full block payload is ~22KB when inlined into the
+ * page query, which 431s every page request. We therefore split the fetch:
+ *
+ *   Phase 1 — page + blocks with LEAN per-target item fields (scalars + the
+ *             small legacy nests). URL ≈ 7KB.
+ *   Phase 2 — for pages that actually contain the heavy custom blocks
+ *             (block_content_block, block_layout_wrapper), one small batched
+ *             query per collection (URLs ≈ 2KB / 7.5KB) resolves the nested
+ *             items / sections / M2A buttons, merged back onto `block.item`.
+ *
+ * The final JSON shape is identical to a single deep fetch, so the frontend
+ * contracts are unchanged.
+ */
+
+const blockButtonFields = [
+	'id',
+	'label',
+	'variant',
+	'size',
+	'type',
+	'url',
+	'sort',
+	{ page: ['id', 'permalink', 'title'] },
+	{ post: ['id', 'slug', 'title'] },
+];
+
+/** M2A button junction (block_button | block_button_group) used by CTA/content/hero blocks. */
+const blockButtonsM2AFields = [
+	'id',
+	'collection',
+	'item',
+	{
+		item: {
+			block_button: blockButtonFields,
+			block_button_group: ['id', 'sort', { buttons: blockButtonFields }],
+		},
+	},
+];
+
+/** File list via the `*_files` O2M junction (files special) — id + display metadata. */
+const blockFileListFields = ['id', { directus_files_id: ['id', 'title', 'filename_download', 'filesize'] }];
+
+/** Full content-item schema (block_content_items) — shared by block_content_block and layout sections. */
+const blockContentItemFields = [
+	'id',
+	'sort',
+	'status',
+	'tagline',
+	'headline',
+	'description',
+	'text_blocks',
+	{ images: blockFileListFields },
+	{ buttons: blockButtonsM2AFields },
+	{ vehicle: ['id', 'title', 'slug', 'tagline'] },
+];
+
+/** Full block_content_block payload — O2M content items (auto-sorted via relation sort_field). */
+const blockContentBlockFields = [
+	'id',
+	'tagline',
+	'variant',
+	'template',
+	'container_width',
+	{ items: blockContentItemFields },
+];
+
+const blockCtaSimpleFields = [
+	'id',
+	'status',
+	'headline',
+	'subtext',
+	'background_style',
+	'container_width',
+	{ buttons: blockButtonsM2AFields },
+];
+
+const blockFormFields = [
+	'id',
+	'tagline',
+	'headline',
+	{
+		form: [
+			'id',
+			'title',
+			'submit_label',
+			'success_message',
+			'on_success',
+			'success_redirect_url',
+			'is_active',
+			{
+				fields: [
+					'id',
+					'name',
+					'type',
+					'label',
+					'placeholder',
+					'help',
+					'validation',
+					'width',
+					'choices',
+					'required',
+					'sort',
+				],
+			},
+		],
+	},
+];
+
+/** Full block_layout_wrapper payload — O2M sections, each an M2A into a nested block. */
+const blockLayoutWrapperFields = [
+	'id',
+	'status',
+	'template',
+	'layout_ratio',
+	'grid_gap',
+	'collapse_breakpoint',
+	{
+		sections: [
+			'id',
+			'collection',
+			'item',
+			{
+				item: {
+					block_content_block: blockContentBlockFields,
+					block_form: blockFormFields,
+					block_cta_simple: blockCtaSimpleFields,
+				},
+			},
+		],
+	},
+];
+
+/**
+ * Page fields configuration for Directus queries (PHASE 1 — lean)
  *
  * This defines the complete field structure for pages including:
  * - Basic page metadata (title, id)
  * - SEO fields for search engine optimization
  * - Complex nested content blocks (hero, gallery, pricing, forms, etc.)
- * - All nested relationships and dynamic content fields
+ *
+ * ⚠️ The two heavy custom blocks (block_content_block, block_layout_wrapper)
+ * only request their scalar fields here — their nested payloads are fetched in
+ * Phase 2 (see enrichCustomBlocks) to keep this query string under the ~16KB
+ * URL limit enforced by the Directus HTTP server (HTTP 431).
  */
 const pageFields = [
 	'title',
@@ -21,12 +169,15 @@ const pageFields = [
 			'id',
 			'background',
 			'collection', // Type of block (hero, gallery, pricing, etc.)
-			'item', // The actual block content
+			'item', // The actual block content (scalars only for the heavy blocks — nested payload resolved in Phase 2)
 			'sort',
 			'hide_block',
 			{
-				// Different block types with their specific fields:
+				// Different block types with their specific fields.
+				// ⚠️ Only the collections listed here are deep-resolved by the M2A fetch;
+				// any other allowed M2A collection comes back as a raw id in `item`.
 				item: {
+					// ── Legacy ANSA starter blocks ──
 					block_richtext: ['id', 'tagline', 'headline', 'content', 'alignment'],
 					block_gallery: ['id', 'tagline', 'headline', { items: ['id', 'directus_file', 'sort'] }],
 					block_pricing: [
@@ -66,42 +217,111 @@ const pageFields = [
 						},
 					],
 					block_posts: ['id', 'tagline', 'headline', 'collection', 'limit'],
-					block_form: [
+					block_form: blockFormFields,
+					// ── ANSA custom page-builder blocks (Mitsubishi 2026) ──
+					// Custom hero — headline/body + single media file or media gallery
+					block_hero_custom: [
 						'id',
-						'tagline',
+						'title',
 						'headline',
-						{
-							form: [
-								'id',
-								'title',
-								'submit_label',
-								'success_message',
-								'on_success',
-								'success_redirect_url',
-								'is_active',
-								{
-									fields: [
-										'id',
-										'name',
-										'type',
-										'label',
-										'placeholder',
-										'help',
-										'validation',
-										'width',
-										'choices',
-										'required',
-										'sort',
-									],
-								},
-							],
-						},
+						'highlight_keyword',
+						'body',
+						'variant',
+						'template',
+						'container_width',
+						'media',
+						{ media_gallery: blockFileListFields },
 					],
+					// CTA — headline/subtext + background style + M2A buttons
+					block_cta_simple: blockCtaSimpleFields,
+					// Heavy blocks — scalars only here; nested payload resolved in Phase 2
+					block_content_block: ['id', 'tagline', 'variant', 'template', 'container_width'],
+					block_layout_wrapper: ['id', 'status', 'template', 'layout_ratio', 'grid_gap', 'collapse_breakpoint'],
 				},
 			},
 		],
 	},
 ];
+
+/**
+ * PHASE 2 — resolve the heavy custom block payloads.
+ *
+ * Scans the page's blocks for `block_content_block` / `block_layout_wrapper`
+ * entries whose `item` is still a raw id (not deep-resolved in Phase 1), then
+ * issues one batched query per collection with the full nested field list and
+ * merges the result back onto `block.item`. Both query URLs stay well under
+ * the ~16KB limit (≈2KB and ≈7.5KB), and content items are returned in
+ * `sort` order (the junction relation carries sort_field = sort).
+ */
+async function enrichCustomBlocks(page: Page, token: string | null): Promise<Page> {
+	const blocks = (page.blocks as PageBlock[]) || [];
+	const contentBlockIds: string[] = [];
+	const layoutWrapperIds: number[] = [];
+
+	for (const block of blocks) {
+		// Phase 1 requested scalar sub-fields, so `item` arrives as a partial
+		// object (scalars only) — detect the missing nested payload, not a raw id.
+		if (block.collection === 'block_content_block' && block.item && typeof block.item === 'object' && !Array.isArray((block.item as BlockContentBlock).items)) {
+			contentBlockIds.push((block.item as BlockContentBlock).id);
+		}
+
+		if (block.collection === 'block_layout_wrapper' && block.item && typeof block.item === 'object' && !Array.isArray((block.item as BlockLayoutWrapper).sections)) {
+			layoutWrapperIds.push((block.item as BlockLayoutWrapper).id);
+		}
+	}
+
+	if (contentBlockIds.length === 0 && layoutWrapperIds.length === 0) return page;
+
+	const [contentBlocks, layoutWrappers] = await Promise.all([
+		contentBlockIds.length
+			? directusServer.request(
+					token && token.trim()
+						? withToken(
+								token,
+								readItems('block_content_block', {
+									filter: { id: { _in: contentBlockIds } },
+									fields: blockContentBlockFields as any,
+								}),
+							)
+						: readItems('block_content_block', {
+								filter: { id: { _in: contentBlockIds } },
+								fields: blockContentBlockFields as any,
+							}),
+				)
+			: Promise.resolve([] as BlockContentBlock[]),
+		layoutWrapperIds.length
+			? directusServer.request(
+					token && token.trim()
+						? withToken(
+								token,
+								readItems('block_layout_wrapper', {
+									filter: { id: { _in: layoutWrapperIds } },
+									fields: blockLayoutWrapperFields as any,
+								}),
+							)
+						: readItems('block_layout_wrapper', {
+								filter: { id: { _in: layoutWrapperIds } },
+								fields: blockLayoutWrapperFields as any,
+							}),
+				)
+			: Promise.resolve([] as BlockLayoutWrapper[]),
+	]);
+
+	const contentMap = new Map((contentBlocks as BlockContentBlock[]).map((b) => [b.id, b]));
+	const wrapperMap = new Map((layoutWrappers as BlockLayoutWrapper[]).map((b) => [b.id, b]));
+
+	for (const block of blocks) {
+		if (block.collection === 'block_content_block' && block.item && typeof block.item === 'object' && !Array.isArray((block.item as BlockContentBlock).items)) {
+			const full = contentMap.get((block.item as BlockContentBlock).id);
+			if (full) block.item = full;
+		} else if (block.collection === 'block_layout_wrapper' && block.item && typeof block.item === 'object' && !Array.isArray((block.item as BlockLayoutWrapper).sections)) {
+			const full = wrapperMap.get((block.item as BlockLayoutWrapper).id);
+			if (full) block.item = full;
+		}
+	}
+
+	return page;
+}
 
 /**
  * Pages API Handler - Fetches individual pages by permalink
@@ -114,10 +334,13 @@ const pageFields = [
  * - Handle version-specific content for content management workflows
  *
  * Key Features:
- * - Permalink-based routing (e.g., /about, /contact, /pricing)
+ * - Permalink-based routing (e.g. /about, /contact, /pricing)
  * - Preview mode with token authentication
  * - Version support for content management workflows
  * - Dynamic content blocks with real-time data fetching
+ * - Two-phase block fetching (see header) that stays under the Directus
+ *   ~16KB GET-URL limit while still deep-resolving M2A buttons, content
+ *   items and layout-wrapper sections
  * - SEO metadata support
  */
 export default defineEventHandler(async (event) => {
@@ -141,7 +364,7 @@ export default defineEventHandler(async (event) => {
 		let pageId = id as string;
 
 		// Version-specific content handling:
-		// When a version is requested (e.g., "draft", "published"), we need to:
+		// When a version is requested (e.g. "draft", "published"), we need to:
 		// 1. Look up the page ID by permalink if not provided directly
 		// 2. Fetch the specific version of that page
 		// 3. Fail gracefully if the page doesn't exist for that version
@@ -237,6 +460,10 @@ export default defineEventHandler(async (event) => {
 			page = pageData[0] as Page;
 		}
 
+		// PHASE 2: resolve the heavy custom block payloads (content items,
+		// layout sections, M2A buttons) fetched with lean fields above.
+		page = await enrichCustomBlocks(page, token);
+
 		// Dynamic Content Enhancement:
 		// Some blocks need additional data fetched at runtime
 		// This is where we enhance static block data with dynamic content
@@ -252,7 +479,7 @@ export default defineEventHandler(async (event) => {
 					block.item.collection === 'posts'
 				) {
 					const blockPost = block.item as BlockPost;
-					const limit = blockPost.limit ?? 6; // Default to 6 posts if no limit specified
+					const limit = blockPost.limit ?? 6; // Default to 6 posts if no post limit specified
 
 					// Fetch the actual posts data for this block
 					// Always fetch published posts only (no preview mode for dynamic content)
@@ -272,7 +499,14 @@ export default defineEventHandler(async (event) => {
 		}
 
 		return page;
-	} catch {
-		throw createError({ statusCode: 500, statusMessage: 'Page not found' });
+	} catch (err) {
+		// Preserve 404s thrown above; surface unexpected errors distinctly so a
+		// broken CMS query (e.g. a 431/500 from Directus) is not masked as a
+		// "Page not found" 404 in production.
+		if (err && typeof err === 'object' && 'statusCode' in err) {
+			throw err;
+		}
+
+		throw createError({ statusCode: 500, statusMessage: 'Failed to load page content' });
 	}
 });

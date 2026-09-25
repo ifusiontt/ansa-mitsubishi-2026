@@ -6,7 +6,8 @@
 	--background-color: #ffffff;
 	--foreground-color: #42566e;
 	--background-color-muted: color-mix(in srgb, var(--background-color), var(--foreground-color) 10%);
-	--accent-color: #6644ff;
+	/* Brand token: Mitsubishi Red (AGENTS.md) */
+	--accent-color: #C3002F;
 	--background-variant-color: #172940;
 	--accent-color-dark: color-mix(in srgb, var(--accent-color), black 40%);
 	--accent-color-soft: color-mix(in srgb, var(--accent-color), white 20%);
@@ -52,4 +53,26 @@
 	a {
 		@apply hover:text-accent transition-colors no-underline;
 	}
+
+	/* Display headers: Montserrat, uppercase, tracked out (see nuxt.config.ts fonts.families) */
+	.font-display {
+		font-family: 'Montserrat', sans-serif;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
 }
+
+/*
+ * ── Future client font swapping: Mitsubishi 'mmc' face ─────────────────────
+ * When the licensed client font becomes available, place it at
+ * /public/fonts/mmc.woff2 and uncomment the rule below, then swap the
+ * display stack in tailwind.config.ts to: ['MMC', 'Montserrat', 'sans-serif']
+ *
+ * @font-face {
+ *   font-family: 'MMC';
+ *   font-style: normal;
+ *   font-weight: 400 800;
+ *   font-display: swap;
+ *   src: url('/fonts/mmc.woff2') format('woff2');
+ * }
+ */

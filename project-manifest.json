@@ -1,6 +1,6 @@
 {
   "project_name": "ANSA Motors Mitsubishi Trinidad Showroom",
-  "last_updated": "2026-09-22T00:00:00Z",
+  "last_updated": "2026-09-24T11:44:17.143+00:00",
   "system_state": {
     "directus_version": "12.x",
     "nuxt_version": "4.x",
@@ -11,9 +11,9 @@
     "docker_stack": "directus-mitsubishi-cms, directus-mitsubishi-db, directus-mitsubishi-redis"
   },
   "database_stats": {
-    "total_collections": 38,
-    "total_fields": 393,
-    "total_relations": 84,
+    "total_collections": 39,
+    "total_fields": 404,
+    "total_relations": 88,
     "core_collections": [
       "vehicles",
       "vehicle_trims",
@@ -22,23 +22,29 @@
       "pages",
       "block_hero_custom",
       "block_layout_wrapper",
-      "block_cta_simple"
+      "block_cta_simple",
+      "vehicle_colors"
     ]
   },
   "architecture_patterns": {
     "branding_color": "#C3002F (Mitsubishi Red)",
     "page_builder": "Dynamic PageBuilder Block Architecture via Directus M2A",
-    "permissions": "Public read enabled for vehicles, vehicle_trims, dealers, pages, globals",
+    "permissions": "Public read enabled for vehicles, vehicle_trims, vehicle_colors, dealers, pages, globals (policy-based field whitelists)",
     "vehicle_slug_route": "/showroom/[slug].vue"
   },
   "active_sprint": {
-    "phase": "Vehicle Detail Page Template & Schema Population",
-    "current_task": "Build out /showroom/[slug].vue Nuxt template based on 8-part Jamaica reference layout and populate vehicle catalog records in Directus",
+    "phase": "ContentBlock templates, branding tokens, schema merge & two-phase page fetch — Complete",
+    "current_task": "Finished the ContentBlock/nuxt-swiper follow-ups. (1) Branding token refactor in app/components/block/templates/*: legacy bg-yellow/#f5e748 -> Mitsubishi Red (bg-accent/#C3002F), bg-blue/#0f4b8f -> dark industrial slate, text-dark -> text-slate-900, text-heading-* normalized to explicit Tailwind scale (e.g. text-lg font-semibold / text-2xl font-bold); final grep confirms zero legacy tokens remain. (2) Schema: re-ran node directus/schema/merge-mitsubishi-schema.js against a fresh live snapshot; audit confirmed all 13 required block collections + junction relations + pages.blocks M2A choices (incl. the 4 custom blocks) already present and T&T vehicle collections (vehicles, vehicle_trims, dealers, vehicle_colors) byte-identical/unchanged; 0 diffs. Applied via `directus schema apply merged-mitsubishi-schema.json --yes` (inside the CMS container) -> 'No changes to apply.' (idempotent, non-destructive). (3) CRITICAL FIX in server/api/pages/one.get.ts: the single deep-fetch page query serialized to a ~22KB GET URL, exceeding Node's ~16KB request-line limit -> Directus returned HTTP 431 (no body) -> the catch-all masked it as 500 'Page not found' -> EVERY public page rendered a fatal 404. Rewrote to a two-phase fetch: Phase 1 = page+blocks with lean scalar item fields (~7KB URL); Phase 2 = enrichCustomBlocks() batch-fetches block_content_block + block_layout_wrapper full payloads (nested items, M2A buttons, wrapper sections) only when those blocks are present (~2KB / ~7.5KB URLs) and merges back onto block.item. Final JSON shape identical to a single deep fetch. Also improved the handler's catch to preserve 404s and surface CMS failures as a distinct 500 'Failed to load page content' instead of masking them as 404. Verified live: /, /service, /about, /contact, /showroom/2025-outlander-sport all HTTP 200; /api/pages/one?permalink=/__e2e_test returns block_cta_simple with resolved M2A buttons and block_layout_wrapper with resolved nested section+buttons; a temporary block_content_block linked to the test page returned items with resolved M2A buttons + vehicle, then the test page_block row was removed. (4) Verification from nuxt/: `npm run typecheck` -> 0 errors (fixed pre-existing type debt: typed useFetch<SiteData> in layouts/default.vue, nullable logo/social_links props in NavigationBar/Footer, `id` on NavigationBar Navigation, typed event in SearchModel, aggregate typing in posts/index.get.ts, and the two-phase casts in one.get.ts); `npm run build` -> Build complete (44.8MB / 17.6MB gzip); eslint clean on all changed files.",
     "reference_url": "https://mitsubishi-motors.com.jm/vehicle/2025-outlander-sport/"
   },
   "known_gotchas": [
     "NEVER run 'docker-compose down -v' — it deletes the persistent Postgres volume.",
     "ADMIN_TOKEN is only used on first bootstrap; admin static token is set directly on the user row.",
-    "Directus 12 schema apply requires unwrapped payload with hash or via diff endpoint."
+    "Directus 12.3 schema API: GET /schema/snapshot -> POST /schema/diff?mode=merge (body = target snapshot with version:2 + directus version + vendor) -> POST /schema/apply (body = { hash, diff } exactly as returned by /schema/diff). /schema/state and GET /schema/diff do not exist in 12.x.",
+    "vehicle_trims.key_features uses the list (repeater) interface over an array of {value} objects — legacy plain-string arrays were migrated in place; always write new trims in the {value} shape.",
+    "Public reads are policy-based field WHITELISTS (directus/seeds/seed-permissions.py keeps them in sync): vehicles exposes hero_block/colors/highlights/trims and vehicle_colors has its own read row; `fields=*` returns only whitelisted fields.",
+    "Public /assets/:id delivery requires a public read row on directus_files — added to FULL_READ in directus/seeds/seed-permissions.py (re-run it after seeding new media or re-cloning); without it hero/colour images 403 for anonymous visitors.",
+    "Directus items are GET-only, so a long `fields` list bloats the query string. Node's HTTP server rejects request lines >~16KB with HTTP 431 (empty body). The full page-builder deep-fetch is ~22KB and 431s — ALWAYS use the two-phase fetch in server/api/pages/one.get.ts (lean page query + per-collection batch enrichment) and keep any single items query well under ~15KB. A 431/500 from Directus here used to be masked as a 404 'Page not found'; the handler now rethrows real 404s and surfaces CMS failures as 500 'Failed to load page content'.",
+    "block_content_block.items and block_content_items.vehicle return in `sort` order automatically because their junction relations carry meta.sort_field = sort (no explicit deep _sort needed). block_layout_wrapper_sections has no sort_field — sections are insertion/PK order."
   ]
 }

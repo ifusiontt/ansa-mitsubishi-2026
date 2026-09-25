@@ -15,12 +15,13 @@ const navigationRef = useTemplateRef('navigationRef');
 defineExpose({ navigationRef });
 
 interface Navigation {
+	id: string;
 	items: NavigationItem[];
 }
 
 interface Globals {
-	logo?: string;
-	logo_dark_mode?: string;
+	logo?: string | null;
+	logo_dark_mode?: string | null;
 }
 
 const props = defineProps<{

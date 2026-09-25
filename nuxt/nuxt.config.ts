@@ -21,9 +21,21 @@ export default defineNuxtConfig({
 		'@nuxt/icon',
 		'@nuxtjs/color-mode',
 		'@nuxt/eslint',
+		'nuxt-swiper',
 	],
 
-	css: ['~/assets/css/tailwind.css'],
+	css: ['~/assets/css/main.css'],
+
+	// https://fonts.nuxt.com — Montserrat for display headers (font-display),
+	// Poppins + Inter for body & UI. global: true emits every @font-face in the
+	// shared global stylesheet so header/footer typography loads on all pages.
+	fonts: {
+		families: [
+			{ name: 'Montserrat', weights: [700, 800], subsets: ['latin'], global: true },
+			{ name: 'Poppins', weights: [400, 600], subsets: ['latin'], global: true },
+			{ name: 'Inter', weights: [400, 500, 600], subsets: ['latin'], global: true },
+		],
+	},
 
 	runtimeConfig: {
 		public: {

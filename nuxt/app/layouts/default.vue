@@ -1,9 +1,30 @@
 <script setup lang="ts">
+interface SiteNav {
+	id: string;
+	title: string;
+	url?: string;
+	page?: { permalink: string };
+	children?: SiteNav[];
+}
+
+interface SiteData {
+	globals: {
+		title?: string | null;
+		description?: string | null;
+		logo?: string | null;
+		logo_dark_mode?: string | null;
+		social_links?: { service: string; url: string }[] | null;
+		accent_color?: string | null;
+	};
+	headerNavigation: { id: string; items: SiteNav[] };
+	footerNavigation: { id: string; items: SiteNav[] };
+}
+
 const {
 	data: siteData,
 	error: siteError,
 	refresh,
-} = await useFetch('/api/site-data', {
+} = await useFetch<SiteData>('/api/site-data', {
 	key: 'site-data',
 });
 
@@ -24,7 +45,7 @@ useHead({
 	style: [
 		{
 			id: 'accent-color',
-			innerHTML: `:root { --accent-color: ${unref(siteData)?.globals.accent_color || '#6644ff'} !important; }`,
+			innerHTML: `:root { --accent-color: ${unref(siteData)?.globals.accent_color || '#C3002F'} !important; }`,
 		},
 	],
 	bodyAttrs: {
@@ -56,7 +77,7 @@ onMounted(() => {
 			:navigation="siteData.headerNavigation"
 			:globals="siteData.globals"
 		/>
-		<NuxtPage />
+		<slot />
 		<Footer
 			v-if="siteData?.footerNavigation"
 			ref="footerRef"

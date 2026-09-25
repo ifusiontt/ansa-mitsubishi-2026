@@ -81,18 +81,17 @@ st, d = req('POST', '/items/navigation', [
 print(f'   -> {st} created {len(d["data"])} nav sets')
 
 print('3. navigation items')
-main_items = [
-    {'navigation': 'main', 'sort': 1, 'title': 'Home', 'type': 'url', 'url': '/'},
-    {'navigation': 'main', 'sort': 2, 'title': 'Dealers', 'type': 'url', 'url': '/dealers'},
-    {'navigation': 'main', 'sort': 3, 'title': 'About', 'type': 'url', 'url': '/about'},
-    {'navigation': 'main', 'sort': 4, 'title': 'Contact', 'type': 'url', 'url': '/contact'},
+# All nav links point to local Nuxt routes (see sync-nav-service-parts.py for the live-DB sync)
+nav_links = [
+    (1, 'Home', '/'),
+    (2, 'Showroom', '/showroom/2025-outlander-sport'),
+    (3, 'About', '/about'),
+    (4, 'Service', '/service'),
+    (5, 'Parts', '/parts'),
+    (6, 'Contact', '/contact'),
 ]
-footer_items = [
-    {'navigation': 'footer', 'sort': 1, 'title': 'Home', 'type': 'url', 'url': '/'},
-    {'navigation': 'footer', 'sort': 2, 'title': 'Dealers', 'type': 'url', 'url': '/dealers'},
-    {'navigation': 'footer', 'sort': 3, 'title': 'About', 'type': 'url', 'url': '/about'},
-    {'navigation': 'footer', 'sort': 4, 'title': 'Contact', 'type': 'url', 'url': '/contact'},
-]
+main_items = [{'navigation': 'main', 'sort': s, 'title': t, 'type': 'url', 'url': u} for (s, t, u) in nav_links]
+footer_items = [{'navigation': 'footer', 'sort': s, 'title': t, 'type': 'url', 'url': u} for (s, t, u) in nav_links]
 st, d = req('POST', '/items/navigation_items', main_items + footer_items)
 print(f'   -> {st} created {len(d["data"])} items')
 
@@ -159,6 +158,31 @@ rt_payloads = [
                     '5-Year / 100,000 km manufacturer warranty.</p>'),
     },
     {
+        'tagline': 'Service Centre',
+        'headline': 'Factory-Trained. Factory-Warranty.',
+        'alignment': 'center',
+        'content': ('<p>ANSA Motors service centres in Port of Spain, San Fernando, and Chaguanas are staffed by '
+                    'factory-trained technicians with Mitsubishi diagnostic tooling, covering scheduled maintenance, '
+                    'repairs, and factory-warranty work for every model in the lineup.</p>'
+                    '<p><strong>Scheduled maintenance</strong> — oil changes, brake service, inspections, and '
+                    '5-Year / 100,000 km warranty checks at factory intervals.</p>'
+                    '<p><strong>Book a service</strong> — call +1 (868) 625-7231 (Port of Spain), '
+                    '+1 (868) 657-8271 (San Fernando), or +1 (868) 665-5321 (Chaguanas). '
+                    'Hours: Mon–Fri 8:00 AM – 4:30 PM, Sat 8:30 AM – 12:30 PM.</p>'),
+    },
+    {
+        'tagline': 'Genuine Parts',
+        'headline': 'Genuine Mitsubishi Parts',
+        'alignment': 'center',
+        'content': ('<p>Every ANSA Motors location stocks genuine Mitsubishi parts and accessories — the exact '
+                    'components your vehicle was engineered with, backed by the Mitsubishi warranty.</p>'
+                    '<p><strong>Parts counters</strong> — Port of Spain (Corner Richmond &amp; Duke Streets), San '
+                    'Fernando (Royal Road), and Chaguanas (Brentwood Commercial Center) can supply, fit, and '
+                    'warranty genuine parts for the full lineup.</p>'
+                    '<p><strong>Ordering</strong> — call +1 (868) 625-7231 with your VIN for same-day availability '
+                    'checks, or visit any parts counter Mon–Fri 8:00 AM – 4:30 PM, Sat 8:30 AM – 12:30 PM.</p>'),
+    },
+    {
         'tagline': 'Get in Touch',
         'headline': 'Contact Us',
         'alignment': 'center',
@@ -186,6 +210,10 @@ pages = [
      'seo': {'title': 'Dealers', 'meta_description': 'Find your nearest ANSA Mitsubishi dealer in Port of Spain, San Fernando, or Chaguanas.', 'og_image': None}},
     {'title': 'About', 'permalink': '/about', 'sort': 2, 'status': 'published', 'published_at': now,
      'seo': {'title': 'About', 'meta_description': 'ANSA Mitsubishi — the authorised Mitsubishi distributor in Trinidad and Tobago.', 'og_image': None}},
+    {'title': 'Service', 'permalink': '/service', 'sort': 4, 'status': 'published', 'published_at': now,
+     'seo': {'title': 'Service', 'meta_description': 'Book factory-warranty service at ANSA Motors — Port of Spain, San Fernando, and Chaguanas.', 'og_image': None}},
+    {'title': 'Parts', 'permalink': '/parts', 'sort': 5, 'status': 'published', 'published_at': now,
+     'seo': {'title': 'Parts', 'meta_description': 'Genuine Mitsubishi parts at ANSA Motors Trinidad & Tobago — Port of Spain, San Fernando, and Chaguanas.', 'og_image': None}},
     {'title': 'Contact', 'permalink': '/contact', 'sort': 3, 'status': 'published', 'published_at': now,
      'seo': {'title': 'Contact', 'meta_description': 'Contact ANSA Mitsubishi — phone, email, and dealership hours.', 'og_image': None}},
 ]
@@ -202,6 +230,8 @@ blocks = [
     # dealers / about / contact: richtext pages
     {'page': page_ids[1], 'sort': 1, 'collection': 'block_richtext', 'item': rt_ids[1], 'background': 'light', 'hide_block': False},
     {'page': page_ids[2], 'sort': 1, 'collection': 'block_richtext', 'item': rt_ids[2], 'background': 'light', 'hide_block': False},
+    {'page': page_ids[4], 'sort': 1, 'collection': 'block_richtext', 'item': rt_ids[4], 'background': 'light', 'hide_block': False},
+    {'page': page_ids[5], 'sort': 1, 'collection': 'block_richtext', 'item': rt_ids[5], 'background': 'light', 'hide_block': False},
     {'page': page_ids[3], 'sort': 1, 'collection': 'block_richtext', 'item': rt_ids[3], 'background': 'light', 'hide_block': False},
 ]
 st, d = req('POST', '/items/page_blocks', blocks)

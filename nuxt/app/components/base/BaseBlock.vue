@@ -5,6 +5,10 @@ import Gallery from '~/components/block/Gallery.vue';
 import Pricing from '~/components/block/Pricing.vue';
 import Posts from '~/components/block/Posts.vue';
 import Form from '~/components/block/FormBlock.vue';
+import BlockHeroCustom from '~/components/block/BlockHeroCustom.vue';
+import BlockCtaSimple from '~/components/block/BlockCtaSimple.vue';
+import BlockLayoutWrapper from '~/components/block/BlockLayoutWrapper.vue';
+import ContentBlock from '~/components/block/ContentBlock.vue';
 
 interface BaseBlockProps {
 	block: {
@@ -26,7 +30,16 @@ const components: Record<string, any> = {
 	block_form: Form,
 };
 
-const Component = computed(() => components[props.block.collection] || null);
+const customBlocks: Record<string, any> = {
+	block_hero_custom: BlockHeroCustom,
+	block_cta_simple: BlockCtaSimple,
+	block_layout_wrapper: BlockLayoutWrapper,
+	block_content_block: ContentBlock,
+};
+
+const Component = computed(
+	() => components[props.block.collection] || customBlocks[props.block.collection] || null,
+);
 const componentData = computed(() => props.block.item);
 </script>
 

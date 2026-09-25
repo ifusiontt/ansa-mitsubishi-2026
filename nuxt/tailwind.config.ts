@@ -14,8 +14,11 @@ const config: Config = {
 	theme: {
 		extend: {
 			fontFamily: {
+				/* Display headers — loaded via @nuxt/fonts (weights 700/800) */
+				display: ['Montserrat', 'sans-serif'],
 				heading: ['Poppins', 'sans-serif'],
-				sans: ['Inter', 'sans-serif'],
+				/* Body & UI — Inter primary, Poppins fallback (loaded via @nuxt/fonts) */
+				sans: ['Inter', 'Poppins', 'sans-serif'],
 				code: ['Fira Mono', 'monospace'],
 			},
 			fontSize: {

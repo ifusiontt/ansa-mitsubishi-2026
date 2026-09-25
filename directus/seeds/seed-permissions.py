@@ -37,7 +37,9 @@ BASE = os.environ.get('DIRECTUS_URL', 'http://localhost:8055')
 WHITELIST = {
     'vehicles': ['id', 'title', 'slug', 'tagline', 'hero_headline', 'starting_price',
                  'primary_color', 'brochure_url', 'status', 'model_year', 'category',
-                 'body_type', 'seating_capacity', 'fuel_type', 'warranty', 'overview'],
+                 'body_type', 'seating_capacity', 'fuel_type', 'warranty', 'overview',
+                 'hero_block', 'colors', 'highlights', 'trims'],
+    'vehicle_colors': ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'image'],
     'vehicle_trims': ['id', 'vehicle', 'vehicle_id', 'vehicle_slug', 'trim_name',
                       'status', 'engine', 'transmission', 'drivetrain', 'price',
                       'key_features'],
@@ -51,6 +53,7 @@ WHITELIST = {
 
 # public marketing content -> all fields
 FULL_READ = [
+    'directus_files',  # required for /assets/:id (hero media, colour images, page imagery)
     'navigation', 'navigation_items', 'pages', 'page_blocks',
     'block_hero', 'block_richtext', 'block_button_group', 'block_button',
     'block_gallery', 'block_gallery_items', 'block_posts', 'block_pricing',

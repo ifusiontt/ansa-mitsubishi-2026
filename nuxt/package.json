@@ -63,6 +63,7 @@
 		"lucide-vue-next": "0.487.0",
 		"nuxt": "4.4.2",
 		"nuxt-security": "2.5.1",
+		"nuxt-swiper": "2.0.1",
 		"radix-vue": "1.9.17",
 		"shadcn-nuxt": "2.4.3",
 		"sharp": "0.34.3",
