@@ -19,3 +19,4 @@ dist/
 
 # Seed script local state (uploaded asset ids)
 scripts/.seed-outlander-assets.json
+.tmp/

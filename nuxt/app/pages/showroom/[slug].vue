@@ -692,12 +692,20 @@ useSeoMeta({
 	height: 100%;
 	object-fit: cover;
 	object-position: center;
-	opacity: 0.92;
+	opacity: 1;
 }
 .vp-hero__scrim {
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.25) 45%, rgba(0, 0, 0, 0.85) 100%);
+	/* Lightened lighting: heavy solid-black wash replaced by a subtle bottom-up
+	   gradient (bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent)
+	   so the vehicle stays bright while bottom-aligned copy keeps contrast. */
+	background: linear-gradient(
+		to top,
+		rgba(2, 6, 23, 0.9) 0%,
+		rgba(2, 6, 23, 0.3) 50%,
+		transparent 100%
+	);
 }
 .vp-hero__content {
 	position: relative;
@@ -729,6 +737,10 @@ useSeoMeta({
 	text-transform: uppercase;
 	line-height: 1.15;
 	color: var(--vp-white);
+	/* Crisp over any vehicle colour: tight 1px edge + soft ambient drop shadow */
+	text-shadow:
+		0 1px 2px rgba(2, 6, 23, 0.5),
+		0 2px 20px rgba(2, 6, 23, 0.45);
 }
 .vp-hero__keyword {
 	color: var(--vp-red-bright);
@@ -820,8 +832,7 @@ useSeoMeta({
 
 .vp-highlight-card {
 	position: relative;
-	min-height: 480px;
-	height: 100%;
+	aspect-ratio: 3 / 4; /* consistent card ratio (aspect-[3/4]); grid stretch keeps the trio equal */
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
@@ -864,11 +875,12 @@ useSeoMeta({
 	position: absolute;
 	inset: 0;
 	z-index: 1;
+	/* Reduced scrim (bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent)
+	   — only the text zone is dense, so interior/exterior detail stays sharp. */
 	background: linear-gradient(
 		to top,
-		rgba(0, 0, 0, 0.92) 0%,
-		rgba(0, 0, 0, 0.55) 45%,
-		rgba(0, 0, 0, 0.15) 75%,
+		rgba(2, 6, 23, 1) 0%,
+		rgba(2, 6, 23, 0.4) 50%,
 		transparent 100%
 	);
 	pointer-events: none;
@@ -879,15 +891,17 @@ useSeoMeta({
 	top: 1.25rem;
 	right: 1.25rem;
 	z-index: 2;
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.25rem;
+	min-width: 2.5rem;
 	height: 2.25rem;
-	border-radius: var(--vp-radius-sm);
-	background: rgba(0, 0, 0, 0.55);
-	backdrop-filter: blur(8px);
-	border: 1px solid rgba(255, 255, 255, 0.15);
+	padding-inline: 0.875rem;
+	border-radius: 9999px; /* pill */
+	background: rgba(15, 23, 42, 0.8); /* bg-slate-900/80 */
+	backdrop-filter: blur(8px); /* backdrop-blur */
+	-webkit-backdrop-filter: blur(8px);
+	border: 1px solid rgba(51, 65, 85, 0.5); /* border-slate-700/50 */
 }
 
 .vp-highlight-card__index {
@@ -925,7 +939,7 @@ useSeoMeta({
 .vp-highlight-card__desc {
 	font-size: 0.875rem;
 	line-height: 1.55;
-	color: rgba(255, 255, 255, 0.82);
+	color: #cbd5e1; /* text-slate-300 */
 	margin: 0;
 }
 
@@ -945,14 +959,16 @@ useSeoMeta({
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 3rem 1.5rem 2.5rem;
-	overflow: hidden;
+	padding: 2rem 1.5rem; /* py-8 px-6 around the vehicle cutout card */
 	border-radius: var(--vp-radius);
+	/* Subtle shadow on the slanted panel (drop-shadow-xl). The filter sits on the
+	   stage rather than the clipped shape so the shadow follows the slanted
+	   edges; the skewed accent stays contained by the backdrop's overflow:hidden. */
+	filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.1)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.1));
 }
 @media (min-width: 768px) {
 	.vp-color-showcase__stage {
 		min-height: 480px;
-		padding: 4.5rem 3rem 3.5rem;
 	}
 }
 
@@ -1090,8 +1106,11 @@ useSeoMeta({
 
 .vp-swatch--selected {
 	transform: scale(1.25);
-	outline-color: var(--vp-red);
-	box-shadow: 0 6px 14px rgba(195, 0, 47, 0.35);
+	/* Distinct Mitsubishi Red focus ring: ring-2 ring-[#C3002F] ring-offset-2 */
+	box-shadow:
+		0 2px 6px rgba(0, 0, 0, 0.2),
+		0 0 0 2px var(--vp-white), /* ring-offset-2 (white section backdrop) */
+		0 0 0 4px var(--vp-red); /* ring-2 #C3002F */
 }
 
 .vp-swatch:focus-visible {
@@ -1118,6 +1137,7 @@ useSeoMeta({
 .vp-trim {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between; /* full-height cards; CTA pinned to bottom (margin-top:auto enforces it) */
 	position: relative;
 	background: var(--vp-white);
 	border: 1px solid var(--vp-grey-light);
