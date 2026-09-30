@@ -72,6 +72,18 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 const selectedTrimIdx = ref(0);
 const selectedTrim = computed<VehicleTrim | null>(() => trims.value[selectedTrimIdx.value] ?? null);
 
+// Contact link pre-filled with the vehicle and (once chosen) trim.
+const contactHref = computed(() => {
+	const params = new URLSearchParams({ vehicle: vehicle.slug });
+	if (selectedTrim.value) params.set('trim', selectedTrim.value.trim_name);
+	return `/contact?${params}`;
+});
+
+function selectTrim(index: number) {
+	selectedTrimIdx.value = index;
+	document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function formatPrice(price: number | null | undefined): string {
 	if (price == null) return '';
 	return `TTD ${new Intl.NumberFormat('en-US').format(price)}`;
@@ -368,8 +380,17 @@ useSeoMeta({
 
 						<ul v-if="trim.key_features?.length" class="vp-trim__features">
 							<li v-for="(feature, featureIndex) in trim.key_features" :key="featureIndex">
-								<span class="vp-trim__tick" aria-hidden="true"></span>
-								{{ feature.value }}
+								<svg
+									class="w-4 h-4 text-red-600 shrink-0 mr-2 mt-0.5"
+									viewBox="0 0 20 20"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									aria-hidden="true"
+								>
+									<path d="M4 10.5l4 4 8-9" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+								<span>{{ feature.value }}</span>
 							</li>
 						</ul>
 
@@ -377,10 +398,20 @@ useSeoMeta({
 							type="button"
 							class="vp-btn vp-btn--outline vp-trim__cta tracking-wider uppercase"
 							:class="{ 'vp-trim__cta--selected': index === selectedTrimIdx }"
-							@click.stop="selectedTrimIdx = index"
+							@click.stop="selectTrim(index)"
 						>
 							{{ index === selectedTrimIdx ? `${trim.trim_name} Selected` : `Select ${trim.trim_name}` }}
 						</button>
+						<a
+							v-if="vehicle.brochure_url"
+							:href="vehicle.brochure_url"
+							target="_blank"
+							rel="noopener"
+							class="text-[11px] font-bold tracking-wider text-slate-500 hover:text-slate-900 uppercase text-center block mt-3 transition-colors"
+							@click.stop
+						>
+							Download brochure <span aria-hidden="true">↓</span>
+						</a>
 					</article>
 				</div>
 			</div>
@@ -490,7 +521,7 @@ useSeoMeta({
 				</p>
 				<div class="vp-cta__actions">
 					<Button as="NuxtLink" href="/dealers" class="vp-btn vp-btn--primary tracking-wider uppercase">Visit a Dealer</Button>
-					<Button as="NuxtLink" href="/contact" class="vp-btn vp-btn--ghost tracking-wider uppercase">Contact Sales</Button>
+					<Button as="NuxtLink" :href="contactHref" class="vp-btn vp-btn--ghost tracking-wider uppercase">Contact Sales</Button>
 				</div>
 			</div>
 		</section>
@@ -978,17 +1009,9 @@ useSeoMeta({
 }
 .vp-trim__features li {
 	display: flex;
-	gap: var(--vp-sp-2);
 	font-size: 15px;
 	line-height: 1.4;
 	color: var(--vp-ink);
-}
-.vp-trim__tick {
-	flex: none;
-	width: 0.5rem;
-	height: 0.5rem;
-	margin-top: 0.5rem;
-	background: var(--vp-red);
 }
 .vp-trim__cta {
 	margin-top: auto;
