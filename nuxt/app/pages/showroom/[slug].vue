@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VehicleColor, VehicleHighlight, VehiclePage, VehicleSummary, VehicleTrim } from '#shared/types/vehicle';
+import type { VehicleColor, VehicleHighlight, VehiclePage, VehicleTrim } from '#shared/types/vehicle';
 
 /**
  * /showroom/[slug] — 8-part vehicle page.
@@ -68,24 +68,6 @@ function stepColor(delta: number) {
 }
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
-
-// Vehicle picker for the colour configurator. Falls back to the current
-// vehicle alone if the index request fails, so the section still renders.
-const { data: vehicleIndex } = await useFetch<VehicleSummary[]>('/api/vehicles', {
-	key: 'vehicle-index',
-	default: () => [],
-});
-
-const vehicleOptions = computed<VehicleSummary[]>(() =>
-	vehicleIndex.value?.length ? vehicleIndex.value : [{ id: vehicle.id, slug: vehicle.slug, title: vehicle.title, model_year: vehicle.model_year }],
-);
-
-function onVehiclePick(event: Event) {
-	const nextSlug = (event.target as HTMLSelectElement).value;
-	if (nextSlug && nextSlug !== vehicle.slug) {
-		navigateTo(`/showroom/${encodeURIComponent(nextSlug)}#colors`);
-	}
-}
 
 const selectedTrimIdx = ref(0);
 const selectedTrim = computed<VehicleTrim | null>(() => trims.value[selectedTrimIdx.value] ?? null);
@@ -252,39 +234,13 @@ useSeoMeta({
 				<!-- Left · copy, vehicle picker, CTA -->
 				<div class="flex flex-col justify-center px-6 py-16 sm:px-10 lg:col-span-5 lg:py-24 lg:pl-[max(2.5rem,calc((100vw-1280px)/2+2.5rem))] lg:pr-10">
 					<h2 class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-slate-900">Explore colour options</h2>
-					<p class="text-slate-600 mt-2">Choose the perfect vehicle and colour for your personality and lifestyle.</p>
-
-					<label for="colors-vehicle-picker" class="mt-10 block text-xs font-bold uppercase tracking-widest text-slate-900">
-						Choose your vehicle
-					</label>
-					<div class="relative mt-3 max-w-sm">
-						<select
-							id="colors-vehicle-picker"
-							class="w-full cursor-pointer appearance-none border-0 border-b-2 border-slate-900 bg-transparent py-3 pl-0 pr-10 text-lg font-bold uppercase tracking-wider text-slate-900 focus:outline-none focus:ring-0 focus-visible:border-[#C3002F]"
-							:value="vehicle.slug"
-							@change="onVehiclePick"
-						>
-							<option v-for="option in vehicleOptions" :key="option.id" :value="option.slug">
-								{{ option.title }}
-							</option>
-						</select>
-						<svg
-							class="pointer-events-none absolute right-1 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-900"
-							viewBox="0 0 20 20"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-							aria-hidden="true"
-						>
-							<path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round" />
-						</svg>
-					</div>
+					<p class="text-slate-600 mt-2">Choose the perfect colour for your personality.</p>
 
 					<NuxtLink
-						to="#highlights"
-						class="mt-10 inline-flex w-fit items-center border border-slate-900 px-6 py-3 text-sm font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-900 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2"
+						:to="{ path: '/contact', query: { vehicle: vehicle.slug } }"
+						class="mt-10 inline-block w-fit px-8 py-3.5 border-2 border-slate-900 text-slate-900 font-bold tracking-widest text-xs uppercase hover:bg-slate-900 hover:text-white transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2"
 					>
-						Discover more
+						Book a test drive
 					</NuxtLink>
 				</div>
 
