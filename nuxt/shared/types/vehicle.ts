@@ -85,3 +85,6 @@ export interface VehiclePage {
 	highlights: VehicleHighlight[];
 	trims: VehicleTrim[];
 }
+
+/** Lightweight vehicle index row (GET /api/vehicles) — used by vehicle pickers. */
+export type VehicleSummary = Pick<VehiclePage, 'id' | 'slug' | 'title' | 'model_year'>;

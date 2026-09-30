@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VehicleColor, VehicleHighlight, VehiclePage, VehicleTrim } from '#shared/types/vehicle';
+import type { VehicleColor, VehicleHighlight, VehiclePage, VehicleSummary, VehicleTrim } from '#shared/types/vehicle';
 
 /**
  * /showroom/[slug] — 8-part vehicle page.
@@ -41,7 +41,11 @@ const heroMedia = computed(() => {
 });
 
 const colors = computed<VehicleColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
-const highlights = computed<VehicleHighlight[]>(() => [...(vehicle.highlights ?? [])].sort((a, b) => a.sort - b.sort));
+// Part 3 is a strict 3-up panel row: show only the top 3 highlights by sort order.
+const MAX_HIGHLIGHTS = 3;
+const highlights = computed<VehicleHighlight[]>(() =>
+	[...(vehicle.highlights ?? [])].sort((a, b) => a.sort - b.sort).slice(0, MAX_HIGHLIGHTS),
+);
 const trims = computed<VehicleTrim[]>(() => [...(vehicle.trims ?? [])].sort((a, b) => a.trim_name.localeCompare(b.trim_name)));
 
 const selectedColorIdx = ref(0);
@@ -56,6 +60,32 @@ const activeColorImageUuid = computed(() => {
 
 	return heroMedia.value;
 });
+
+function stepColor(delta: number) {
+	const count = colors.value.length;
+	if (!count) return;
+	selectedColorIdx.value = (selectedColorIdx.value + delta + count) % count;
+}
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+// Vehicle picker for the colour configurator. Falls back to the current
+// vehicle alone if the index request fails, so the section still renders.
+const { data: vehicleIndex } = await useFetch<VehicleSummary[]>('/api/vehicles', {
+	key: 'vehicle-index',
+	default: () => [],
+});
+
+const vehicleOptions = computed<VehicleSummary[]>(() =>
+	vehicleIndex.value?.length ? vehicleIndex.value : [{ id: vehicle.id, slug: vehicle.slug, title: vehicle.title, model_year: vehicle.model_year }],
+);
+
+function onVehiclePick(event: Event) {
+	const nextSlug = (event.target as HTMLSelectElement).value;
+	if (nextSlug && nextSlug !== vehicle.slug) {
+		navigateTo(`/showroom/${encodeURIComponent(nextSlug)}#colors`);
+	}
+}
 
 const selectedTrimIdx = ref(0);
 const selectedTrim = computed<VehicleTrim | null>(() => trims.value[selectedTrimIdx.value] ?? null);
@@ -168,96 +198,155 @@ useSeoMeta({
 		</section>
 
 		<!-- ════════════════════════════════════════════════════════════
-		     PART 3 · HIGHLIGHTS — 3-column visual highlights grid
+		     PART 3 · HIGHLIGHTS — full-bleed 3-up expandable panels
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="highlights" class="vp-section vp-section--mist" aria-label="Vehicle highlights">
-			<div class="vp-container">
-				<header class="vp-section-head">
-					<p class="vp-tagline tracking-wider uppercase">Key Highlights</p>
-					<h2 class="vp-h2 tracking-wider uppercase">Engineered to Excel</h2>
-				</header>
-				<div class="vp-highlights-grid">
-					<article
-						v-for="(highlight, index) in highlights"
-						:key="highlight.id"
-						class="vp-highlight-card group"
+		<section id="highlights" class="bg-white pb-16 md:pb-20" aria-labelledby="highlights-heading">
+			<h2 id="highlights-heading" class="sr-only">{{ vehicle.title }} highlights</h2>
+			<div class="flex w-full flex-col gap-3 rounded-xl bg-slate-950 p-2 md:flex-row md:gap-2 md:min-h-[560px] lg:min-h-[620px]">
+				<article
+					v-for="(highlight, index) in highlights"
+					:key="highlight.id"
+					class="group relative w-full flex-none h-[240px] md:h-auto md:flex-1 overflow-hidden bg-slate-950 transition-all duration-500 ease-out md:hover:flex-[1.35]"
+				>
+					<DirectusImage
+						v-if="highlightImageUuid(highlight)"
+						:uuid="highlightImageUuid(highlight)"
+						:alt="highlight.headline || highlight.tagline || vehicle.title"
+						class="absolute inset-0 object-cover w-full h-full transform scale-100 group-hover:scale-105 transition-transform duration-700"
+					/>
+					<div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" aria-hidden="true" />
+
+					<span
+						class="absolute right-5 top-5 z-10 rounded-full bg-slate-900/80 backdrop-blur-md px-3 py-1 text-xs font-bold tracking-widest text-white"
+						aria-hidden="true"
 					>
-						<div class="vp-highlight-card__bg-wrap">
-							<DirectusImage
-								v-if="highlightImageUuid(highlight)"
-								:uuid="highlightImageUuid(highlight)"
-								:alt="highlight.headline || highlight.tagline || vehicle.title"
-								class="vp-highlight-card__img"
-							/>
-							<div v-else class="vp-highlight-card__fallback-bg" />
-						</div>
-						<div class="vp-highlight-card__overlay" aria-hidden="true" />
-						<div class="vp-highlight-card__top-badge" aria-hidden="true">
-							<span class="vp-highlight-card__index tracking-wider uppercase">{{ String(index + 1).padStart(2, '0') }}</span>
-						</div>
-						<div class="vp-highlight-card__content">
-							<p v-if="highlight.tagline" class="vp-tagline vp-tagline--on-dark tracking-wider uppercase">
-								{{ highlight.tagline }}
-							</p>
-							<h3 v-if="highlight.headline" class="vp-highlight-card__headline tracking-wider uppercase">
-								{{ highlight.headline }}
-							</h3>
-							<p v-if="highlight.description" class="vp-body vp-body--on-dark vp-highlight-card__desc">
-								{{ highlight.description }}
-							</p>
-						</div>
-					</article>
-				</div>
+						{{ pad2(index + 1) }}
+					</span>
+
+					<div class="relative z-10 p-6 lg:p-8 flex flex-col justify-end h-full">
+						<p v-if="highlight.tagline" class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">
+							{{ highlight.tagline }}
+						</p>
+						<h3 v-if="highlight.headline" class="text-xl lg:text-2xl font-bold uppercase tracking-wider text-white mb-3">
+							{{ highlight.headline }}
+						</h3>
+						<p v-if="highlight.description" class="text-slate-300 text-sm leading-relaxed max-w-md opacity-90 transition-opacity duration-300">
+							{{ highlight.description }}
+						</p>
+						<NuxtLink
+							to="#specs"
+							class="inline-flex w-fit items-center text-xs font-bold tracking-widest uppercase text-white mt-4 border-b border-white/30 pb-1 group-hover:border-red-500 transition-colors focus:outline-none focus-visible:border-red-500"
+						>
+							Learn more <span class="ml-2" aria-hidden="true">→</span>
+						</NuxtLink>
+					</div>
+				</article>
 			</div>
 		</section>
 
 		<!-- ════════════════════════════════════════════════════════════
-		     PART 4 · COLORS — interactive exterior colour selector
+		     PART 4 · COLORS — 2-column slanted mini-configurator
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="colors" class="vp-section vp-section--white" aria-label="Exterior colours">
-			<div class="vp-container">
-				<header class="vp-section-head vp-section-head--center">
-					<p class="vp-tagline tracking-wider uppercase">Exterior Palette</p>
-					<h2 class="vp-h2 tracking-wider uppercase">Colours</h2>
-				</header>
+		<section id="colors" class="relative isolate overflow-hidden bg-white pt-8 md:pt-12" aria-label="Exterior colours">
+			<div class="grid lg:grid-cols-12 lg:min-h-[600px]">
+				<!-- Left · copy, vehicle picker, CTA -->
+				<div class="flex flex-col justify-center px-6 py-16 sm:px-10 lg:col-span-5 lg:py-24 lg:pl-[max(2.5rem,calc((100vw-1280px)/2+2.5rem))] lg:pr-10">
+					<h2 class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-slate-900">Explore colour options</h2>
+					<p class="text-slate-600 mt-2">Choose the perfect vehicle and colour for your personality and lifestyle.</p>
 
-				<div class="vp-color-showcase">
-					<!-- Angled background slash container stage -->
-					<div class="vp-color-showcase__stage">
-						<div class="vp-color-showcase__slash-backdrop" aria-hidden="true">
-							<div class="vp-color-showcase__slash-shape" />
-							<div class="vp-color-showcase__slash-accent" />
-						</div>
-
-						<!-- Centered active color variant car image -->
-						<div class="vp-color-showcase__car-wrap">
-							<DirectusImage
-								v-if="activeColorImageUuid"
-								:uuid="activeColorImageUuid"
-								:alt="`${vehicle.title} in ${selectedColor?.color_name ?? ''}`"
-								class="vp-color-showcase__car-img"
-							/>
-							<div class="vp-color-showcase__car-shadow" aria-hidden="true" />
-						</div>
+					<label for="colors-vehicle-picker" class="mt-10 block text-xs font-bold uppercase tracking-widest text-slate-900">
+						Choose your vehicle
+					</label>
+					<div class="relative mt-3 max-w-sm">
+						<select
+							id="colors-vehicle-picker"
+							class="w-full cursor-pointer appearance-none border-0 border-b-2 border-slate-900 bg-transparent py-3 pl-0 pr-10 text-lg font-bold uppercase tracking-wider text-slate-900 focus:outline-none focus:ring-0 focus-visible:border-[#C3002F]"
+							:value="vehicle.slug"
+							@change="onVehiclePick"
+						>
+							<option v-for="option in vehicleOptions" :key="option.id" :value="option.slug">
+								{{ option.title }}
+							</option>
+						</select>
+						<svg
+							class="pointer-events-none absolute right-1 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-900"
+							viewBox="0 0 20 20"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							aria-hidden="true"
+						>
+							<path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
 					</div>
 
-					<!-- Color details and swatches centered below car -->
-					<div class="vp-color-showcase__controls">
-						<div class="vp-color-showcase__info">
-							<p v-if="selectedColor" class="vp-swatch-name tracking-wider uppercase">
-								{{ selectedColor.color_name }}
-							</p>
-							<p v-if="selectedColor" class="vp-swatch-hex tracking-widest uppercase">
-								{{ selectedColor.hex_code }}
-							</p>
+					<NuxtLink
+						to="#highlights"
+						class="mt-10 inline-flex w-fit items-center border border-slate-900 px-6 py-3 text-sm font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-900 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2"
+					>
+						Discover more
+					</NuxtLink>
+				</div>
+
+				<!-- Right · dark slanted visualizer canvas -->
+				<div class="relative flex flex-col items-center justify-center px-6 pb-12 pt-10 lg:col-span-7 lg:py-16 lg:pl-[12%] lg:pr-10">
+					<!-- Slanted backdrop, tinted toward the active colour. The tint layer
+					     paints its gradient from `currentColor` so the 500ms colour transition
+					     actually animates (gradients themselves aren't transitionable). -->
+					<div
+						class="absolute inset-0 bg-[#121316] lg:[clip-path:polygon(20%_0,100%_0,100%_100%,0%_100%)]"
+						aria-hidden="true"
+					>
+						<div
+							class="absolute inset-0 bg-[linear-gradient(135deg,currentColor_0%,transparent_75%)] opacity-[0.16] transition-colors duration-500"
+							:style="{ color: selectedColor?.hex_code || '#121316' }"
+						/>
+					</div>
+
+					<!-- Vehicle render + ground shadow -->
+					<div class="relative z-10 w-full max-w-3xl">
+						<DirectusImage
+							v-if="activeColorImageUuid"
+							:key="activeColorImageUuid"
+							:uuid="activeColorImageUuid"
+							:alt="`${vehicle.title} in ${selectedColor?.color_name ?? ''}`"
+							class="relative z-10 mx-auto max-h-[360px] w-full object-contain drop-shadow-[0_24px_30px_rgba(0,0,0,0.55)]"
+						/>
+						<div
+							class="mx-auto -mt-6 h-8 w-4/5 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.75)_0%,rgba(0,0,0,0.3)_45%,transparent_72%)] blur-sm"
+							aria-hidden="true"
+						/>
+					</div>
+
+					<!-- Controls -->
+					<div v-if="colors.length" class="relative z-10 mt-8 flex flex-col items-center text-center text-white">
+						<div class="flex items-center gap-4 text-sm font-bold tracking-widest">
+							<button
+								type="button"
+								class="grid h-8 w-8 place-items-center rounded-full text-white/70 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+								aria-label="Previous colour"
+								@click="stepColor(-1)"
+							>
+								<svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+									<path d="M12.5 5l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</button>
+							<span aria-live="polite">
+								{{ pad2(selectedColorIdx + 1) }}<span class="text-white/50">/{{ pad2(colors.length) }}</span>
+							</span>
+							<button
+								type="button"
+								class="grid h-8 w-8 place-items-center rounded-full text-white/70 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+								aria-label="Next colour"
+								@click="stepColor(1)"
+							>
+								<svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+									<path d="M7.5 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</button>
 						</div>
 
-						<div
-							v-if="colors.length"
-							class="vp-swatch-row"
-							role="radiogroup"
-							aria-label="Exterior colours"
-						>
+						<div class="mt-5 flex flex-wrap items-center justify-center gap-4" role="radiogroup" aria-label="Exterior colours">
 							<button
 								v-for="(color, index) in colors"
 								:key="color.id"
@@ -265,17 +354,18 @@ useSeoMeta({
 								role="radio"
 								:aria-checked="index === selectedColorIdx"
 								:aria-label="color.color_name"
-								class="vp-swatch"
-								:class="{
-									'vp-swatch--selected': index === selectedColorIdx,
-									'vp-swatch--light': /^#(fff|FFF|f{6}|F{6})$/.test(color.hex_code),
-								}"
+								class="h-7 w-7 rounded-full shadow-md transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+								:class="index === selectedColorIdx ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-slate-950' : 'hover:scale-110'"
 								:style="{ background: color.hex_code }"
 								@click="selectedColorIdx = index"
 							>
 								<span class="sr-only">{{ color.color_name }}</span>
 							</button>
 						</div>
+
+						<p v-if="selectedColor" class="mt-6 text-lg font-bold uppercase tracking-widest md:text-xl">
+							{{ selectedColor.color_name }}
+						</p>
 					</div>
 				</div>
 			</div>
@@ -816,306 +906,6 @@ useSeoMeta({
 	font-size: var(--vp-fs-base);
 	font-weight: 700;
 	color: var(--vp-ink);
-}
-
-/* ════════════════ PART 3 · HIGHLIGHTS (3-Column Visual Grid) ════════════════ */
-.vp-highlights-grid {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: var(--vp-gap-xl);
-}
-@media (min-width: 768px) {
-	.vp-highlights-grid {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
-}
-
-.vp-highlight-card {
-	position: relative;
-	aspect-ratio: 3 / 4; /* consistent card ratio (aspect-[3/4]); grid stretch keeps the trio equal */
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	overflow: hidden;
-	border-radius: var(--vp-radius);
-	background: #0d0f12;
-	box-shadow: var(--vp-shadow-natural);
-	transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
-}
-.vp-highlight-card:hover {
-	transform: translateY(-4px);
-	box-shadow: var(--vp-shadow-card), 0 20px 30px -10px rgba(0, 0, 0, 0.35);
-}
-
-.vp-highlight-card__bg-wrap {
-	position: absolute;
-	inset: 0;
-	z-index: 0;
-	overflow: hidden;
-}
-
-.vp-highlight-card__img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	object-position: center;
-	transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.vp-highlight-card:hover .vp-highlight-card__img {
-	transform: scale(1.06);
-}
-
-.vp-highlight-card__fallback-bg {
-	width: 100%;
-	height: 100%;
-	background: radial-gradient(circle at 50% 30%, #1e242c 0%, #0b0d10 100%);
-}
-
-.vp-highlight-card__overlay {
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	/* Reduced scrim (bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent)
-	   — only the text zone is dense, so interior/exterior detail stays sharp. */
-	background: linear-gradient(
-		to top,
-		rgba(2, 6, 23, 1) 0%,
-		rgba(2, 6, 23, 0.4) 50%,
-		transparent 100%
-	);
-	pointer-events: none;
-}
-
-.vp-highlight-card__top-badge {
-	position: absolute;
-	top: 1.25rem;
-	right: 1.25rem;
-	z-index: 2;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 2.5rem;
-	height: 2.25rem;
-	padding-inline: 0.875rem;
-	border-radius: 9999px; /* pill */
-	background: rgba(15, 23, 42, 0.8); /* bg-slate-900/80 */
-	backdrop-filter: blur(8px); /* backdrop-blur */
-	-webkit-backdrop-filter: blur(8px);
-	border: 1px solid rgba(51, 65, 85, 0.5); /* border-slate-700/50 */
-}
-
-.vp-highlight-card__index {
-	font-family: var(--vp-font-heading);
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: var(--vp-label-track);
-	color: rgba(255, 255, 255, 0.85);
-}
-
-.vp-highlight-card__content {
-	position: relative;
-	z-index: 2;
-	padding: 2.25rem 1.75rem 2rem;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-}
-
-.vp-highlight-card__content .vp-tagline {
-	margin-bottom: 0.5rem;
-}
-
-.vp-highlight-card__headline {
-	margin: 0 0 0.75rem;
-	font-family: var(--vp-font-heading);
-	font-size: 1.25rem;
-	font-weight: var(--vp-fw-bold);
-	line-height: 1.25;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-	color: var(--vp-white);
-}
-
-.vp-highlight-card__desc {
-	font-size: 0.875rem;
-	line-height: 1.55;
-	color: #cbd5e1; /* text-slate-300 */
-	margin: 0;
-}
-
-/* ════════════════ PART 4 · COLORS (Angled Slash Stage) ════════════════ */
-.vp-color-showcase {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-}
-
-.vp-color-showcase__stage {
-	position: relative;
-	width: 100%;
-	min-height: 380px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 2rem 1.5rem; /* py-8 px-6 around the vehicle cutout card */
-	border-radius: var(--vp-radius);
-	/* Subtle shadow on the slanted panel (drop-shadow-xl). The filter sits on the
-	   stage rather than the clipped shape so the shadow follows the slanted
-	   edges; the skewed accent stays contained by the backdrop's overflow:hidden. */
-	filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.1)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.1));
-}
-@media (min-width: 768px) {
-	.vp-color-showcase__stage {
-		min-height: 480px;
-	}
-}
-
-.vp-color-showcase__slash-backdrop {
-	position: absolute;
-	inset: 0;
-	z-index: 0;
-	pointer-events: none;
-	overflow: hidden;
-}
-
-.vp-color-showcase__slash-shape {
-	position: absolute;
-	inset: 0;
-	background: linear-gradient(125deg, #f8f9fa 0%, #edf0f4 45%, #e2e6eb 100%);
-	clip-path: polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%);
-	border-radius: var(--vp-radius);
-	box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-@media (max-width: 640px) {
-	.vp-color-showcase__slash-shape {
-		clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-	}
-}
-
-.vp-color-showcase__slash-accent {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	right: 6%;
-	width: 6px;
-	background: var(--vp-red);
-	transform: skewX(-14deg);
-	opacity: 0.85;
-}
-@media (max-width: 640px) {
-	.vp-color-showcase__slash-accent {
-		display: none;
-	}
-}
-
-.vp-color-showcase__car-wrap {
-	position: relative;
-	z-index: 1;
-	width: 100%;
-	max-width: 820px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.vp-color-showcase__car-img {
-	width: 100%;
-	max-height: 380px;
-	object-fit: contain;
-	filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.2));
-	transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-}
-
-.vp-color-showcase__car-shadow {
-	width: 85%;
-	height: 28px;
-	margin-top: -12px;
-	background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.12) 45%, transparent 70%);
-	border-radius: 50%;
-	filter: blur(4px);
-}
-
-.vp-color-showcase__controls {
-	position: relative;
-	z-index: 1;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	text-align: center;
-	margin-top: 2rem;
-}
-
-.vp-color-showcase__info {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	margin-bottom: 1.25rem;
-}
-
-.vp-swatch-name {
-	margin: 0;
-	font-family: var(--vp-font-heading);
-	font-size: 1rem;
-	font-weight: 700;
-	letter-spacing: var(--vp-label-track);
-	text-transform: uppercase;
-	color: var(--vp-ink);
-}
-
-.vp-swatch-hex {
-	margin: 0.25rem 0 0;
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: 0.1em;
-	color: var(--vp-grey);
-}
-
-.vp-swatch-row {
-	display: flex;
-	align-items: center;
-	gap: 1.25rem;
-}
-
-.vp-swatch {
-	width: 34px;
-	height: 34px;
-	padding: 0;
-	border: 2px solid var(--vp-white);
-	border-radius: 100%;
-	cursor: pointer;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2);
-	outline: 2px solid transparent;
-	outline-offset: 2px;
-	transition:
-		transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-		outline-color 0.25s ease,
-		box-shadow 0.25s ease;
-}
-
-.vp-swatch--light {
-	border-color: var(--vp-grey-light);
-}
-
-.vp-swatch:hover {
-	transform: scale(1.18);
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-}
-
-.vp-swatch--selected {
-	transform: scale(1.25);
-	/* Distinct Mitsubishi Red focus ring: ring-2 ring-[#C3002F] ring-offset-2 */
-	box-shadow:
-		0 2px 6px rgba(0, 0, 0, 0.2),
-		0 0 0 2px var(--vp-white), /* ring-offset-2 (white section backdrop) */
-		0 0 0 4px var(--vp-red); /* ring-2 #C3002F */
-}
-
-.vp-swatch:focus-visible {
-	outline-color: var(--vp-red);
-	outline-offset: 3px;
 }
 
 /* ════════════════ PART 5 · TRIMS ════════════════ */
