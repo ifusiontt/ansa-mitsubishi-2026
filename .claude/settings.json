@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(directus/.env)",
+      "Read(directus/.env.*)",
+      "Edit(directus/.env)",
+      "Edit(directus/.env.*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Read(.tmp/**)",
+      "Edit(.tmp/**)",
+      "Read(content-raw/**)",
+      "Edit(content-raw/**)",
+      "Read(graphify-out/**)",
+      "Edit(graphify-out/**)",
+      "Read(*.sql)",
+      "Read(*.sql.gz)",
+      "Read(*.sqlite)",
+      "Read(*.db)",
+      "Read(node_modules/**)",
+      "Read(nuxt/node_modules/**)",
+      "Read(directus/node_modules/**)"
+    ],
+    "allow": [
+      "Bash(npm run typecheck)",
+      "Bash(npm run dev)",
+      "Bash(node scripts/*)",
+      "Bash(python3 directus/seeds/*)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)"
+    ]
+  }
+}
