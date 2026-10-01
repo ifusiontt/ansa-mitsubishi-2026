@@ -9,6 +9,8 @@ Field model (Directus 12): `fields` is a WHITELIST.
   - explicit list = only those fields
 
 `globals` holds secrets (openai_api_key, directus_url) -> strict whitelist.
+`forms` -> whitelist WITHOUT `emails` (notification recipients/templates are only
+read server-side by /api/forms/submit with the server token) or `submissions`.
 Deliberately NOT public: ai_prompts, form_submissions, form_submission_values, website.
 """
 import json
@@ -49,6 +51,8 @@ WHITELIST = {
                 'opening_hours', 'services'],
     'globals': ['id', 'title', 'url', 'logo', 'logo_dark_mode', 'favicon',
                 'accent_color', 'tagline', 'description', 'social_links'],
+    'forms': ['id', 'title', 'is_active', 'sort', 'submit_label', 'on_success',
+              'success_message', 'success_redirect_url', 'fields'],
 }
 
 # public marketing content -> all fields
@@ -62,7 +66,7 @@ FULL_READ = [
     'block_cta_simple',
     'block_cta_simple_buttons', 'block_hero_custom', 'block_hero_custom_files',
     'block_layout_wrapper', 'block_layout_wrapper_sections',
-    'posts', 'redirects', 'forms', 'form_fields',
+    'posts', 'redirects', 'form_fields',
 ]
 
 
@@ -86,8 +90,10 @@ def main():
     print('public policy:', public_policy)
 
     st, d = req('GET', '/permissions?limit=-1')
+    # Only the public policy's rows: other policies' rules must never be patched here.
     existing = {(p['collection'], p['action']): p['id']
-                for p in d['data'] if p.get('id') is not None and not p.get('system')}
+                for p in d['data']
+                if p.get('id') is not None and not p.get('system') and p.get('policy') == public_policy}
 
     created, patched, failed = 0, 0, []
     for coll, fields in list(WHITELIST.items()) + [(c, ['*']) for c in FULL_READ]:
