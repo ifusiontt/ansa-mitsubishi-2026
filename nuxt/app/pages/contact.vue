@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Form, FormField } from '#shared/types/schema';
+import type { Dealer, Form, FormField } from '#shared/types/schema';
 import FormBuilder from '~/components/forms/FormBuilder.vue';
+import DealershipMap from '~/components/shared/DealershipMap.vue';
 
 /**
  * /contact — renders the active "Contact" form from the Directus `forms` collection.
@@ -23,6 +24,9 @@ const { data: form } = await useFetch<Form>('/api/forms/one', {
 	key: 'form-contact',
 	query: { title: CONTACT_FORM_TITLE },
 });
+
+// Branch locations are supplementary: a failed fetch just hides the map.
+const { data: dealers } = await useFetch<Dealer[]>('/api/dealers', { key: 'dealers', default: () => [] });
 
 const fields = computed(() => (form.value?.fields ?? []).filter((field): field is FormField => typeof field !== 'string'));
 
@@ -112,6 +116,10 @@ useSeoMeta({
 						The contact form is currently unavailable. Please call or visit your nearest ANSA Mitsubishi dealership.
 					</div>
 				</div>
+			</div>
+
+			<div v-if="dealers?.length" class="mt-16 md:mt-24">
+				<DealershipMap :dealers="dealers" />
 			</div>
 		</Container>
 	</section>
