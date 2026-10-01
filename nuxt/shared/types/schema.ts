@@ -621,6 +621,8 @@ export interface VehicleColor {
 	color_name: string;
 	/** @description Hex color code, e.g. #003399 */
 	hex_code?: string | null;
+	/** @description Manufacturer paint code, e.g. U28 */
+	color_code?: string | null;
 	/** @description Paint swatch / exterior photo */
 	image?: DirectusFile | string | null;
 }

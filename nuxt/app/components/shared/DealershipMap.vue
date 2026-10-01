@@ -327,6 +327,12 @@ onBeforeUnmount(() => {
 	scrollbar-color: #262626 transparent;
 }
 
+/* Pull Esri's charcoal canvas down to the page's #000 while keeping land outlines legible.
+   Only the tile pane is filtered, so the red markers keep their full brightness. */
+:deep(.leaflet-tile-pane) {
+	filter: brightness(0.6) contrast(1.25) grayscale(0.2);
+}
+
 :deep(.dealer-pin) {
 	background: transparent;
 	border: 0;

@@ -21,7 +21,7 @@
  *   2. Uploads the model's optimised renders to a same-named Directus folder
  *      (Triton, Xpander Cross) — web formats only (jpg/jpeg/webp, no .psd/.tif).
  *   3. Creates/links a hero block (block_hero_custom, hero_immersive/dark_industrial).
- *   4. Upserts vehicle_colors (idempotent by vehicle + color_name), linking
+ *   4. Upserts vehicle_colors (idempotent by vehicle + color_code, falling back to color_name), linking
  *      exterior renders where a matching paint-code render exists.
  *   5. Creates a "Key Highlights" parent block (block_content_block) plus one
  *      block_content_items row per highlight, each linked to an image through
@@ -40,7 +40,7 @@
  *
  * Idempotent: safe to re-run. Files are tracked in scripts/.seed-remaining-assets.json
  * (this build 403s GET /items/directus_files, so the state file is the source
- * of truth for "already uploaded"); colors by (vehicle, color_name); highlights
+ * of truth for "already uploaded"); colors by (vehicle, color_code | color_name); highlights
  * by (vehicle, sort); trims by (vehicle, trim_name); hero blocks and content
  * blocks are looked up before creating.
  *
@@ -120,8 +120,10 @@ const VEHICLES = [
 			{ sort: 1, color_name: 'Deep Bronze Metallic', hex_code: '#4A3B32' },
 			{ sort: 2, color_name: 'Impuls Blue', hex_code: '#0047AB' },
 			{ sort: 3, color_name: 'Yamabuki Orange Metallic', hex_code: '#D86B27' },
-			{ sort: 4, color_name: 'Graphite Gray Metallic', hex_code: '#4A4D4E', image: 'Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U28_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 5, color_name: 'Blade Silver Metallic', hex_code: '#C0C0C0', image: 'Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U33_Mid-Resolution-JPEG-rev-1.jpeg' },
+			{ sort: 4, color_name: 'Graphite Gray', hex_code: '#4A4D52', color_code: 'U28', image: 'Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U28_Mid-Resolution-JPEG-rev-1.jpeg' },
+			{ sort: 5, color_name: 'Blade Silver', hex_code: '#B3B7BB', color_code: 'U33', image: 'Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U33_Mid-Resolution-JPEG-rev-1.jpeg' },
+			{ sort: 6, color_name: 'Jet Black Mica', hex_code: '#1C1D21', color_code: 'X37' }, // no Triton X37 render
+			{ sort: 7, color_name: 'White Diamond', hex_code: '#F2F4F5', color_code: 'W81' }, // no Triton W81 render
 		],
 		blockTagline: 'Triton Key Highlights',
 		highlights: [
@@ -216,11 +218,11 @@ const VEHICLES = [
 		},
 		colors: [
 			{ sort: 1, color_name: 'Green Bronze Metallic', hex_code: '#4B5320', image: 'Xpander Cross_RHD_Front_Right/26MY_XS_Exterior_front-right_RHD_C31_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 2, color_name: 'Quartz White Pearl', hex_code: '#F5F5F5', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_W81_Mid-Resolution-JPEG-rev-1 (1).jpeg' },
-			{ sort: 3, color_name: 'Blade Silver Metallic', hex_code: '#C0C0C0', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_U33_Mid-Resolution-JPEG-rev-1 (1).jpeg' },
+			{ sort: 2, color_name: 'Quartz White Pearl', hex_code: '#F0F2F3', color_code: 'W81', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_W81_Mid-Resolution-JPEG-rev-1 (1).jpeg' },
+			{ sort: 3, color_name: 'Blade Silver Metallic', hex_code: '#B2B6BA', color_code: 'U33', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_U33_Mid-Resolution-JPEG-rev-1 (1).jpeg' },
 			{ sort: 4, color_name: 'Graphite Gray Metallic', hex_code: '#4A4D4E', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_U28_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 5, color_name: 'Jet Black Mica', hex_code: '#1A1A1A', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_X37_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 6, color_name: 'Sunrise Orange Metallic', hex_code: '#E65100', image: 'Xpander Cross_RHD_Rear_Right/26MY_XS_Exterior_rear-right_RHD_M13_Mid-Resolution-JPEG-rev-1.jpeg' },
+			{ sort: 5, color_name: 'Jet Black Mica', hex_code: '#18191B', color_code: 'X37', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_X37_Mid-Resolution-JPEG-rev-1.jpeg' },
+			{ sort: 6, color_name: 'Sunrise Orange', hex_code: '#C8501E', color_code: 'M38', image: 'Xpander Cross_RHD_Rear_Right/26MY_XS_Exterior_rear-right_RHD_M13_Mid-Resolution-JPEG-rev-1.jpeg' },
 		],
 		blockTagline: 'Xpander Cross Key Highlights',
 		highlights: [
@@ -599,25 +601,35 @@ async function ensureHero(vehicle, row) {
 // ---------------------------------------------------------------------------
 
 async function ensureColors(vehicle, row) {
-	const existing = await api('GET', '/items/vehicle_colors', undefined, {
-		'filter[vehicle_id][_eq]': row.id,
-		fields: 'id,sort,color_name,hex_code,image',
+	// SEARCH (query in the body): a stale cached GET here would miss rows and create duplicates.
+	const existing = await api('SEARCH', '/items/vehicle_colors', {
+		query: {
+			filter: { vehicle_id: { _eq: row.id } },
+			fields: ['id', 'sort', 'color_name', 'hex_code', 'color_code', 'image'],
+			limit: -1,
+		},
 	});
-	const byName = new Map((existing.data ?? []).map((c) => [c.color_name, c]));
+	const rows = existing.data ?? [];
+	const byName = new Map(rows.map((c) => [c.color_name, c]));
+	// Paint codes are stable across renames (see directus/seeds/vehicle-colors.mjs), so match on them first.
+	const byCode = new Map(rows.filter((c) => c.color_code).map((c) => [c.color_code, c]));
 	for (const spec of vehicle.colors) {
 		const imgId = spec.image ? fileByRel(vehicle, spec.image) : null;
-		const current = byName.get(spec.color_name);
+		const current = (spec.color_code && byCode.get(spec.color_code)) || byName.get(spec.color_name);
 		const payload = {
 			vehicle_id: row.id,
 			sort: spec.sort,
 			color_name: spec.color_name,
 			hex_code: spec.hex_code,
+			...(spec.color_code ? { color_code: spec.color_code } : {}),
 			...(imgId ? { image: imgId } : {}),
 		};
 		if (current) {
 			const changed =
 				current.sort !== spec.sort ||
+				current.color_name !== spec.color_name ||
 				current.hex_code !== spec.hex_code ||
+				(spec.color_code ?? null) !== (current.color_code ?? null) ||
 				String(current.image ?? null) !== String(imgId ?? null);
 			if (changed) {
 				await api('PATCH', `/items/vehicle_colors/${current.id}`, payload);

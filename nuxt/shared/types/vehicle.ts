@@ -36,6 +36,8 @@ export interface VehicleColor {
 	vehicle_id: number | null;
 	color_name: string;
 	hex_code: string;
+	/** Manufacturer paint code, e.g. U28 */
+	color_code?: string | null;
 	image: VehicleFileRef | null;
 }
 
