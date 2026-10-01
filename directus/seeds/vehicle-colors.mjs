@@ -15,9 +15,8 @@
  * Colors not in the palette (e.g. Triton "Deep Bronze Metallic") are left as-is.
  * Idempotent: a rerun matches every entry by code and changes nothing.
  *
- * NOTE: scripts/seed-remaining-vehicles.mjs upserts colors by (vehicle, color_name)
- * using the older "... Metallic" names; rerunning it after this script would
- * recreate those rows alongside the renamed ones.
+ * scripts/seed-remaining-vehicles.mjs carries the same names / hexes / codes and
+ * upserts by color_code first, so the two scripts can be rerun in either order.
  *
  * Usage:  node directus/seeds/vehicle-colors.mjs
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
