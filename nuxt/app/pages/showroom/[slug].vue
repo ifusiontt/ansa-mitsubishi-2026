@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 import type { VehicleColor, VehicleHighlight, VehiclePage, VehicleTrim } from '#shared/types/vehicle';
 
 /**
@@ -29,6 +30,9 @@ if (!vehicleData.value || error.value) {
 
 const vehicle = vehicleData.value;
 
+// Model name without the brand prefix ("Mitsubishi Triton" → "Triton") for headlines.
+const displayTitle = vehicle.title.replace(/^mitsubishi\s+/i, '');
+
 /* ------------------------------------------------------------------ */
 /* derived state                                                       */
 /* ------------------------------------------------------------------ */
@@ -39,6 +43,10 @@ const heroMedia = computed(() => {
 	if (!media) return '';
 	return typeof media === 'string' ? media : media.id ?? '';
 });
+
+// Optional background video (vehicles.hero_video_url); falls back to heroMedia.
+const heroVideoUrl = computed(() => vehicle.hero_video_url || '');
+const heroKicker = computed(() => [vehicle.model_year, vehicle.category].filter(Boolean).join(' '));
 
 const colors = computed<VehicleColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
 // Part 3 is a strict 3-up panel row: show only the top 3 highlights by sort order.
@@ -72,22 +80,63 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 const selectedTrimIdx = ref(0);
 const selectedTrim = computed<VehicleTrim | null>(() => trims.value[selectedTrimIdx.value] ?? null);
 
-// Contact link pre-filled with the vehicle and (once chosen) trim.
-const contactHref = computed(() => {
-	const params = new URLSearchParams({ vehicle: vehicle.slug });
+// Contact links pre-filled with the vehicle, intent and (once chosen) trim.
+function contactHref(intent: 'dealer' | 'sales'): string {
+	const params = new URLSearchParams({ vehicle: vehicle.slug, intent });
 	if (selectedTrim.value) params.set('trim', selectedTrim.value.trim_name);
 	return `/contact?${params}`;
-});
+}
+
+function scrollToSection(id: string) {
+	document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 function selectTrim(index: number) {
 	selectedTrimIdx.value = index;
-	document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	scrollToSection('cta');
 }
 
 function formatPrice(price: number | null | undefined): string {
 	if (price == null) return '';
-	return `TTD ${new Intl.NumberFormat('en-US').format(price)}`;
+	return `TTD $${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(price)}`;
 }
+
+type SpecRow = { label: string; value: string };
+const compactRows = (rows: Array<{ label: string; value: string | number | null | undefined }>): SpecRow[] =>
+	rows.filter((row) => row.value != null && row.value !== '').map((row) => ({ label: row.label, value: String(row.value) }));
+
+// Part 2 quick specs bar.
+const quickSpecs = computed(() =>
+	compactRows([
+		{ label: 'Model Year', value: vehicle.model_year },
+		{ label: 'Category', value: vehicle.category },
+		{ label: 'Body Type', value: vehicle.body_type },
+		{ label: 'Fuel Type', value: vehicle.fuel_type },
+		{ label: 'Seating', value: vehicle.seating_capacity ? `${vehicle.seating_capacity} Seats` : null },
+		{ label: 'Starting At', value: vehicle.starting_price ? formatPrice(vehicle.starting_price) : null },
+	]),
+);
+
+// Part 6 — re-derives whenever the Part 5 trim selection changes.
+const keySpecs = computed(() =>
+	compactRows([
+		{ label: 'Engine', value: selectedTrim.value?.engine },
+		{ label: 'Transmission', value: selectedTrim.value?.transmission },
+		{ label: 'Drivetrain', value: selectedTrim.value?.drivetrain },
+		{ label: 'Seating Capacity', value: vehicle.seating_capacity ? `${vehicle.seating_capacity} Passengers` : null },
+		{ label: 'Fuel Type', value: vehicle.fuel_type },
+		{ label: 'Warranty', value: vehicle.warranty },
+	]),
+);
+
+const glanceRows = computed(() =>
+	compactRows([
+		{ label: 'Model Year', value: vehicle.model_year },
+		{ label: 'Category', value: vehicle.category },
+		{ label: 'Starting Price', value: vehicle.starting_price ? formatPrice(vehicle.starting_price) : null },
+		{ label: 'Warranty', value: vehicle.warranty },
+	]),
+);
 
 function highlightImageUuid(highlight: VehicleHighlight | any): string {
 	if (highlight.image) {
@@ -115,36 +164,64 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 1 · HERO — immersive dark hero (hero_block)
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="hero" class="vp-hero" aria-label="Vehicle hero">
-			<div v-if="heroMedia" class="vp-hero__media" aria-hidden="true">
-				<DirectusImage :uuid="heroMedia" :alt="heroBlock?.headline || vehicle.title" loading="eager" />
-			</div>
-			<div class="vp-hero__scrim" aria-hidden="true" />
-			<div class="vp-container vp-hero__content">
-				<p class="vp-kicker tracking-wider uppercase">
-					<span v-if="vehicle.model_year">{{ vehicle.model_year }}</span>
-					<span v-if="vehicle.model_year && vehicle.category" class="vp-kicker__dot" aria-hidden="true">·</span>
-					<span v-if="vehicle.category">{{ vehicle.category }}</span>
-				</p>
-				<h1 class="vp-hero__headline tracking-wider uppercase">
-					<span v-if="heroBlock?.highlight_keyword" class="vp-hero__keyword">{{
-						heroBlock.highlight_keyword
-					}}</span><template v-if="heroBlock?.headline">
-						<br />{{ heroBlock.headline }}</template>
-				</h1>
-				<p v-if="heroBlock?.body" class="vp-hero__body">{{ heroBlock.body }}</p>
-				<div class="vp-hero__actions">
-					<Button as="a" href="#trims" class="vp-btn vp-btn--primary tracking-wider uppercase">View Trims &amp; Pricing</Button>
-					<Button
-						v-if="vehicle.brochure_url"
-						as="a"
-						:href="vehicle.brochure_url"
-						target="_blank"
-						rel="noopener"
-						class="vp-btn vp-btn--ghost tracking-wider uppercase"
-					>
-						Download Brochure
-					</Button>
+		<section
+			id="hero"
+			class="relative flex items-end md:items-center min-h-[min(92svh,860px)] overflow-hidden bg-slate-950"
+			aria-labelledby="hero-heading"
+		>
+			<!-- Background: looping video when provided, else the hero image -->
+			<video
+				v-if="heroVideoUrl"
+				:src="heroVideoUrl"
+				:poster="heroMedia ? getDirectusAssetURL(heroMedia) : undefined"
+				autoplay
+				loop
+				muted
+				playsinline
+				class="absolute inset-0 w-full h-full object-cover"
+				aria-hidden="true"
+			/>
+			<DirectusImage
+				v-else-if="heroMedia"
+				:uuid="heroMedia"
+				alt=""
+				loading="eager"
+				class="absolute inset-0 w-full h-full object-cover"
+				aria-hidden="true"
+			/>
+
+			<!-- Legibility scrims: left-to-right for the copy, bottom-up for the fold -->
+			<div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/50 to-transparent" aria-hidden="true" />
+			<div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/30" aria-hidden="true" />
+
+			<div class="vp-container relative z-10 py-24 md:py-32">
+				<div class="max-w-2xl text-left z-10 relative">
+					<p v-if="heroKicker" class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">{{ heroKicker }}</p>
+					<h1 id="hero-heading" class="text-4xl md:text-6xl font-extrabold uppercase tracking-tight text-white mb-3">
+						{{ displayTitle }}
+					</h1>
+					<p v-if="heroBlock?.headline" class="text-lg md:text-xl font-bold uppercase tracking-wider text-slate-200 mb-4">
+						{{ heroBlock.headline }}
+					</p>
+					<p v-if="heroBlock?.body" class="text-sm text-slate-300 max-w-lg mb-8 leading-relaxed">{{ heroBlock.body }}</p>
+					<div class="flex flex-wrap gap-4 justify-start">
+						<a
+							href="#trims"
+							class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors shadow-lg shadow-red-950/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+							@click.prevent="scrollToSection('trims')"
+						>
+							View Trims &amp; Pricing
+						</a>
+						<a
+							v-if="vehicle.brochure_url"
+							:href="vehicle.brochure_url"
+							target="_blank"
+							rel="noopener"
+							class="inline-block border border-white/40 hover:border-white text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+						>
+							Download Brochure
+						</a>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -152,40 +229,22 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 2 · OVERVIEW — tagline, headline, copy + facts strip
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="overview" class="vp-section vp-section--white" aria-label="Vehicle overview">
+		<section id="overview" class="vp-section vp-section--white" aria-labelledby="overview-heading">
 			<div class="vp-container">
-				<div class="vp-overview">
-					<div class="vp-overview__intro">
-						<p v-if="vehicle.tagline" class="vp-tagline tracking-wider uppercase">{{ vehicle.tagline }}</p>
-						<h2 v-if="vehicle.hero_headline" class="vp-h2 tracking-wider uppercase">{{ vehicle.hero_headline }}</h2>
+				<div class="grid gap-6 md:grid-cols-2 md:gap-12 md:items-end">
+					<div>
+						<p v-if="vehicle.tagline" class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">{{ vehicle.tagline }}</p>
+						<h2 id="overview-heading" class="text-2xl md:text-4xl font-bold uppercase tracking-wider text-slate-900">
+							{{ vehicle.hero_headline || vehicle.title }}
+						</h2>
 					</div>
-					<p v-if="vehicle.overview" class="vp-overview__copy">{{ vehicle.overview }}</p>
+					<p v-if="vehicle.overview" class="text-slate-600 text-sm md:text-base leading-relaxed max-w-xl">{{ vehicle.overview }}</p>
 				</div>
 
-				<dl class="vp-facts">
-					<div v-if="vehicle.model_year" class="vp-fact">
-						<dt class="tracking-wider uppercase">Model Year</dt>
-						<dd>{{ vehicle.model_year }}</dd>
-					</div>
-					<div v-if="vehicle.category" class="vp-fact">
-						<dt class="tracking-wider uppercase">Category</dt>
-						<dd>{{ vehicle.category }}</dd>
-					</div>
-					<div v-if="vehicle.body_type" class="vp-fact">
-						<dt class="tracking-wider uppercase">Body Type</dt>
-						<dd>{{ vehicle.body_type }}</dd>
-					</div>
-					<div v-if="vehicle.fuel_type" class="vp-fact">
-						<dt class="tracking-wider uppercase">Fuel Type</dt>
-						<dd>{{ vehicle.fuel_type }}</dd>
-					</div>
-					<div v-if="vehicle.seating_capacity" class="vp-fact">
-						<dt class="tracking-wider uppercase">Seating</dt>
-						<dd>{{ vehicle.seating_capacity }} Seats</dd>
-					</div>
-					<div v-if="vehicle.starting_price" class="vp-fact">
-						<dt class="tracking-wider uppercase">Starting At</dt>
-						<dd>{{ formatPrice(vehicle.starting_price) }}</dd>
+				<dl class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 pt-8 border-t border-slate-200 mt-8">
+					<div v-for="fact in quickSpecs" :key="fact.label">
+						<dt class="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">{{ fact.label }}</dt>
+						<dd class="text-sm md:text-base font-bold text-slate-900">{{ fact.value }}</dd>
 					</div>
 				</dl>
 			</div>
@@ -420,40 +479,22 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 6 · KEY SPECS — dark industrial spec grid
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="specs" class="vp-section vp-section--dark" aria-label="Key specifications">
+		<section id="specs" class="vp-section vp-section--dark" aria-labelledby="specs-heading">
 			<div class="vp-container">
-				<header class="vp-section-head">
-					<p class="vp-tagline vp-tagline--on-dark tracking-wider uppercase">Under the Hood</p>
-					<h2 class="vp-h2 vp-h2--on-dark tracking-wider uppercase">Key Specifications</h2>
+				<header>
+					<p class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">Under the Hood</p>
+					<h2 id="specs-heading" class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-white mb-8">Key Specifications</h2>
 				</header>
+				<!-- Engine / transmission / drivetrain come from the selected trim (Part 5);
+				     seating, fuel and warranty are vehicle-level fields shared by all trims. -->
 				<dl class="vp-specs">
-					<div v-if="selectedTrim?.engine" class="vp-spec">
-						<dt class="tracking-wider uppercase">Engine</dt>
-						<dd>{{ selectedTrim.engine }}</dd>
-					</div>
-					<div v-if="selectedTrim?.transmission" class="vp-spec">
-						<dt class="tracking-wider uppercase">Transmission</dt>
-						<dd>{{ selectedTrim.transmission }}</dd>
-					</div>
-					<div v-if="selectedTrim?.drivetrain" class="vp-spec">
-						<dt class="tracking-wider uppercase">Drivetrain</dt>
-						<dd>{{ selectedTrim.drivetrain }}</dd>
-					</div>
-					<div v-if="vehicle.seating_capacity" class="vp-spec">
-						<dt class="tracking-wider uppercase">Seating Capacity</dt>
-						<dd>{{ vehicle.seating_capacity }} Passengers</dd>
-					</div>
-					<div v-if="vehicle.fuel_type" class="vp-spec">
-						<dt class="tracking-wider uppercase">Fuel Type</dt>
-						<dd>{{ vehicle.fuel_type }}</dd>
-					</div>
-					<div v-if="vehicle.warranty" class="vp-spec">
-						<dt class="tracking-wider uppercase">Warranty</dt>
-						<dd>{{ vehicle.warranty }}</dd>
+					<div v-for="spec in keySpecs" :key="spec.label">
+						<dt class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1 border-t border-slate-800 pt-3">{{ spec.label }}</dt>
+						<dd class="text-base md:text-lg font-bold text-white leading-snug">{{ spec.value }}</dd>
 					</div>
 				</dl>
-				<p v-if="selectedTrim" class="vp-specs-note">
-					Showing <strong>{{ selectedTrim.trim_name }}</strong> trim — select a trim above to compare.
+				<p v-if="selectedTrim" class="mt-8 text-sm text-slate-400" aria-live="polite">
+					Showing <strong class="font-bold text-white">{{ selectedTrim.trim_name }}</strong> trim — select a trim above to compare.
 				</p>
 			</div>
 		</section>
@@ -461,45 +502,35 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 7 · BROCHURE — download CTA + at-a-glance card
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="brochure" class="vp-section vp-section--white" aria-label="Brochure">
+		<section id="brochure" class="vp-section vp-section--white" aria-labelledby="brochure-heading">
 			<div class="vp-container vp-brochure">
-				<div class="vp-brochure__copy">
-					<p class="vp-tagline tracking-wider uppercase">Learn More</p>
-					<h2 class="vp-h2 tracking-wider uppercase">Brochure</h2>
-					<p class="vp-body">
+				<div>
+					<p class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">Learn More</p>
+					<h2 id="brochure-heading" class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-slate-900 mb-4">Brochure</h2>
+					<p class="max-w-lg text-slate-600 leading-relaxed">
 						Explore the full feature list, dimensions, and technical specifications for the
 						{{ vehicle.model_year }} {{ vehicle.title }}.
 					</p>
-					<div v-if="vehicle.brochure_url" class="vp-brochure__actions">
-						<Button
-							as="a"
-							:href="vehicle.brochure_url"
-							target="_blank"
-							rel="noopener"
-							class="vp-btn vp-btn--primary tracking-wider uppercase"
-						>
-							Download Brochure
-						</Button>
-					</div>
+					<a
+						v-if="vehicle.brochure_url"
+						:href="vehicle.brochure_url"
+						target="_blank"
+						rel="noopener"
+						class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors inline-block mt-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+					>
+						Download Brochure
+					</a>
 				</div>
-				<aside class="vp-glance" aria-label="Vehicle at a glance">
-					<h3 class="vp-glance__title tracking-wider uppercase">At a Glance</h3>
-					<dl class="vp-glance__list">
-						<div v-if="vehicle.model_year" class="vp-glance__row">
-							<dt class="tracking-wider uppercase">Model Year</dt>
-							<dd>{{ vehicle.model_year }}</dd>
-						</div>
-						<div v-if="vehicle.category" class="vp-glance__row">
-							<dt class="tracking-wider uppercase">Category</dt>
-							<dd>{{ vehicle.category }}</dd>
-						</div>
-						<div v-if="vehicle.starting_price" class="vp-glance__row">
-							<dt class="tracking-wider uppercase">Starting Price</dt>
-							<dd>{{ formatPrice(vehicle.starting_price) }}</dd>
-						</div>
-						<div v-if="vehicle.warranty" class="vp-glance__row">
-							<dt class="tracking-wider uppercase">Warranty</dt>
-							<dd>{{ vehicle.warranty }}</dd>
+				<aside class="bg-white border border-slate-200/90 rounded-xl p-6 md:p-8 shadow-sm" aria-labelledby="glance-heading">
+					<h3 id="glance-heading" class="text-xs font-bold tracking-widest text-slate-900 uppercase pb-4 border-b border-slate-100 mb-2">At a Glance</h3>
+					<dl>
+						<div
+							v-for="row in glanceRows"
+							:key="row.label"
+							class="flex justify-between items-start gap-4 py-3 border-b border-slate-100 last:border-none"
+						>
+							<dt class="shrink-0 pt-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ row.label }}</dt>
+							<dd class="text-right font-bold text-sm text-slate-900 break-words max-w-[60%]">{{ row.value }}</dd>
 						</div>
 					</dl>
 				</aside>
@@ -509,20 +540,27 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 8 · CTA — dealer / contact call to action
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="cta" class="vp-section vp-section--dark vp-cta" aria-label="Next steps">
-			<div class="vp-container">
-				<p class="vp-tagline vp-tagline--on-dark tracking-wider uppercase">Next Step</p>
-				<h2 class="vp-h2 vp-h2--on-dark vp-cta__headline tracking-wider uppercase">
-					Ready to <span class="vp-cta__keyword">{{ heroBlock?.highlight_keyword ?? 'Drive' }}</span>?
-				</h2>
-				<p class="vp-body vp-body--on-dark vp-cta__copy">
-					Visit a dealer to take a test drive, or talk to our sales team about the
-					{{ vehicle.model_year }} {{ vehicle.title }}.
-				</p>
-				<div class="vp-cta__actions">
-					<Button as="NuxtLink" href="/dealers" class="vp-btn vp-btn--primary tracking-wider uppercase">Visit a Dealer</Button>
-					<Button as="NuxtLink" :href="contactHref" class="vp-btn vp-btn--ghost tracking-wider uppercase">Contact Sales</Button>
-				</div>
+		<section id="cta" class="bg-slate-950 text-white py-20 md:py-24 px-4 text-center border-t border-slate-900" aria-labelledby="cta-heading">
+			<p class="text-xs font-bold tracking-widest text-red-500 uppercase mb-3">Next Step</p>
+			<h2 id="cta-heading" class="text-3xl md:text-5xl font-bold uppercase tracking-wider text-white mb-4">
+				Ready to <span class="text-red-600">{{ displayTitle }}</span>?
+			</h2>
+			<p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-8 leading-relaxed">
+				Visit a dealer to take a test drive, or talk to our sales team about the {{ vehicle.model_year }} {{ vehicle.title }}.
+			</p>
+			<div class="flex flex-wrap justify-center gap-4">
+				<NuxtLink
+					:to="contactHref('dealer')"
+					class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors shadow-lg shadow-red-950/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+				>
+					Visit a Dealer
+				</NuxtLink>
+				<NuxtLink
+					:to="contactHref('sales')"
+					class="inline-block border border-white/40 hover:border-white text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+				>
+					Contact Sales
+				</NuxtLink>
 			</div>
 		</section>
 	</div>
@@ -719,26 +757,6 @@ useSeoMeta({
 		border-color 0.25s ease,
 		color 0.25s ease;
 }
-.vp-btn--primary {
-	background: var(--vp-red);
-	border-color: var(--vp-red);
-	color: var(--vp-white);
-}
-.vp-btn--primary:hover {
-	background: color-mix(in srgb, var(--vp-red) 85%, black);
-	border-color: color-mix(in srgb, var(--vp-red) 85%, black);
-	color: var(--vp-white);
-}
-.vp-btn--ghost {
-	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.4);
-	color: var(--vp-white);
-}
-.vp-btn--ghost:hover {
-	background: rgba(255, 255, 255, 0.1);
-	border-color: rgba(255, 255, 255, 0.7);
-	color: var(--vp-white);
-}
 .vp-btn--outline {
 	background: var(--vp-white);
 	border: 1px solid var(--vp-grey-light);
@@ -749,150 +767,6 @@ useSeoMeta({
 	border-color: var(--vp-red);
 	color: var(--vp-red);
 	background: var(--vp-white);
-}
-
-/* ════════════════ PART 1 · HERO ════════════════ */
-.vp-hero {
-	position: relative;
-	display: flex;
-	align-items: flex-end;
-	min-height: min(92svh, 860px);
-	background: var(--vp-black);
-	overflow: hidden;
-}
-.vp-hero__media {
-	position: absolute;
-	inset: 0;
-}
-.vp-hero__media :deep(img) {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	object-position: center;
-	opacity: 1;
-}
-.vp-hero__scrim {
-	position: absolute;
-	inset: 0;
-	/* Lightened lighting: heavy solid-black wash replaced by a subtle bottom-up
-	   gradient (bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent)
-	   so the vehicle stays bright while bottom-aligned copy keeps contrast. */
-	background: linear-gradient(
-		to top,
-		rgba(2, 6, 23, 0.9) 0%,
-		rgba(2, 6, 23, 0.3) 50%,
-		transparent 100%
-	);
-}
-.vp-hero__content {
-	position: relative;
-	z-index: 1;
-	max-width: 48rem;
-	padding-top: var(--vp-section-py);
-	padding-bottom: var(--vp-section-py);
-}
-.vp-kicker {
-	display: flex;
-	align-items: center;
-	gap: var(--vp-gap-xs);
-	margin: 0 0 var(--vp-sp-3);
-	font-size: var(--vp-fs-small);
-	font-weight: 700;
-	letter-spacing: var(--vp-label-track);
-	text-transform: uppercase;
-	color: var(--vp-grey-light);
-}
-.vp-kicker__dot {
-	color: var(--vp-red-bright);
-}
-.vp-hero__headline {
-	margin: 0 0 var(--vp-sp-4);
-	font-family: var(--vp-font-heading);
-	font-size: clamp(2rem, 1.375rem + 3vw, 2.625rem); /* 32px → 42px (extracted h1/huge) */
-	font-weight: var(--vp-fw-bold);
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-	line-height: 1.15;
-	color: var(--vp-white);
-	/* Crisp over any vehicle colour: tight 1px edge + soft ambient drop shadow */
-	text-shadow:
-		0 1px 2px rgba(2, 6, 23, 0.5),
-		0 2px 20px rgba(2, 6, 23, 0.45);
-}
-.vp-hero__keyword {
-	color: var(--vp-red-bright);
-}
-.vp-hero__body {
-	margin: 0 0 var(--vp-sp-5);
-	max-width: 36rem;
-	font-size: var(--vp-fs-base);
-	line-height: var(--vp-lh);
-	color: rgba(255, 255, 255, 0.85);
-}
-.vp-hero__actions {
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--vp-gap-md);
-}
-
-/* ════════════════ PART 2 · OVERVIEW ════════════════ */
-.vp-overview {
-	display: grid;
-	gap: var(--vp-sp-5);
-}
-@media (min-width: 768px) {
-	.vp-overview {
-		grid-template-columns: 1fr 1.5fr;
-		align-items: end;
-	}
-}
-.vp-overview__intro {
-	display: flex;
-	flex-direction: column;
-}
-.vp-overview__intro .vp-h2 {
-	margin-bottom: 0;
-}
-.vp-overview__copy {
-	margin: 0;
-	font-size: var(--vp-fs-base);
-	line-height: var(--vp-lh);
-	color: var(--vp-grey);
-}
-.vp-facts {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 0 var(--vp-gap-xl);
-	margin: var(--vp-sp-6) 0 0;
-	border-top: 1px solid var(--vp-grey-light);
-}
-@media (min-width: 1024px) {
-	.vp-facts {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
-}
-@media (min-width: 1280px) {
-	.vp-facts {
-		grid-template-columns: repeat(6, minmax(0, 1fr));
-	}
-}
-.vp-fact {
-	padding-block: var(--vp-sp-3);
-	border-bottom: 1px solid var(--vp-grey-light);
-}
-.vp-fact dt {
-	margin-bottom: var(--vp-sp-1);
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: var(--vp-label-track);
-	text-transform: uppercase;
-	color: var(--vp-grey);
-}
-.vp-fact dd {
-	margin: 0;
-	font-size: var(--vp-fs-base);
-	font-weight: 700;
-	color: var(--vp-ink);
 }
 
 /* ════════════════ PART 5 · TRIMS ════════════════ */
@@ -1040,32 +914,6 @@ useSeoMeta({
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 }
-.vp-spec {
-	padding-top: var(--vp-sp-3);
-	border-top: 1px solid rgba(191, 194, 196, 0.3);
-}
-.vp-spec dt {
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: var(--vp-label-track);
-	text-transform: uppercase;
-	color: var(--vp-grey-light);
-}
-.vp-spec dd {
-	margin: var(--vp-sp-2) 0 0;
-	font-size: var(--vp-fs-medium);
-	font-weight: 700;
-	line-height: 1.3;
-	color: var(--vp-white);
-}
-.vp-specs-note {
-	margin: var(--vp-sp-4) 0 0;
-	font-size: var(--vp-fs-small);
-	color: var(--vp-grey-light);
-}
-.vp-specs-note strong {
-	color: var(--vp-white);
-}
 
 /* ════════════════ PART 7 · BROCHURE ════════════════ */
 .vp-brochure {
@@ -1078,86 +926,5 @@ useSeoMeta({
 		grid-template-columns: 1.2fr 1fr;
 		gap: var(--vp-sp-7);
 	}
-}
-.vp-brochure__copy .vp-h2 {
-	margin-bottom: var(--vp-sp-3);
-}
-.vp-brochure__copy .vp-body {
-	max-width: 32rem;
-}
-.vp-brochure__actions {
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--vp-gap-md);
-	margin-top: var(--vp-sp-4);
-}
-.vp-glance {
-	background: var(--vp-white);
-	border: 1px solid var(--vp-grey-light);
-	border-radius: var(--vp-radius);
-	box-shadow: var(--vp-shadow-natural);
-	padding: var(--vp-sp-5);
-}
-.vp-glance__title {
-	margin: 0 0 var(--vp-sp-3);
-	font-size: var(--vp-fs-small);
-	font-weight: 700;
-	letter-spacing: var(--vp-label-track);
-	text-transform: uppercase;
-	color: var(--vp-ink);
-}
-.vp-glance__row {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: var(--vp-gap-md);
-	padding-block: var(--vp-sp-2);
-	border-bottom: 1px solid color-mix(in srgb, var(--vp-grey-light) 50%, white);
-}
-.vp-glance__row:last-child {
-	border-bottom: none;
-}
-.vp-glance__row dt {
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: var(--vp-label-track);
-	text-transform: uppercase;
-	color: var(--vp-grey);
-}
-.vp-glance__row dd {
-	margin: 0;
-	font-size: var(--vp-fs-base);
-	font-weight: 700;
-	text-align: right;
-	color: var(--vp-ink);
-}
-
-/* ════════════════ PART 8 · CTA ════════════════ */
-.vp-cta {
-	text-align: center;
-}
-.vp-cta .vp-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-.vp-cta .vp-tagline {
-	margin-bottom: var(--vp-sp-2);
-}
-.vp-cta__headline {
-	margin-bottom: var(--vp-sp-3);
-}
-.vp-cta__keyword {
-	color: var(--vp-red-bright);
-}
-.vp-cta__copy {
-	margin-inline: auto;
-}
-.vp-cta__actions {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: var(--vp-gap-md);
-	margin-top: var(--vp-sp-5);
 }
 </style>

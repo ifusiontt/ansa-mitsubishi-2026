@@ -80,6 +80,8 @@ export interface VehiclePage {
 	fuel_type: string | null;
 	warranty: string | null;
 	overview: string | null;
+	/** Optional looping hero background video (full URL). Not yet a Directus field. */
+	hero_video_url?: string | null;
 	hero_block: VehicleHeroBlock | null;
 	colors: VehicleColor[];
 	highlights: VehicleHighlight[];
