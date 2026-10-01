@@ -12,6 +12,9 @@ const props = defineProps<{
 	submitLabel: string;
 	formId?: string;
 	blockFormId?: string;
+	/** Values keyed by field name that override the empty defaults (e.g. from the query string). */
+	prefill?: Record<string, string>;
+	theme?: 'light' | 'dark';
 }>();
 
 const isSubmitting = ref(false);
@@ -57,6 +60,11 @@ const initialValues = computed(() => {
 				case 'text':
 				default:
 					defaults[name] = '';
+			}
+
+			const prefilled = props.prefill?.[name];
+			if (prefilled !== undefined && ['text', 'textarea', 'select', 'radio', 'hidden'].includes(field.type ?? 'text')) {
+				defaults[name] = prefilled;
 			}
 
 			return defaults;
@@ -106,7 +114,13 @@ const onSubmitForm = handleSubmit(async (formValues) => {
 		@submit.prevent="onSubmitForm"
 	>
 		<div class="flex flex-wrap gap-4">
-			<BaseFormField v-for="field in validFields" :key="field.id" :field="field" :model-value="values[field.name]" />
+			<BaseFormField
+				v-for="field in validFields"
+				:key="field.id"
+				:field="field"
+				:model-value="values[field.name]"
+				:theme="theme"
+			/>
 			<div class="w-full">
 				<div
 					:data-directus="
@@ -132,6 +146,7 @@ const onSubmitForm = handleSubmit(async (formValues) => {
 						type="submit"
 						:label="submitLabel"
 						:disabled="isSubmitting"
+						:class-name="theme === 'dark' ? 'bg-[#C3002F] text-white hover:bg-[#A30027]' : undefined"
 						icon="arrow"
 						icon-position="right"
 					/>

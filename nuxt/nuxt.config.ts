@@ -45,6 +45,8 @@ export default defineNuxtConfig({
 			enableVisualEditing: process.env.NUXT_PUBLIC_ENABLE_VISUAL_EDITING !== 'false',
 		},
 		directusServerToken: process.env.DIRECTUS_SERVER_TOKEN,
+		// Optional: endpoint that delivers rendered form notification emails (e.g. a Directus Flow webhook).
+		formsEmailWebhookUrl: process.env.FORMS_EMAIL_WEBHOOK_URL,
 	},
 
 	shadcn: {

@@ -7,6 +7,12 @@ interface SubmissionValue {
 	file?: string;
 }
 
+/** Prefer the human-readable choice label (e.g. "Outlander Sport") over its stored value in emails. */
+function displayValue(field: FormField, value: string): string {
+	const choice = field.choices?.find((option) => option.value === value);
+	return choice?.text ?? value;
+}
+
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
 	const formData = await readMultipartFormData(event);
@@ -45,14 +51,21 @@ export default defineEventHandler(async (event) => {
 	// Fetch the authoritative form field definitions from Directus server-side.
 	// This ensures validation rules (required, validation patterns) come from the
 	// source of truth rather than client-provided data.
+	let form: Form;
 	let fields: FormField[];
 
 	try {
-		const form = (await directusServer.request(
+		form = (await directusServer.request(
 			withToken(
 				TOKEN,
 				readItem('forms', formId.trim(), {
-					fields: ['is_active', { fields: ['id', 'name', 'type', 'label', 'required', 'validation'] }],
+					fields: [
+						'id',
+						'title',
+						'is_active',
+						'emails',
+						{ fields: ['id', 'name', 'type', 'label', 'required', 'validation', 'choices'] },
+					],
 				} as any),
 			),
 		)) as unknown as Form;
@@ -81,6 +94,8 @@ export default defineEventHandler(async (event) => {
 
 	try {
 		const submissionValues: SubmissionValue[] = [];
+		// Plain-text values keyed by field name, used to resolve `{# field_name #}` email merge tags.
+		const mergeValues: Record<string, string> = {};
 
 		for (const field of fields) {
 			if (!field.name) continue;
@@ -100,12 +115,16 @@ export default defineEventHandler(async (event) => {
 						field: field.id,
 						file: uploadedFile.id,
 					});
+					mergeValues[field.name] = value.name;
 				}
 			} else {
 				submissionValues.push({
 					field: field.id,
 					value: String(value),
 				});
+				mergeValues[field.name] = Array.isArray(value)
+					? value.map((item) => displayValue(field, String(item))).join(', ')
+					: displayValue(field, String(value));
 			}
 		}
 
@@ -114,7 +133,21 @@ export default defineEventHandler(async (event) => {
 			values: submissionValues,
 		};
 
-		await directusServer.request(withToken(TOKEN, createItem('form_submissions', payload)));
+		const submission = (await directusServer.request(
+			withToken(TOKEN, createItem('form_submissions', payload, { fields: ['id'] })),
+		)) as { id?: string } | null;
+
+		// Email delivery is best-effort: the submission is already stored, so a mail
+		// failure must not surface as a failed submission to the visitor.
+		try {
+			await dispatchFormEmails(renderFormEmails(form.emails, mergeValues), {
+				formId: formId.trim(),
+				formTitle: form.title,
+				submissionId: submission?.id ?? null,
+			});
+		} catch (error) {
+			console.error('[forms] Failed to dispatch form emails', error);
+		}
 
 		return { success: true };
 	} catch {

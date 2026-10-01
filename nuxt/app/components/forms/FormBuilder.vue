@@ -19,7 +19,11 @@ const props = defineProps<{
 	form: CustomFormData;
 	className?: string;
 	blockFormId?: string;
+	prefill?: Record<string, string>;
+	theme?: 'light' | 'dark';
 }>();
+
+const isDark = computed(() => props.theme === 'dark');
 
 const isSubmitted = ref(false);
 const error = ref<string | null>(null);
@@ -61,15 +65,34 @@ const handleSubmit = async (data: Record<string, any>) => {
 </script>
 
 <template>
-	<div v-if="form.is_active" :class="['space-y-6 border border-input p-8 rounded-lg', className]">
-		<div v-if="isSubmitted" class="flex flex-col items-center justify-center space-y-4 p-6 text-center">
-			<CheckCircle class="size-12 text-green-500" />
-			<p class="text-gray-600">
+	<div
+		v-if="form.is_active"
+		:class="[
+			'space-y-6 border p-8 rounded-lg',
+			isDark ? 'bg-black text-white border-neutral-800' : 'border-input',
+			className,
+		]"
+	>
+		<div
+			v-if="isSubmitted"
+			role="status"
+			aria-live="polite"
+			class="flex flex-col items-center justify-center space-y-4 p-6 text-center"
+		>
+			<CheckCircle :class="['size-12', isDark ? 'text-[#C3002F]' : 'text-green-500']" />
+			<p :class="isDark ? 'text-neutral-300' : 'text-gray-600'">
 				{{ form.success_message || 'Your form has been submitted successfully.' }}
 			</p>
 		</div>
 		<template v-else>
-			<div v-if="error" class="p-4 text-red-500 bg-red-100 rounded-md">
+			<div
+				v-if="error"
+				role="alert"
+				:class="[
+					'p-4 rounded-md',
+					isDark ? 'text-white bg-[#C3002F]/15 border border-[#C3002F]/50' : 'text-red-500 bg-red-100',
+				]"
+			>
 				<strong>Error:</strong>
 				{{ error }}
 			</div>
@@ -79,6 +102,8 @@ const handleSubmit = async (data: Record<string, any>) => {
 				:submitLabel="form.submit_label || 'Submit'"
 				:formId="form.id"
 				:blockFormId="blockFormId"
+				:prefill="prefill"
+				:theme="theme"
 			/>
 		</template>
 	</div>
