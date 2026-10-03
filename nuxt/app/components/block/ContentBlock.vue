@@ -11,10 +11,10 @@ import ContentBlockFeaturesGrid from '~/components/block/ContentBlockTemplateFea
 import ContentBlockServicesList from '~/components/block/ContentBlockTemplateServicesList.vue';
 // Updated semantic layout-agnostic import target
 import ContentBlockTemplateContactInfo from '~/components/block/templates/ContentBlockTemplateContactInfo.vue';
-import type { BlockContentBlock, BlockContentItems } from '#shared/types/content-block';
+import type { ContentBlockPayload, BlockContentItems } from '#shared/types/content-block';
 
 interface ContentBlockProps {
-	data?: BlockContentBlock;
+	data?: ContentBlockPayload;
 }
 
 const props = withDefaults(defineProps<ContentBlockProps>(), {

@@ -20,3 +20,6 @@ dist/
 # Seed script local state (uploaded asset ids)
 scripts/.seed-outlander-assets.json
 .tmp/
+
+# Directus uploaded file binaries (bind-mounted into the CMS container)
+directus/uploads/

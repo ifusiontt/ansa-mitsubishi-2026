@@ -5,6 +5,9 @@
  * (regenerated via `npm run generate:types` from the live Directus schema).
  * `ContentBlock.vue` and `ContentBlockFallback.vue` type against these
  * instead of importing from `#shared/types/schema`.
+ *
+ * Names must not collide with `schema.ts` exports: Nuxt auto-imports every
+ * `shared/types` export and warns (and silently picks one) on duplicates.
  */
 
 export interface BlockContentItems {
@@ -25,7 +28,7 @@ export interface BlockContentItems {
 	[key: string]: any;
 }
 
-export interface BlockContentBlock {
+export interface ContentBlockPayload {
 	/** @primaryKey */
 	id: string;
 	tagline?: string | null;

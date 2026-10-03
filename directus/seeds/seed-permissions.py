@@ -11,7 +11,9 @@ Field model (Directus 12): `fields` is a WHITELIST.
 `globals` holds secrets (openai_api_key, directus_url) -> strict whitelist.
 `forms` -> whitelist WITHOUT `emails` (notification recipients/templates are only
 read server-side by /api/forms/submit with the server token) or `submissions`.
-Deliberately NOT public: ai_prompts, form_submissions, form_submission_values, website.
+Deliberately NOT public (read): ai_prompts, form_submissions, form_submission_values, website.
+The public *create* rule on form_submissions (service/parts only) is managed by
+parts-service-forms.mjs; this script only touches `read` rows.
 """
 import json
 import os
@@ -38,7 +40,7 @@ BASE = os.environ.get('DIRECTUS_URL', 'http://localhost:8055')
 # explicit whitelists (safe by construction)
 WHITELIST = {
     'vehicles': ['id', 'title', 'slug', 'tagline', 'hero_headline', 'starting_price',
-                 'primary_color', 'brochure_url', 'status', 'model_year', 'category',
+                 'primary_color', 'brochure_url', 'status', 'model_year', 'category', 'menu_image',
                  'body_type', 'seating_capacity', 'fuel_type', 'warranty', 'overview',
                  'hero_block', 'colors', 'highlights', 'trims'],
     'vehicle_colors': ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'color_code', 'image'],
@@ -53,6 +55,7 @@ WHITELIST = {
                 'accent_color', 'tagline', 'description', 'social_links'],
     'forms': ['id', 'title', 'is_active', 'sort', 'submit_label', 'on_success',
               'success_message', 'success_redirect_url', 'fields'],
+    'faqs': ['id', 'sort', 'question', 'answer', 'category', 'is_published'],
 }
 
 # public marketing content -> all fields

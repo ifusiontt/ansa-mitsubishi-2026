@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Menu, ChevronDown } from 'lucide-vue-next';
+import { onClickOutside, useEventListener } from '@vueuse/core';
 import SearchModal from '~/components/base/SearchModel.vue';
+import HeaderMegaMenu from '~/components/layout/HeaderMegaMenu.vue';
 
 interface NavigationItem {
 	id: string;
@@ -49,6 +51,44 @@ const forceWhiteLogo = computed(() => !darkLogoUrl.value);
 const handleLinkClick = () => {
 	menuOpen.value = false;
 };
+
+/* ------------------------------------------------------------------ */
+/* Vehicles mega menu (desktop)                                        */
+/* ------------------------------------------------------------------ */
+
+const MEGA_MENU_ID = 'vehicles-mega-menu';
+const megaOpen = ref(false);
+let closeTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** The top-level "Vehicles" / "Showroom" item (no CMS children) opens the mega menu instead of linking. */
+const isVehiclesItem = (item: NavigationItem) =>
+	!item.children?.length &&
+	(/^(vehicles|showroom)$/i.test(item.title.trim()) || (item.page?.permalink || item.url || '').startsWith('/showroom'));
+
+function openMega() {
+	clearTimeout(closeTimer);
+	megaOpen.value = true;
+}
+
+// Short grace period so the pointer can travel from the nav item down into the panel.
+function scheduleCloseMega() {
+	clearTimeout(closeTimer);
+	closeTimer = setTimeout(() => (megaOpen.value = false), 150);
+}
+
+function closeMega() {
+	clearTimeout(closeTimer);
+	megaOpen.value = false;
+}
+
+onClickOutside(navigationRef, closeMega);
+useEventListener('keydown', (event: KeyboardEvent) => {
+	if (event.key === 'Escape') closeMega();
+});
+
+const route = useRoute();
+watch(() => route.fullPath, closeMega);
+onBeforeUnmount(() => clearTimeout(closeTimer));
 </script>
 
 <template>
@@ -93,6 +133,23 @@ const handleLinkClick = () => {
 									</ul>
 								</NavigationMenuContent>
 							</template>
+
+							<button
+								v-else-if="isVehiclesItem(section)"
+								type="button"
+								:aria-expanded="megaOpen"
+								:aria-controls="MEGA_MENU_ID"
+								:class="[
+									'flex items-center gap-1 p-2 text-xs font-bold tracking-widest uppercase transition-colors hover:text-red-600',
+									megaOpen ? 'text-red-600' : 'text-slate-200',
+								]"
+								@mouseenter="openMega"
+								@mouseleave="scheduleCloseMega"
+								@click="megaOpen ? closeMega() : openMega()"
+							>
+								{{ section.title }}
+								<ChevronDown :class="['size-3.5 transition-transform', { 'rotate-180': megaOpen }]" aria-hidden="true" />
+							</button>
 
 							<NavigationMenuLink v-else as-child>
 								<NuxtLink :to="section.page?.permalink || section.url || '#'" class="p-2 text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-red-600 transition-colors">
@@ -159,5 +216,10 @@ const handleLinkClick = () => {
 				<ThemeToggle class-name="!border-neutral-700 !bg-transparent text-white hover:text-red-500" />
 			</nav>
 		</Container>
+
+		<!-- Desktop only: on mobile the Showroom item stays a plain link in the dropdown. -->
+		<div class="hidden md:block" @mouseenter="megaOpen && openMega()" @mouseleave="scheduleCloseMega">
+			<HeaderMegaMenu :id="MEGA_MENU_ID" :open="megaOpen" @close="closeMega" />
+		</div>
 	</header>
 </template>

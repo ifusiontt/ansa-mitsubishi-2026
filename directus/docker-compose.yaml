@@ -42,6 +42,10 @@ services:
       PUBLIC_URL: "http://localhost:8055"
       CORS_ENABLED: "true"
       CORS_ORIGIN: "true"
+    volumes:
+      # Uploaded file binaries. Without this mount they live only in the container
+      # layer and are lost whenever the container is recreated (file rows survive in Postgres).
+      - ./uploads:/directus/uploads
     depends_on:
       - database
       - cache

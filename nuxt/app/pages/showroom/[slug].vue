@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
-import type { VehicleColor, VehicleHighlight, VehiclePage, VehicleTrim } from '#shared/types/vehicle';
+import type { VehiclePageColor, VehicleHighlight, VehiclePage, VehiclePageTrim } from '#shared/types/vehicle';
+import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
 
 /**
  * /showroom/[slug] — 8-part vehicle page.
@@ -48,26 +49,30 @@ const heroMedia = computed(() => {
 const heroVideoUrl = computed(() => vehicle.hero_video_url || '');
 const heroKicker = computed(() => [vehicle.model_year, vehicle.category].filter(Boolean).join(' '));
 
-const colors = computed<VehicleColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
+const colors = computed<VehiclePageColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
 // Part 3 is a strict 3-up panel row: show only the top 3 highlights by sort order.
 const MAX_HIGHLIGHTS = 3;
 const highlights = computed<VehicleHighlight[]>(() =>
 	[...(vehicle.highlights ?? [])].sort((a, b) => a.sort - b.sort).slice(0, MAX_HIGHLIGHTS),
 );
-const trims = computed<VehicleTrim[]>(() => [...(vehicle.trims ?? [])].sort((a, b) => a.trim_name.localeCompare(b.trim_name)));
+const trims = computed<VehiclePageTrim[]>(() => [...(vehicle.trims ?? [])].sort((a, b) => a.trim_name.localeCompare(b.trim_name)));
 
 const selectedColorIdx = ref(0);
-const selectedColor = computed<VehicleColor | null>(() => colors.value[selectedColorIdx.value] ?? null);
+const selectedColor = computed<VehiclePageColor | null>(() => colors.value[selectedColorIdx.value] ?? null);
 
-const activeColorImageUuid = computed(() => {
-	const color = selectedColor.value;
-
+const colorImageUuid = (color: VehiclePageColor | null) => {
 	if (color?.image) {
 		return typeof color.image === 'string' ? color.image : color.image.id ?? '';
 	}
 
 	return heroMedia.value;
-});
+};
+
+const activeColorImageUuid = computed(() => colorImageUuid(selectedColor.value));
+
+// Renders are resized by Directus for the ~768px stage (2x for high-DPI screens).
+const colorRenderUrl = (uuid: string) => (uuid ? `${getDirectusAssetURL(uuid)}?width=1536&quality=82&format=webp` : '');
+const colorRenderUrls = computed(() => colors.value.map((color) => colorRenderUrl(colorImageUuid(color))));
 
 function stepColor(delta: number) {
 	const count = colors.value.length;
@@ -78,7 +83,7 @@ function stepColor(delta: number) {
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
 const selectedTrimIdx = ref(0);
-const selectedTrim = computed<VehicleTrim | null>(() => trims.value[selectedTrimIdx.value] ?? null);
+const selectedTrim = computed<VehiclePageTrim | null>(() => trims.value[selectedTrimIdx.value] ?? null);
 
 // Contact links pre-filled with the vehicle, intent and (once chosen) trim.
 function contactHref(intent: 'dealer' | 'sales'): string {
@@ -332,12 +337,13 @@ useSeoMeta({
 
 					<!-- Vehicle render + ground shadow -->
 					<div class="relative z-10 w-full max-w-3xl">
-						<DirectusImage
-							v-if="activeColorImageUuid"
-							:key="activeColorImageUuid"
-							:uuid="activeColorImageUuid"
+						<!-- Fixed 16:9 stage: switching colours crossfades without any reflow. -->
+						<VehicleColorStage
+							class="relative z-10"
+							:src="colorRenderUrl(activeColorImageUuid)"
 							:alt="`${vehicle.title} in ${selectedColor?.color_name ?? ''}`"
-							class="relative z-10 mx-auto max-h-[360px] w-full object-contain drop-shadow-[0_24px_30px_rgba(0,0,0,0.55)]"
+							:preload="colorRenderUrls"
+							img-class="drop-shadow-[0_24px_30px_rgba(0,0,0,0.55)]"
 						/>
 						<div
 							class="mx-auto -mt-6 h-8 w-4/5 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.75)_0%,rgba(0,0,0,0.3)_45%,transparent_72%)] blur-sm"

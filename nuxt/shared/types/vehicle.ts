@@ -1,6 +1,10 @@
 /**
  * Types for the hybrid vehicle schema (see scripts/apply-hybrid-vehicle-schema.js).
  *
+ * These describe the nested /showroom payload, not raw collection rows, so they use
+ * `VehiclePage*` names: the generated `schema.ts` already exports `VehicleColor` /
+ * `VehicleTrim`, and Nuxt auto-imports (and warns on) duplicate `shared/types` exports.
+ *
  * Payload shape as returned by:
  *   GET /items/vehicles?filter[slug][_eq]=:slug&fields=*,hero_block.*,colors.*,highlights.*,trims.*
  */
@@ -30,7 +34,7 @@ export interface VehicleHeroBlock {
 }
 
 /** O2M -> vehicle_colors (vehicles.colors) */
-export interface VehicleColor {
+export interface VehiclePageColor {
 	id: number;
 	sort: number;
 	vehicle_id: number | null;
@@ -53,7 +57,7 @@ export interface VehicleHighlight {
 }
 
 /** O2M -> vehicle_trims (vehicles.trims) — key_features is a repeater of { value } objects */
-export interface VehicleTrim {
+export interface VehiclePageTrim {
 	id: number;
 	trim_name: string;
 	status: string;
@@ -84,11 +88,18 @@ export interface VehiclePage {
 	overview: string | null;
 	/** Optional looping hero background video (full URL). Not yet a Directus field. */
 	hero_video_url?: string | null;
+	/** M2O -> directus_files: header mega menu card image (falls back to hero_block.media). */
+	menu_image: VehicleFileRef | null;
 	hero_block: VehicleHeroBlock | null;
-	colors: VehicleColor[];
+	colors: VehiclePageColor[];
 	highlights: VehicleHighlight[];
-	trims: VehicleTrim[];
+	trims: VehiclePageTrim[];
 }
 
-/** Lightweight vehicle index row (GET /api/vehicles) — used by vehicle pickers. */
-export type VehicleSummary = Pick<VehiclePage, 'id' | 'slug' | 'title' | 'model_year'>;
+/** Lightweight published-vehicle index row (GET /api/vehicles) — used by the header mega menu. */
+export type VehicleSummary = Pick<
+	VehiclePage,
+	'id' | 'slug' | 'title' | 'model_year' | 'starting_price' | 'menu_image'
+> & {
+	hero_block: Pick<VehicleHeroBlock, 'media'> | null;
+};
