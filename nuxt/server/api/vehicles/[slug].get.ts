@@ -16,10 +16,6 @@ import type { VehiclePage } from '#shared/types/vehicle';
  * frontend), so we explicitly request `images.directus_files_id.*` — the nested
  * path through the junction FK resolves the full file object the vehicle page
  * needs (`highlight.images[0].directus_files_id.id`).
- *
- * `highlights.item` (the parent block_content_block) is expanded so the page can
- * separate the alternating feature rows (variant `services_alternating`, seeded by
- * directus/seeds/vehicle-content-blocks.mjs) from the 3-up highlight panels.
  */
 export default defineEventHandler(async (event) => {
 	const slug = getRouterParam(event, 'slug');
@@ -33,7 +29,7 @@ export default defineEventHandler(async (event) => {
 			filter: { slug: { _eq: slug } },
 			limit: 1,
 			fields:
-				['*', { hero_block: ['*'] }, { colors: ['*'] }, { highlights: ['*', { images: ['directus_files_id.*'] }, { item: ['id', 'tagline', 'template', 'variant'] }] }, { trims: ['*'] }] as any,
+				['*', { hero_block: ['*'] }, { colors: ['*'] }, { highlights: ['*', { images: ['directus_files_id.*'] }] }, { trims: ['*'] }] as any,
 			// 'vehicles' is not in the generated Schema yet, so the Deep type
 			// parameter falls back — cast the deep-sort object explicitly.
 			deep: {

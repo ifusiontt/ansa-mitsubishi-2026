@@ -63,6 +63,25 @@ const EXPECTED_HIGHLIGHTS = [
 		description:
 			'A driver-focused cabin with premium materials, Smartphone-link audio, and Mitsubishi Safety Sensing.',
 	},
+	// 4–6: added by directus/seeds/vehicle-content-blocks.mjs
+	{
+		sort: 4,
+		tagline: 'TECHNOLOGY',
+		headline: 'Driver-Focused Digital Cockpit',
+		description: '8-inch SDA touchscreen with Apple CarPlay & Android Auto integration.',
+	},
+	{
+		sort: 5,
+		tagline: 'COMFORT',
+		headline: 'Ergonomic Seating & Space',
+		description: 'Heat Guard synthetic leather seats engineered for tropical climate comfort.',
+	},
+	{
+		sort: 6,
+		tagline: 'HANDLING',
+		headline: 'Active Yaw Control (AYC)',
+		description: 'Monitors cornering force and applies brake vectoring for optimal road traction.',
+	},
 ];
 
 const EXPECTED_TRIMS = ['ES', 'SE S-AWC', 'SEL Premium S-AWC'];

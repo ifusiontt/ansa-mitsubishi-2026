@@ -56,8 +56,6 @@ export interface VehicleHighlight {
 	vehicle: number;
 	/** M2M junction rows; `directus_files_id` is expanded by /api/vehicles/:slug. */
 	images?: Array<{ id: number; directus_files_id: VehicleFileRef | null }>;
-	/** Parent block_content_block — `variant: 'services_alternating'` marks a feature row. */
-	item?: { id: string; tagline: string | null; template: string | null; variant: string | null } | string | null;
 }
 
 /** O2M -> vehicle_trims (vehicles.trims) — key_features is a repeater of { value } objects */

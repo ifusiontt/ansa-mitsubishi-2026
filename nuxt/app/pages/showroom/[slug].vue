@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
-import type { VehiclePageColor, VehicleHighlight, VehiclePage, VehiclePageTrim } from '#shared/types/vehicle';
+import type { VehiclePageColor, VehiclePage, VehiclePageTrim } from '#shared/types/vehicle';
 import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
 import VehicleHighlights from '~/components/showroom/VehicleHighlights.vue';
 
@@ -51,19 +51,6 @@ const heroVideoUrl = computed(() => vehicle.hero_video_url || '');
 const heroKicker = computed(() => [vehicle.model_year, vehicle.category].filter(Boolean).join(' '));
 
 const colors = computed<VehiclePageColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
-// `vehicles.highlights` carries two kinds of rows, told apart by their parent block:
-// feature rows (variant `services_alternating`) render in VehicleHighlights below the
-// colours; everything else feeds the Part 3 panels.
-const isFeatureRow = (highlight: VehicleHighlight) =>
-	typeof highlight.item === 'object' && highlight.item?.variant === 'services_alternating';
-const sortedHighlights = computed(() => [...(vehicle.highlights ?? [])].sort((a, b) => a.sort - b.sort));
-const featureRows = computed(() => sortedHighlights.value.filter(isFeatureRow));
-
-// Part 3 is a strict 3-up panel row: show only the top 3 highlights by sort order.
-const MAX_HIGHLIGHTS = 3;
-const highlights = computed<VehicleHighlight[]>(() =>
-	sortedHighlights.value.filter((highlight) => !isFeatureRow(highlight)).slice(0, MAX_HIGHLIGHTS),
-);
 const trims = computed<VehiclePageTrim[]>(() => [...(vehicle.trims ?? [])].sort((a, b) => a.trim_name.localeCompare(b.trim_name)));
 
 const selectedColorIdx = ref(0);
@@ -151,19 +138,6 @@ const glanceRows = computed(() =>
 		{ label: 'Warranty', value: vehicle.warranty },
 	]),
 );
-
-function highlightImageUuid(highlight: VehicleHighlight | any): string {
-	if (highlight.image) {
-		return typeof highlight.image === 'string' ? highlight.image : highlight.image.id ?? '';
-	}
-
-	if (Array.isArray(highlight.images) && highlight.images[0]) {
-		const img = highlight.images[0].directus_files_id || highlight.images[0];
-		return typeof img === 'string' ? img : img.id ?? '';
-	}
-
-	return heroMedia.value;
-}
 
 useSeoMeta({
 	title: vehicle.model_year ? `${vehicle.model_year} ${vehicle.title}` : vehicle.title,
@@ -261,53 +235,6 @@ useSeoMeta({
 						<dd class="text-sm md:text-base font-bold text-slate-900">{{ fact.value }}</dd>
 					</div>
 				</dl>
-			</div>
-		</section>
-
-		<!-- ════════════════════════════════════════════════════════════
-		     PART 3 · HIGHLIGHTS — full-bleed 3-up expandable panels
-	     ════════════════════════════════════════════════════════════ -->
-		<section id="highlights" class="bg-white pb-16 md:pb-20" aria-labelledby="highlights-heading">
-			<h2 id="highlights-heading" class="sr-only">{{ vehicle.title }} highlights</h2>
-			<div class="flex w-full flex-col gap-3 rounded-xl bg-slate-950 p-2 md:flex-row md:gap-2 md:min-h-[560px] lg:min-h-[620px]">
-				<article
-					v-for="(highlight, index) in highlights"
-					:key="highlight.id"
-					class="group relative w-full flex-none h-[240px] md:h-auto md:flex-1 overflow-hidden bg-slate-950 transition-all duration-500 ease-out md:hover:flex-[1.35]"
-				>
-					<DirectusImage
-						v-if="highlightImageUuid(highlight)"
-						:uuid="highlightImageUuid(highlight)"
-						:alt="highlight.headline || highlight.tagline || vehicle.title"
-						class="absolute inset-0 object-cover w-full h-full transform scale-100 group-hover:scale-105 transition-transform duration-700"
-					/>
-					<div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" aria-hidden="true" />
-
-					<span
-						class="absolute right-5 top-5 z-10 rounded-full bg-slate-900/80 backdrop-blur-md px-3 py-1 text-xs font-bold tracking-widest text-white"
-						aria-hidden="true"
-					>
-						{{ pad2(index + 1) }}
-					</span>
-
-					<div class="relative z-10 p-6 lg:p-8 flex flex-col justify-end h-full">
-						<p v-if="highlight.tagline" class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">
-							{{ highlight.tagline }}
-						</p>
-						<h3 v-if="highlight.headline" class="text-xl lg:text-2xl font-bold uppercase tracking-wider text-white mb-3">
-							{{ highlight.headline }}
-						</h3>
-						<p v-if="highlight.description" class="text-slate-300 text-sm leading-relaxed max-w-md opacity-90 transition-opacity duration-300">
-							{{ highlight.description }}
-						</p>
-						<NuxtLink
-							to="#specs"
-							class="inline-flex w-fit items-center text-xs font-bold tracking-widest uppercase text-white mt-4 border-b border-white/30 pb-1 group-hover:border-red-500 transition-colors focus:outline-none focus-visible:border-red-500"
-						>
-							Learn more <span class="ml-2" aria-hidden="true">→</span>
-						</NuxtLink>
-					</div>
-				</article>
 			</div>
 		</section>
 
@@ -413,8 +340,10 @@ useSeoMeta({
 			</div>
 		</section>
 
-		<!-- Feature rows — alternating image / text (services_alternating blocks) -->
-		<VehicleHighlights :items="featureRows" :vehicle-title="displayTitle" />
+		<!-- ════════════════════════════════════════════════════════════
+		     HIGHLIGHTS — every published highlight, alternating image / text rows
+	     ════════════════════════════════════════════════════════════ -->
+		<VehicleHighlights :items="vehicle.highlights ?? []" :vehicle-title="displayTitle" :fallback-image="heroMedia" />
 
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 5 · TRIMS — selectable trim cards with key features

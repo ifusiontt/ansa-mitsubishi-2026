@@ -3,32 +3,38 @@ import type { VehicleHighlight } from '#shared/types/vehicle';
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 
 /**
- * Alternating feature rows (image left / text right, then mirrored) for the
- * vehicle page. Items are the vehicle's block_content_items whose parent block
- * is a `services_alternating` feature block — see directus/seeds/vehicle-content-blocks.mjs.
+ * Vehicle highlights as alternating rows (image left / text right, then mirrored).
+ * Renders every published `vehicles.highlights` item in sort order — no cap.
+ * Content and images are seeded by directus/seeds/vehicle-content-blocks.mjs.
  */
-const props = defineProps<{
-	items: VehicleHighlight[];
-	vehicleTitle: string;
-}>();
+const props = withDefaults(
+	defineProps<{
+		items: VehicleHighlight[];
+		vehicleTitle: string;
+		/** Directus file id shown when an item has no image (normally the hero render). */
+		fallbackImage?: string;
+	}>(),
+	{ fallbackImage: '' },
+);
 
 const { setAttr } = useVisualEditing();
 
 const rows = computed(() =>
 	props.items
 		.filter((item) => item.status === 'published')
+		.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
 		.map((item) => {
-			const id = directusFileId(item.images?.[0]?.directus_files_id);
+			const id = directusFileId(item.images?.[0]?.directus_files_id) || props.fallbackImage;
 			return { ...item, imageUrl: id ? `${getDirectusAssetURL(id)}?width=1400&quality=82&format=webp` : '' };
 		}),
 );
 </script>
 
 <template>
-	<section v-if="rows.length" id="features" class="bg-black py-20 text-white md:py-28" aria-labelledby="features-heading">
+	<section v-if="rows.length" id="highlights" class="scroll-mt-20 bg-black py-20 text-white md:py-28" aria-labelledby="highlights-heading">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-16">
-			<p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">Features</p>
-			<h2 id="features-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Inside the {{ vehicleTitle }}</h2>
+			<p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">Highlights</p>
+			<h2 id="highlights-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Inside the {{ vehicleTitle }}</h2>
 
 			<div class="mt-14 space-y-10 md:space-y-16">
 				<article
