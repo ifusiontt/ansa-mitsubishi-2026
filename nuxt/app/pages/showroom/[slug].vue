@@ -2,6 +2,7 @@
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 import type { VehiclePageColor, VehicleHighlight, VehiclePage, VehiclePageTrim } from '#shared/types/vehicle';
 import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
+import VehicleHighlights from '~/components/showroom/VehicleHighlights.vue';
 
 /**
  * /showroom/[slug] — 8-part vehicle page.
@@ -50,10 +51,18 @@ const heroVideoUrl = computed(() => vehicle.hero_video_url || '');
 const heroKicker = computed(() => [vehicle.model_year, vehicle.category].filter(Boolean).join(' '));
 
 const colors = computed<VehiclePageColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
+// `vehicles.highlights` carries two kinds of rows, told apart by their parent block:
+// feature rows (variant `services_alternating`) render in VehicleHighlights below the
+// colours; everything else feeds the Part 3 panels.
+const isFeatureRow = (highlight: VehicleHighlight) =>
+	typeof highlight.item === 'object' && highlight.item?.variant === 'services_alternating';
+const sortedHighlights = computed(() => [...(vehicle.highlights ?? [])].sort((a, b) => a.sort - b.sort));
+const featureRows = computed(() => sortedHighlights.value.filter(isFeatureRow));
+
 // Part 3 is a strict 3-up panel row: show only the top 3 highlights by sort order.
 const MAX_HIGHLIGHTS = 3;
 const highlights = computed<VehicleHighlight[]>(() =>
-	[...(vehicle.highlights ?? [])].sort((a, b) => a.sort - b.sort).slice(0, MAX_HIGHLIGHTS),
+	sortedHighlights.value.filter((highlight) => !isFeatureRow(highlight)).slice(0, MAX_HIGHLIGHTS),
 );
 const trims = computed<VehiclePageTrim[]>(() => [...(vehicle.trims ?? [])].sort((a, b) => a.trim_name.localeCompare(b.trim_name)));
 
@@ -403,6 +412,9 @@ useSeoMeta({
 				</div>
 			</div>
 		</section>
+
+		<!-- Feature rows — alternating image / text (services_alternating blocks) -->
+		<VehicleHighlights :items="featureRows" :vehicle-title="displayTitle" />
 
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 5 · TRIMS — selectable trim cards with key features
