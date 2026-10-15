@@ -9,6 +9,8 @@ const props = defineProps<{
 	error?: string;
 	required?: boolean;
 	hint?: string;
+	/** Replaces the default label styling (e.g. white labels over a photo). */
+	labelClass?: string;
 }>();
 
 const id = computed(() => `inquiry-${props.name}`);
@@ -29,7 +31,7 @@ const controlAttrs = computed(() => ({
 
 <template>
 	<div>
-		<label :for="id" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+		<label :for="id" :class="labelClass ?? 'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-300'">
 			{{ label }}
 			<span v-if="required" class="text-brand-red" aria-hidden="true">*</span>
 			<span v-else class="font-normal normal-case tracking-normal text-neutral-500">(optional)</span>

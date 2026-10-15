@@ -74,6 +74,9 @@ const inputClass =
 	'placeholder-neutral-400 backdrop-blur-sm transition-colors hover:border-white/40 focus:border-brand-red focus:outline-none ' +
 	'focus:ring-1 focus:ring-brand-red focus:ring-offset-0 aria-[invalid=true]:border-brand-red/80 [color-scheme:dark]';
 
+/** Field labels sit over the brightest part of the photo — pure white, bold, with a shadow. */
+const labelClass = 'mb-1.5 block text-xs font-bold uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]';
+
 const initial = (): TestDriveInput => ({
 	full_name: '',
 	phone: '',
@@ -103,10 +106,10 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 				<p class="mt-3 text-neutral-300">Schedule a personalized test drive or visit our showroom.</p>
 
 				<form class="mt-8 space-y-4" data-inquiry-form novalidate @submit.prevent="submit">
-					<InquiryField v-slot="attrs" name="full_name" label="Name" required :error="errors.full_name">
+					<InquiryField v-slot="attrs" name="full_name" label="Name" required :label-class="labelClass" :error="errors.full_name">
 						<input v-bind="attrs" v-model="values.full_name" type="text" autocomplete="name" :class="inputClass" @blur="touch('full_name')" />
 					</InquiryField>
-					<InquiryField v-slot="attrs" name="phone" label="Phone Number" required :error="errors.phone">
+					<InquiryField v-slot="attrs" name="phone" label="Phone Number" required :label-class="labelClass" :error="errors.phone">
 						<input
 							v-bind="attrs"
 							v-model="values.phone"
@@ -117,7 +120,7 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 							@blur="touch('phone')"
 						/>
 					</InquiryField>
-					<InquiryField v-slot="attrs" name="vehicle_model" label="Model" required :error="errors.vehicle_model">
+					<InquiryField v-slot="attrs" name="vehicle_model" label="Model" required :label-class="labelClass" :error="errors.vehicle_model">
 						<select v-bind="attrs" v-model="values.vehicle_model" :class="inputClass" @blur="touch('vehicle_model')">
 							<option value="" disabled>Select a model</option>
 							<option v-for="model in VEHICLE_MODEL_OPTIONS" :key="model" :value="model">{{ model }}</option>
