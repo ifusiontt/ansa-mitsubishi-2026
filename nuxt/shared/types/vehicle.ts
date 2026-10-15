@@ -101,7 +101,9 @@ export interface VehiclePage {
 /** Lightweight published-vehicle index row (GET /api/vehicles) — used by the header mega menu. */
 export type VehicleSummary = Pick<
 	VehiclePage,
-	'id' | 'slug' | 'title' | 'model_year' | 'starting_price' | 'menu_image'
+	'id' | 'slug' | 'title' | 'model_year' | 'starting_price' | 'menu_image' | 'category' | 'seating_capacity' | 'fuel_type'
 > & {
 	hero_block: Pick<VehicleHeroBlock, 'media'> | null;
+	/** Spec slice for the homepage cards' quick-spec reveal. */
+	trims: Pick<VehiclePageTrim, 'status' | 'price' | 'engine' | 'drivetrain'>[];
 };

@@ -4,7 +4,8 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
 
 /**
- * Homepage colour switcher: pick a model, then a vehicle_colors swatch.
+ * Homepage colour switcher: pick a model, then a vehicle_colors swatch. Hovering a swatch previews
+ * it on the stage instantly; clicking locks it in, and leaving the palette returns to the locked colour.
  * OEM split stage — copy, segmented model switcher and CTA on the light side; the render,
  * floor shadow and swatches framed by a dark wedge with a slanted left edge
  * (full-bleed dark panel when stacked on mobile).
@@ -23,12 +24,17 @@ const { data: vehicle } = await useFetch<VehiclePage>(() => `/api/vehicles/${sel
 
 const colors = computed(() => [...(vehicle.value?.colors ?? [])].sort((a, b) => a.sort - b.sort));
 const selectedColor = computed(() => colors.value[selectedColorIdx.value] ?? null);
+/** Swatch under the pointer — drives the stage while set; the click selection is what sticks. */
+const previewColorIdx = ref<number | null>(null);
+const shownColorIdx = computed(() => previewColorIdx.value ?? selectedColorIdx.value);
+const shownColor = computed(() => colors.value[shownColorIdx.value] ?? null);
 // From the already-loaded fleet list, so the tabs and CTA update on click, before the colour fetch lands.
 const selectedModel = computed(() => props.vehicles.find((model) => model.slug === selectedSlug.value));
 const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 
 watch(selectedSlug, () => {
 	selectedColorIdx.value = 0;
+	previewColorIdx.value = null;
 });
 
 const renderUrl = (uuid: string) => (uuid ? `${getDirectusAssetURL(uuid)}?${VEHICLE_RENDER_QUERY}` : '');
@@ -91,7 +97,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 				<!-- Glow tinted toward the active paint; `currentColor` lets the colour change animate. -->
 				<div
 					class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_55%_55%,currentColor_0%,transparent_60%)] opacity-25 transition-colors duration-700"
-					:style="{ color: selectedColor?.hex_code || '#0A0A0A' }"
+					:style="{ color: shownColor?.hex_code || '#0A0A0A' }"
 					aria-hidden="true"
 				/>
 
@@ -103,8 +109,8 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 					/>
 					<VehicleColorStage
 						class="relative z-10"
-						:src="colorRenderUrl(selectedColorIdx)"
-						:alt="`${vehicle?.title ?? ''} in ${selectedColor?.color_name ?? ''}`"
+						:src="colorRenderUrl(shownColorIdx)"
+						:alt="`${vehicle?.title ?? ''} in ${shownColor?.color_name ?? ''}`"
 						:preload="renderUrls"
 						img-class="drop-shadow-[0_24px_30px_rgba(0,0,0,0.75)]"
 					/>
@@ -115,7 +121,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 				</div>
 
 				<div v-if="colors.length" class="mt-8 flex flex-col items-center text-center">
-					<div class="flex flex-wrap items-center justify-center gap-4" role="radiogroup" aria-label="Exterior colours">
+					<div class="flex flex-wrap items-center justify-center gap-4" role="radiogroup" aria-label="Exterior colours" @mouseleave="previewColorIdx = null">
 						<button
 							v-for="(color, index) in colors"
 							:key="color.id"
@@ -124,14 +130,25 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 							:aria-checked="index === selectedColorIdx"
 							:aria-label="color.color_name"
 							class="h-8 w-8 rounded-full border border-white/10 shadow-md transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-							:class="index === selectedColorIdx ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-neutral-950' : 'hover:scale-110'"
+							:class="
+								index === selectedColorIdx
+									? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-neutral-950'
+									: index === previewColorIdx
+										? 'scale-110 ring-1 ring-white/60 ring-offset-2 ring-offset-neutral-950'
+										: 'hover:scale-110'
+							"
 							:style="{ background: color.hex_code }"
+							@mouseenter="previewColorIdx = index"
 							@click="selectedColorIdx = index"
 						/>
 					</div>
-					<p v-if="selectedColor" class="mt-6 text-lg font-bold uppercase tracking-widest" aria-live="polite">
-						{{ selectedColor.color_name }}
-						<span v-if="selectedColor.color_code" class="ml-2 text-sm text-neutral-400">{{ selectedColor.color_code }}</span>
+					<!-- Visual label follows the preview; only the locked selection is announced -->
+					<p v-if="shownColor" class="mt-6 text-lg font-bold uppercase tracking-widest" aria-hidden="true">
+						{{ shownColor.color_name }}
+						<span v-if="shownColor.color_code" class="ml-2 text-sm text-neutral-400">{{ shownColor.color_code }}</span>
+					</p>
+					<p v-if="selectedColor" class="sr-only" aria-live="polite">
+						{{ selectedColor.color_name }}<template v-if="selectedColor.color_code">, paint code {{ selectedColor.color_code }}</template>
 					</p>
 				</div>
 			</div>
