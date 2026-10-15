@@ -44,6 +44,11 @@ const config: Config = {
 				input: 'var(--input-color)',
 				secondary: 'var(--accent-color-dark)',
 				accent: 'var(--accent-color)',
+				/* Official Mitsubishi Motors Red — CTAs, overlines, hover/active accents */
+				'brand-red': {
+					DEFAULT: '#ED0008',
+					dark: '#C80007',
+				},
 				soft: 'var(--accent-color-soft)',
 				blue: {
 					DEFAULT: '#172940',

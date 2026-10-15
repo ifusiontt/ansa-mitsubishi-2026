@@ -13,9 +13,10 @@ camera perspective and ground plane are untouched.
 
 Rules
 -----
-- every *.webp in <src_dir> must carry alpha (RGBA); its non-transparent bounding box is
-  scaled to CAR_WIDTH and centred on the canvas, its bottom edge on GROUND_Y
-- output: real WebP with alpha (quality 90), same filename, in <dst_dir>
+- every *.webp / *.png in <src_dir> must carry alpha (RGBA); its non-transparent bounding box
+  is scaled to CAR_WIDTH and centred on the canvas, its bottom edge on GROUND_Y
+- output: same format and filename in <dst_dir> — WebP with alpha (quality 90) or lossless PNG
+  (e.g. the homepage menu cutouts, via directus/seeds/add-vehicle-menu-image.mjs)
 - source files are never modified
 
 Usage:  python3 -I scripts/normalize-render-canvas.py <src_dir> <dst_dir>
@@ -45,7 +46,10 @@ def normalize(src: Path, dst: Path) -> str:
     if top < 0:
         raise SystemExit(f"{src.name}: car taller than the space above the ground line")
     canvas.alpha_composite(car, (left, top))
-    canvas.save(dst, "WEBP", quality=QUALITY, alpha_quality=100, method=6)
+    if dst.suffix.lower() == ".png":
+        canvas.save(dst, "PNG", optimize=True)
+    else:
+        canvas.save(dst, "WEBP", quality=QUALITY, alpha_quality=100, method=6)
     return f"{src.name}: car {car.width}x{car.height} at +{left}+{top} on {CANVAS[0]}x{CANVAS[1]}"
 
 
@@ -53,9 +57,9 @@ def main() -> None:
     if len(sys.argv) != 3:
         raise SystemExit(__doc__)
     src_dir, dst_dir = Path(sys.argv[1]), Path(sys.argv[2])
-    renders = sorted(src_dir.glob("*.webp"))
+    renders = sorted([*src_dir.glob("*.webp"), *src_dir.glob("*.png")])
     if not renders:
-        raise SystemExit(f"no .webp renders in {src_dir}")
+        raise SystemExit(f"no .webp / .png renders in {src_dir}")
     dst_dir.mkdir(parents=True, exist_ok=True)
     for src in renders:
         print(normalize(src, dst_dir / src.name))

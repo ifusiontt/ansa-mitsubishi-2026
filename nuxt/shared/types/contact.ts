@@ -1,6 +1,6 @@
 /**
- * Service booking + parts request contracts, shared by the Vue forms
- * (components/forms/ServiceBookingForm.vue, PartsRequestForm.vue) and
+ * Service booking, parts request and quick test-drive contracts, shared by the Vue forms
+ * (components/forms/ServiceBookingForm.vue, PartsRequestForm.vue, home/HomeContactBanner.vue) and
  * server/api/forms/parts-service.post.ts so both sides validate identically.
  *
  * Submissions land in Directus `form_submissions` with `submission_type` and a
@@ -8,12 +8,13 @@
  */
 import { z } from 'zod';
 
-export type InquiryType = 'service' | 'parts';
+export type InquiryType = 'service' | 'parts' | 'test_drive';
 
 /** Directus `forms.title` each inquiry type is filed under. */
 export const INQUIRY_FORM_TITLES: Record<InquiryType, string> = {
 	service: 'Service Booking',
 	parts: 'Parts Request',
+	test_drive: 'Test Drive Request',
 };
 
 /** Branch choices; `value` is stored as `metadata.dealer_id` (matches `dealers.slug` where a row exists). */
@@ -56,17 +57,21 @@ const numberInput = (message: string) =>
 
 const dealerIds = DEALER_OPTIONS.map((d) => d.value) as [DealerId, ...DealerId[]];
 
+const phoneSchema = z
+	.string()
+	.trim()
+	.min(7, 'Enter a valid contact number')
+	.max(20, 'Enter a valid contact number')
+	.regex(/^[+\d\s().-]+$/, 'Enter a valid contact number');
+
+const vehicleModelSchema = (message: string) => z.enum(VEHICLE_MODEL_OPTIONS, { errorMap: () => ({ message }) });
+
 const contactSchema = z.object({
 	first_name: z.string().trim().min(1, 'First name is required').max(100),
 	last_name: z.string().trim().min(1, 'Last name is required').max(100),
-	phone: z
-		.string()
-		.trim()
-		.min(7, 'Enter a valid contact number')
-		.max(20, 'Enter a valid contact number')
-		.regex(/^[+\d\s().-]+$/, 'Enter a valid contact number'),
+	phone: phoneSchema,
 	email: z.string().trim().email('Enter a valid email address').max(255),
-	vehicle_model: z.enum(VEHICLE_MODEL_OPTIONS, { errorMap: () => ({ message: 'Select your vehicle model' }) }),
+	vehicle_model: vehicleModelSchema('Select your vehicle model'),
 	registration_number: z
 		.string()
 		.trim()
@@ -101,13 +106,25 @@ export const partsRequestSchema = contactSchema.extend({
 	part_description: z.string().trim().min(5, 'Describe the part you need').max(1000),
 });
 
+/** Homepage quick request: name, phone and the model to drive — the sales team follows up by phone. */
+export const testDriveSchema = z.object({
+	full_name: z.string().trim().min(2, 'Enter your name').max(200),
+	phone: phoneSchema,
+	vehicle_model: vehicleModelSchema('Select a model to test drive'),
+});
+
 export type ServiceBookingInput = z.input<typeof serviceBookingSchema>;
 export type ServiceBooking = z.output<typeof serviceBookingSchema>;
 export type PartsRequestInput = z.input<typeof partsRequestSchema>;
 export type PartsRequest = z.output<typeof partsRequestSchema>;
+export type TestDriveInput = z.input<typeof testDriveSchema>;
+export type TestDrive = z.output<typeof testDriveSchema>;
 
 /** Request body for POST /api/forms/parts-service. */
-export type InquiryPayload = { type: 'service'; data: ServiceBookingInput } | { type: 'parts'; data: PartsRequestInput };
+export type InquiryPayload =
+	| { type: 'service'; data: ServiceBookingInput }
+	| { type: 'parts'; data: PartsRequestInput }
+	| { type: 'test_drive'; data: TestDriveInput };
 
 /**
  * `form_submissions.metadata` — contact details plus every request field.
@@ -117,20 +134,44 @@ export interface InquiryMetadata {
 	first_name: string;
 	last_name: string;
 	phone: string;
-	email: string;
+	/** null for test-drive requests, which only collect name + phone. */
+	email: string | null;
 	service_type: ServiceType | null;
 	vehicle_model: VehicleModel;
-	registration_number: string;
+	registration_number: string | null;
 	vehicle_mileage: number | null;
 	vehicle_year: number | null;
 	chassis_number: string | null;
 	part_number: string | null;
 	part_description: string | null;
 	request_date: string | null;
-	dealer_id: DealerId;
+	dealer_id: DealerId | null;
 }
 
-export function toInquiryMetadata(payload: { type: 'service'; data: ServiceBooking } | { type: 'parts'; data: PartsRequest }): InquiryMetadata {
+export function toInquiryMetadata(
+	payload: { type: 'service'; data: ServiceBooking } | { type: 'parts'; data: PartsRequest } | { type: 'test_drive'; data: TestDrive },
+): InquiryMetadata {
+	if (payload.type === 'test_drive') {
+		// Single name field: first word → first_name, the rest → last_name.
+		const [first = '', ...rest] = payload.data.full_name.split(/\s+/);
+		return {
+			first_name: first,
+			last_name: rest.join(' '),
+			phone: payload.data.phone,
+			email: null,
+			vehicle_model: payload.data.vehicle_model,
+			registration_number: null,
+			dealer_id: null,
+			service_type: null,
+			vehicle_mileage: null,
+			request_date: null,
+			vehicle_year: null,
+			chassis_number: null,
+			part_number: null,
+			part_description: null,
+		};
+	}
+
 	const { data } = payload;
 	const base = {
 		first_name: data.first_name,

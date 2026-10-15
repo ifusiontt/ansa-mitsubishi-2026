@@ -110,11 +110,11 @@ useHead(() => ({
 		<section v-show="activeTab === 'faq'" id="faq" class="scroll-mt-24 py-12 md:py-20">
 			<Container>
 				<div class="mx-auto max-w-3xl">
-					<p class="text-xs font-semibold uppercase tracking-[0.25em] text-[#C3002F]">Support</p>
+					<p class="text-xs font-semibold uppercase tracking-[0.25em] text-brand-red">Support</p>
 					<h2 class="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Frequently Asked Questions</h2>
 					<p class="mt-4 text-neutral-400">
 						Warranty, parts, service and financing at ANSA Motors T&amp;T. Can't find your answer?
-						<NuxtLink to="/contact" class="text-[#C3002F] underline-offset-4 hover:underline">Contact us</NuxtLink>.
+						<NuxtLink to="/contact" class="text-brand-red underline-offset-4 hover:underline">Contact us</NuxtLink>.
 					</p>
 
 					<div class="mt-10">

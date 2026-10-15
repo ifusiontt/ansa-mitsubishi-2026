@@ -97,7 +97,7 @@ useSeoMeta({
 	<section class="bg-black text-white min-h-[70vh] py-16 md:py-24">
 		<Container>
 			<div class="max-w-3xl mx-auto">
-				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#C3002F]">ANSA Mitsubishi</p>
+				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-red">ANSA Mitsubishi</p>
 				<h1 class="mt-3 text-4xl md:text-5xl font-bold tracking-tight">Contact Us</h1>
 				<p class="mt-4 text-neutral-400 max-w-xl">
 					Questions about a vehicle, a test drive, or service? Send us a message and our team will get back to you.

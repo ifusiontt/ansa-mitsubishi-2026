@@ -91,7 +91,7 @@ const SKIP_IMAGE = process.env.SKIP_IMAGE === '1';
 const ROOT = path.resolve(__dirname, '..');
 const MANIFEST_PATH = path.join(ROOT, 'project-manifest.json');
 
-const BRAND_RED = '#C3002F';
+const BRAND_RED = '#ED0008';
 
 const log = (...args) => console.log(...args);
 const step = (n, title) => log(`\n${'='.repeat(72)}\n[${n}] ${title}\n${'='.repeat(72)}`);

@@ -49,17 +49,20 @@ const imageUrl = computed(() => {
 		<!-- Shade sits under the card: bottom-up on mobile, right-to-left on desktop -->
 		<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-transparent lg:bg-gradient-to-l" aria-hidden="true" />
 
-		<div class="mx-auto flex min-h-[560px] max-w-7xl items-center px-4 py-20 sm:px-6 lg:justify-end lg:px-16">
+		<div class="mx-auto flex min-h-[560px] max-w-7xl items-center px-4 py-24 sm:px-6 md:py-32 lg:justify-end lg:px-16">
 			<article
 				class="max-w-md rounded-xl border border-white/10 bg-neutral-900/60 p-8 shadow-2xl shadow-black/50 backdrop-blur-md"
 				:data-directus="item ? setAttr({ collection: 'block_content_items', item: item.id, fields: ['headline', 'description', 'images'], mode: 'drawer' }) : undefined"
 			>
-				<p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">{{ eyebrow }}</p>
+				<p class="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-white">
+					<span class="h-1.5 w-1.5 rounded-full bg-brand-red" aria-hidden="true" />
+					{{ eyebrow }}
+				</p>
 				<h2 id="home-spotlight-heading" class="mt-4 text-3xl font-black leading-tight tracking-tight text-white">{{ headline }}</h2>
 				<p class="mt-4 leading-relaxed text-neutral-300">{{ description }}</p>
 				<NuxtLink
 					:to="ctaTo"
-					class="mt-8 inline-block rounded-md bg-[#C3002F] px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#a30027] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+					class="mt-8 inline-block rounded-md bg-brand-red px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
 				>
 					Explore safety
 				</NuxtLink>

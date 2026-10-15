@@ -14,6 +14,9 @@
  *   4. Uploads the transparent (RGBA PNG) model cutouts from the content library and
  *      assigns them as `menu_image` — used by the homepage "Find your Mitsubishi" cards
  *      and the header mega menu, so they float on the dark cards without a white box.
+ *      Cutouts listed in NORMALIZE are first re-framed by scripts/normalize-render-canvas.py
+ *      (car scaled to the shared studio width and ground line), so every model renders at the
+ *      same proportions in the fixed-height cards.
  *
  * Idempotent: every step checks current state first (cutouts are matched by filename + size).
  *
@@ -21,6 +24,7 @@
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
  *         CONTENT_DIR (default ~/Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026)
  */
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -118,10 +122,26 @@ const CUTOUTS = {
 	triton: 'Triton/triton_menu_cutout.png',
 	'xpander-cross': 'Xpander_Cross/xpander_menu_cutout.png',
 };
+/**
+ * Cutouts exported with a different framing: the Xpander Cross car is ~3150px wide on the
+ * 4000x2800 canvas vs ~2770px for the Outlander Sport and Triton, so it rendered ~13% larger.
+ */
+const NORMALIZE = new Set(['xpander-cross']);
+const NORMALIZE_SCRIPT = path.join(HERE, '..', '..', 'scripts', 'normalize-render-canvas.py');
+
+/** Re-framed copy of a cutout in a temp dir (the content library is never modified). Deterministic output, so re-runs reuse the upload. */
+function normalizedCopy(abs) {
+	const src = fs.mkdtempSync(path.join(os.tmpdir(), 'menu-cutout-src-'));
+	const dst = fs.mkdtempSync(path.join(os.tmpdir(), 'menu-cutout-dst-'));
+	fs.copyFileSync(abs, path.join(src, path.basename(abs)));
+	execFileSync('python3', ['-I', NORMALIZE_SCRIPT, src, dst], { stdio: 'inherit' });
+	return path.join(dst, path.basename(abs));
+}
 
 /** Directus file id for a cutout — reuses a same-name, same-size upload. */
-async function ensureCutout(relPath) {
-	const abs = path.join(CONTENT_DIR, '02_Showroom_Models', relPath);
+async function ensureCutout(relPath, normalize = false) {
+	const original = path.join(CONTENT_DIR, '02_Showroom_Models', relPath);
+	const abs = normalize ? normalizedCopy(original) : original;
 	const buf = fs.readFileSync(abs);
 	// PNG IHDR colour type 6 = RGBA; anything else would bring the white box back
 	if (buf[25] !== 6) throw new Error(`${relPath} is not an RGBA PNG (colour type ${buf[25]})`);
@@ -142,15 +162,23 @@ async function ensureCutout(relPath) {
 	return JSON.parse(text).data.id;
 }
 
+let changed = false;
 const { data: vehicles } = await api('SEARCH', '/items/vehicles', { query: { fields: ['id', 'slug', 'menu_image'], limit: -1 } });
 for (const [slug, relPath] of Object.entries(CUTOUTS)) {
 	const vehicle = vehicles.find((v) => v.slug === slug);
 	if (!vehicle) throw new Error(`vehicle not found: ${slug}`);
-	const fileId = await ensureCutout(relPath);
+	const fileId = await ensureCutout(relPath, NORMALIZE.has(slug));
 	if (vehicle.menu_image === fileId) {
 		console.log(`= ${slug}: menu_image already ${path.basename(relPath)}`);
 	} else {
 		await api('PATCH', `/items/vehicles/${vehicle.id}`, { menu_image: fileId });
 		console.log(`+ ${slug}: menu_image → ${path.basename(relPath)} (${fileId})`);
+		changed = true;
 	}
+}
+
+// This instance serves stale GET reads after writes (see contact-form.mjs); the Nuxt API reads via GET.
+if (changed) {
+	await api('POST', '/utils/cache/clear');
+	console.log('~ Directus data cache cleared');
 }

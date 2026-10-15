@@ -101,7 +101,7 @@ const resolveImageUuid = (item: any): string | null => {
                   <!-- Tagline -->
                   <p
                     v-if="item.tagline"
-                    class="text-[#C3002F] text-[11px] font-bold uppercase tracking-widest mb-4"
+                    class="text-brand-red text-[11px] font-bold uppercase tracking-widest mb-4"
                   >
                     {{ item.tagline }}
                   </p>
@@ -180,7 +180,7 @@ const resolveImageUuid = (item: any): string | null => {
               <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent -z-5" />
               <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-16 w-full">
                 <div class="max-w-3xl text-left">
-                  <p v-if="items[0].tagline" class="text-[#C3002F] text-[11px] font-bold uppercase tracking-widest mb-4">
+                  <p v-if="items[0].tagline" class="text-brand-red text-[11px] font-bold uppercase tracking-widest mb-4">
                     {{ items[0].tagline }}
                   </p>
                   <h1 v-if="items[0].headline" class="text-white text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 leading-tight">
@@ -248,7 +248,7 @@ swiper-slide {
 }
 
 :deep(.hero-slider-pagination .swiper-pagination-bullet-active) {
-  background: #C3002F;
+  background: #ED0008;
   width: 28px;
   border-radius: 5px;
 }

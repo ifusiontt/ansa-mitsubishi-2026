@@ -7,7 +7,7 @@
 	--foreground-color: #42566e;
 	--background-color-muted: color-mix(in srgb, var(--background-color), var(--foreground-color) 10%);
 	/* Brand token: Mitsubishi Red (AGENTS.md) */
-	--accent-color: #C3002F;
+	--accent-color: #ED0008;
 	--background-variant-color: #172940;
 	--accent-color-dark: color-mix(in srgb, var(--accent-color), black 40%);
 	--accent-color-soft: color-mix(in srgb, var(--accent-color), white 20%);

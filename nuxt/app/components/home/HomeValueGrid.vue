@@ -23,7 +23,7 @@ const { setAttr } = useVisualEditing();
 const imageUrl = (item: BlockContentItem) => {
 	const first = item.images?.[0];
 	const id = typeof first === 'object' ? directusFileId(first.directus_files_id) : '';
-	return id ? `${getDirectusAssetURL(id)}?width=900&height=1200&fit=cover&quality=80&format=webp` : '';
+	return id ? `${getDirectusAssetURL(id)}?width=1000&height=1100&fit=cover&quality=80&format=webp` : '';
 };
 
 const cards = computed(() => {
@@ -43,13 +43,14 @@ const cards = computed(() => {
 </script>
 
 <template>
-	<section class="bg-white text-neutral-950 dark:bg-black dark:text-white" aria-labelledby="home-value-heading">
+	<section class="bg-white py-24 text-neutral-950 dark:bg-black dark:text-white md:py-32" aria-labelledby="home-value-heading">
 		<h2 id="home-value-heading" class="sr-only">{{ block?.tagline || 'The ANSA Difference' }}</h2>
-		<ul class="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-16">
+		<!-- Full-bleed, edge-to-edge panels -->
+		<ul class="grid w-full max-w-none grid-cols-1 gap-0 px-0 md:grid-cols-3">
 			<li
 				v-for="card in cards"
 				:key="card.key"
-				class="group relative isolate flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-xl bg-neutral-900 text-white"
+				class="group relative isolate flex h-[500px] flex-col justify-end overflow-hidden bg-neutral-900 text-white md:h-[540px]"
 				:data-directus="card.id ? setAttr({ collection: 'block_content_items', item: card.id, fields: ['tagline', 'headline', 'description', 'images'], mode: 'drawer' }) : undefined"
 			>
 				<img
@@ -61,12 +62,15 @@ const cards = computed(() => {
 				/>
 				<!-- Fallback until photography is attached in Directus -->
 				<div v-else class="absolute inset-0 -z-20 bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-950" aria-hidden="true" />
-				<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent" aria-hidden="true" />
+				<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/95 via-black/50 to-transparent" aria-hidden="true" />
 
-				<div class="p-8">
-					<p v-if="card.tagline" class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">{{ card.tagline }}</p>
-					<h3 class="mt-2 text-2xl font-black tracking-tight">{{ card.headline }}</h3>
-					<p class="mt-3 leading-relaxed text-neutral-200">{{ card.description }}</p>
+				<div class="p-8 lg:p-12">
+					<p v-if="card.tagline" class="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-white">
+						<span class="h-1.5 w-1.5 rounded-full bg-brand-red" aria-hidden="true" />
+						{{ card.tagline }}
+					</p>
+					<h3 class="mt-2 text-2xl font-black tracking-tight lg:text-3xl">{{ card.headline }}</h3>
+					<p class="mt-3 max-w-sm leading-relaxed text-neutral-200">{{ card.description }}</p>
 				</div>
 			</li>
 		</ul>

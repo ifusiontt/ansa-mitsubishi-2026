@@ -30,12 +30,12 @@ const tabs: { key: PartsServiceTab; label: string; to: string; icon: string }[] 
 
 <template>
 	<section class="relative isolate overflow-hidden bg-[#080808] text-white">
-		<div aria-hidden="true" class="ps-hero-slope absolute inset-0 -z-10 bg-[#C3002F] md:-translate-x-1.5" />
+		<div aria-hidden="true" class="ps-hero-slope absolute inset-0 -z-10 bg-brand-red md:-translate-x-1.5" />
 		<div aria-hidden="true" class="ps-hero-slope absolute inset-0 -z-10 bg-[#121212]" />
 
 		<div class="mx-auto grid max-w-7xl items-end gap-6 px-4 pt-12 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:px-8 md:pt-16">
 			<div class="pb-8 md:pb-12">
-				<p class="text-xs font-semibold uppercase tracking-[0.25em] text-[#C3002F]">{{ eyebrow }}</p>
+				<p class="text-xs font-semibold uppercase tracking-[0.25em] text-brand-red">{{ eyebrow }}</p>
 				<h1 class="mt-3 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">{{ title }}</h1>
 				<p v-if="description" class="mt-4 max-w-xl text-neutral-400">{{ description }}</p>
 			</div>
@@ -58,13 +58,13 @@ const tabs: { key: PartsServiceTab; label: string; to: string; icon: string }[] 
 						:aria-current="tab.key === active ? 'page' : undefined"
 						:class="[
 							'flex items-center justify-center gap-2 border-b-2 px-4 py-4 text-sm font-bold uppercase tracking-wider transition-colors md:justify-start md:px-6',
-							'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C3002F]',
+							'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-red',
 							tab.key === active
-								? 'border-[#C3002F] text-white'
+								? 'border-brand-red text-white'
 								: 'border-transparent text-neutral-400 hover:border-neutral-600 hover:text-white',
 						]"
 					>
-						<Icon :name="tab.icon" class="size-4" :class="tab.key === active ? 'text-[#C3002F]' : ''" />
+						<Icon :name="tab.icon" class="size-4" :class="tab.key === active ? 'text-brand-red' : ''" />
 						{{ tab.label }}
 					</NuxtLink>
 				</li>

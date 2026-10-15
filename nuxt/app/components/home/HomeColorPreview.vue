@@ -47,8 +47,8 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 		/>
 
 		<div class="mx-auto grid max-w-7xl items-center px-4 sm:px-6 lg:grid-cols-12 lg:px-16">
-			<div class="py-16 lg:col-span-4 lg:py-28">
-				<p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">Colour Studio</p>
+			<div class="py-24 md:py-32 lg:col-span-4">
+				<p class="text-xs font-bold uppercase tracking-[0.3em] text-brand-red">Colour Studio</p>
 				<h2 id="home-colors-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Explore colour options</h2>
 				<p class="mt-4 text-neutral-600 dark:text-neutral-400">Preview factory paint options across the 2026 lineup.</p>
 
@@ -57,7 +57,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 					<select
 						id="home-colors-model"
 						v-model="selectedSlug"
-						class="w-full appearance-none rounded-md border border-neutral-300 bg-white py-3 pl-4 pr-10 text-sm font-bold uppercase tracking-widest text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+						class="w-full appearance-none rounded-md border border-neutral-300 bg-white py-3 pl-4 pr-10 text-sm font-bold uppercase tracking-widest text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
 					>
 						<option v-for="model in vehicles" :key="model.slug" :value="model.slug">{{ model.title }}</option>
 					</select>
@@ -71,7 +71,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 				<NuxtLink
 					v-if="vehicle"
 					:to="`/showroom/${vehicle.slug}#colors`"
-					class="mt-10 inline-flex items-center gap-2 rounded-md bg-[#C3002F] px-6 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#a30027] hover:text-white"
+					class="mt-10 inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark hover:text-white"
 				>
 					Explore the {{ vehicle.title }}
 					<Icon name="lucide:arrow-right" class="h-4 w-4" />
@@ -80,7 +80,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 
 			<!-- Mobile: full-bleed dark panel; desktop: transparent over the wedge. -->
 			<div
-				class="relative isolate -mx-4 overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-950 to-[#0b1630] px-4 py-14 text-white sm:-mx-6 sm:px-6 lg:col-span-8 lg:mx-0 lg:overflow-visible lg:bg-none lg:py-24 lg:pl-20 lg:pr-0"
+				class="relative isolate -mx-4 overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-950 to-[#0b1630] px-4 py-16 text-white sm:-mx-6 sm:px-6 md:py-24 lg:col-span-8 lg:mx-0 lg:overflow-visible lg:bg-none lg:py-32 lg:pl-20 lg:pr-0"
 			>
 				<!-- Glow tinted toward the active paint; `currentColor` lets the colour change animate. -->
 				<div
@@ -117,7 +117,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 							role="radio"
 							:aria-checked="index === selectedColorIdx"
 							:aria-label="color.color_name"
-							class="h-8 w-8 rounded-full border border-white/10 shadow-md transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+							class="h-8 w-8 rounded-full border border-white/10 shadow-md transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
 							:class="index === selectedColorIdx ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-neutral-950' : 'hover:scale-110'"
 							:style="{ background: color.hex_code }"
 							@click="selectedColorIdx = index"

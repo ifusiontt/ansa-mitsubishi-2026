@@ -28,7 +28,7 @@ const getFieldComponent = () => componentMap[props.field.type ?? ''] || Input;
 const isDark = computed(() => props.theme === 'dark');
 
 const darkControlClass =
-	'bg-black text-white border-neutral-800 placeholder:text-neutral-500 focus-visible:ring-[#C3002F] focus-visible:ring-offset-black';
+	'bg-black text-white border-neutral-800 placeholder:text-neutral-500 focus-visible:ring-brand-red focus-visible:ring-offset-black';
 
 /**
  * Directus stores email/phone inputs as `text` fields, so the HTML input type is

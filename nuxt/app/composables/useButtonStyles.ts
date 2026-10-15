@@ -7,7 +7,7 @@
  *
  * Visual alignment:
  * - rounded-md corners (matches card style)
- * - Mitsubishi Red (#C3002F) bg + white text for primary CTAs
+ * - Mitsubishi Red (#ED0008) bg + white text for primary CTAs
  * - Dark Industrial Slate (#0A0A0A / slate-900) for structural / secondary actions
  */
 

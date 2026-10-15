@@ -45,7 +45,7 @@ useHead({
 	style: [
 		{
 			id: 'accent-color',
-			innerHTML: `:root { --accent-color: ${unref(siteData)?.globals.accent_color || '#C3002F'} !important; }`,
+			innerHTML: `:root { --accent-color: ${unref(siteData)?.globals.accent_color || '#ED0008'} !important; }`,
 		},
 	],
 	bodyAttrs: {

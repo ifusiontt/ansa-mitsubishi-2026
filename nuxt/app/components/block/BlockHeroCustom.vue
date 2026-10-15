@@ -31,7 +31,7 @@ function renderHighlightedText(text: string, keyword: string, currentVariant: st
   const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi');
 
   // Apply Mitsubishi Red on dark themes, and Dark Industrial Slate on light themes for pristine legibility
-  const colorClass = currentVariant === 'light_clean' ? 'text-slate-900 font-black' : 'text-[#C3002F] font-extrabold';
+  const colorClass = currentVariant === 'light_clean' ? 'text-slate-900 font-black' : 'text-brand-red font-extrabold';
   return text.replace(regex, `<span class="${colorClass}">$1</span>`);
 }
 </script>
@@ -40,7 +40,7 @@ function renderHighlightedText(text: string, keyword: string, currentVariant: st
   <section
     v-if="variant === 'dark_industrial'"
     :data-directus="setAttr({ collection: 'block_hero_custom', item: data.id ?? '', fields: 'body', mode: 'modal' })"
-    class="bg-slate-950 py-20 text-white relative overflow-hidden border-b-4 border-[#C3002F] w-full"
+    class="bg-slate-950 py-20 text-white relative overflow-hidden border-b-4 border-brand-red w-full"
   >
     <div :class="isFullWidth ? 'w-full' : 'max-w-7xl mx-auto px-6'" class="relative z-10">
       <div class="flex flex-col lg:flex-row items-center gap-12">

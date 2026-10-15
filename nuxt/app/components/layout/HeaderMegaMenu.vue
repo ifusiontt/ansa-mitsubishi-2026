@@ -48,7 +48,7 @@ const priceFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0
 			class="absolute inset-x-0 top-full bg-black/95 backdrop-blur-md border-b border-neutral-900 text-white p-8"
 		>
 			<Container>
-				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#C3002F]">2026 Lineup</p>
+				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-red">2026 Lineup</p>
 
 				<ul
 					v-if="vehicles.length"
@@ -57,7 +57,7 @@ const priceFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0
 					<li v-for="vehicle in vehicles" :key="vehicle.id">
 						<NuxtLink
 							:to="`/showroom/${vehicle.slug}`"
-							class="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-4 focus-visible:ring-offset-black"
+							class="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-4 focus-visible:ring-offset-black"
 							@click="emit('close')"
 						>
 							<div class="aspect-[16/10] overflow-hidden rounded-xl bg-neutral-950 border border-neutral-900">
@@ -71,7 +71,7 @@ const priceFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0
 								/>
 							</div>
 							<p
-								class="mt-4 text-sm font-bold uppercase tracking-widest transition-colors group-hover:text-[#C3002F]"
+								class="mt-4 text-sm font-bold uppercase tracking-widest transition-colors group-hover:text-brand-red"
 							>
 								{{ displayTitle(vehicle) }}
 							</p>

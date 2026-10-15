@@ -124,18 +124,18 @@ const headlineParts = computed(() => {
 		>
 			<div class="max-w-2xl">
 				<p class="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em] text-neutral-400">
-					<span class="h-px w-10 bg-[#C3002F]" aria-hidden="true" />
+					<span class="h-px w-10 bg-brand-red" aria-hidden="true" />
 					ANSA Motors · 2026 Lineup
 				</p>
 				<h1 class="text-5xl font-black uppercase leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
-					{{ headlineParts.before }}<span v-if="headlineParts.keyword" class="text-[#C3002F]">{{ headlineParts.keyword }}</span>{{ headlineParts.after }}
+					{{ headlineParts.before }}<span v-if="headlineParts.keyword" class="text-brand-red">{{ headlineParts.keyword }}</span>{{ headlineParts.after }}
 				</h1>
 				<p v-if="hero.body" class="mt-6 max-w-xl text-lg text-neutral-300 lg:text-xl">{{ hero.body }}</p>
 
 				<div class="mt-10 flex flex-wrap gap-4">
 					<NuxtLink
 						to="#models"
-						class="inline-block rounded-md bg-[#C3002F] px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-red-950/50 transition-colors hover:bg-[#a30027] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+						class="inline-block rounded-md bg-brand-red px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
 					>
 						Explore models
 					</NuxtLink>
@@ -180,7 +180,7 @@ const headlineParts = computed(() => {
 			>
 				<span
 					class="block h-1 rounded-full transition-all duration-500 group-focus-visible:ring-2 group-focus-visible:ring-white group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-black"
-					:class="index === active ? 'w-10 bg-[#C3002F]' : 'w-5 bg-white/40 group-hover:bg-white/70'"
+					:class="index === active ? 'w-10 bg-brand-red' : 'w-5 bg-white/40 group-hover:bg-white/70'"
 				/>
 			</button>
 		</div>

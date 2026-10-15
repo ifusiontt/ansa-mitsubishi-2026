@@ -33,7 +33,7 @@ const rows = computed(() =>
 <template>
 	<section v-if="rows.length" id="highlights" class="scroll-mt-20 bg-black py-20 text-white md:py-28" aria-labelledby="highlights-heading">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-16">
-			<p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">Highlights</p>
+			<p class="text-xs font-bold uppercase tracking-[0.3em] text-brand-red">Highlights</p>
 			<h2 id="highlights-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Inside the {{ vehicleTitle }}</h2>
 
 			<div class="mt-14 space-y-10 md:space-y-16">
@@ -58,7 +58,7 @@ const rows = computed(() =>
 					</div>
 
 					<div class="rounded-xl border border-neutral-900 bg-neutral-950/80 p-8 backdrop-blur-sm md:p-10" :class="index % 2 === 1 ? 'md:order-1' : ''">
-						<p v-if="row.tagline" class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">{{ row.tagline }}</p>
+						<p v-if="row.tagline" class="text-xs font-bold uppercase tracking-[0.3em] text-brand-red">{{ row.tagline }}</p>
 						<h3 v-if="row.headline" class="mt-3 text-2xl font-black tracking-tight text-white md:text-3xl">{{ row.headline }}</h3>
 						<p v-if="row.description" class="mt-4 leading-relaxed text-neutral-400">{{ row.description }}</p>
 					</div>

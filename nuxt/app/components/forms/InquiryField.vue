@@ -31,7 +31,7 @@ const controlAttrs = computed(() => ({
 	<div>
 		<label :for="id" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
 			{{ label }}
-			<span v-if="required" class="text-[#C3002F]" aria-hidden="true">*</span>
+			<span v-if="required" class="text-brand-red" aria-hidden="true">*</span>
 			<span v-else class="font-normal normal-case tracking-normal text-neutral-500">(optional)</span>
 		</label>
 		<!-- One v-bind object: a static `name` on <slot> would select the slot by name instead of passing a prop. -->

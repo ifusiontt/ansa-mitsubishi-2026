@@ -106,7 +106,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 			</NuxtLink>
 
 			<nav class="flex items-center gap-4">
-				<SearchModal class="text-white [&_button]:text-white [&_button:hover]:bg-transparent [&_button:hover]:text-red-500" />
+				<SearchModal class="text-white [&_button]:text-white [&_button:hover]:bg-transparent [&_button:hover]:text-brand-red" />
 				<NavigationMenu
 					class="hidden md:flex [&_.origin-top-center]:border-neutral-800 [&_.origin-top-center]:bg-black [&_.origin-top-center]:shadow-2xl"
 					:data-directus="
@@ -117,7 +117,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 						<NavigationMenuItem v-for="section in props.navigation.items" :key="section.id">
 							<template v-if="section.children?.length">
 								<NavigationMenuTrigger
-									class="bg-transparent hover:bg-transparent focus:bg-transparent focus:outline-none focus:text-red-600 data-[state=open]:bg-transparent data-[state=open]:text-red-600 text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-red-600 transition-colors"
+									class="bg-transparent hover:bg-transparent focus:bg-transparent focus:outline-none focus:text-brand-red data-[state=open]:bg-transparent data-[state=open]:text-brand-red text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-brand-red transition-colors"
 								>
 									{{ section.title }}
 								</NavigationMenuTrigger>
@@ -125,7 +125,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 									<ul class="min-h-[100px] flex flex-col gap-2">
 										<li v-for="child in section.children" :key="child.id">
 											<NavigationMenuLink as-child>
-												<NuxtLink :to="child.page?.permalink || child.url || '#'" class="block py-1 text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-red-600 transition-colors">
+												<NuxtLink :to="child.page?.permalink || child.url || '#'" class="block py-1 text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-brand-red transition-colors">
 													{{ child.title }}
 												</NuxtLink>
 											</NavigationMenuLink>
@@ -140,8 +140,8 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 								:aria-expanded="megaOpen"
 								:aria-controls="MEGA_MENU_ID"
 								:class="[
-									'flex items-center gap-1 p-2 text-xs font-bold tracking-widest uppercase transition-colors hover:text-red-600',
-									megaOpen ? 'text-red-600' : 'text-slate-200',
+									'flex items-center gap-1 p-2 text-xs font-bold tracking-widest uppercase transition-colors hover:text-brand-red',
+									megaOpen ? 'text-brand-red' : 'text-slate-200',
 								]"
 								@mouseenter="openMega"
 								@mouseleave="scheduleCloseMega"
@@ -152,7 +152,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 							</button>
 
 							<NavigationMenuLink v-else as-child>
-								<NuxtLink :to="section.page?.permalink || section.url || '#'" class="p-2 text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-red-600 transition-colors">
+								<NuxtLink :to="section.page?.permalink || section.url || '#'" class="p-2 text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-brand-red transition-colors">
 									{{ section.title }}
 								</NuxtLink>
 							</NavigationMenuLink>
@@ -167,7 +167,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 								variant="link"
 								size="icon"
 								aria-label="Open menu"
-								class="text-white hover:text-red-500"
+								class="text-white hover:text-brand-red"
 							>
 								<Menu />
 							</Button>
@@ -181,7 +181,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 								<div v-for="section in props.navigation.items" :key="section.id">
 									<Collapsible v-if="section.children?.length">
 										<CollapsibleTrigger
-											class="w-full text-left flex items-center focus:outline-none text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-red-600 transition-colors"
+											class="w-full text-left flex items-center focus:outline-none text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-brand-red transition-colors"
 										>
 											<span>{{ section.title }}</span>
 											<ChevronDown class="size-4 ml-1 hover:rotate-180 active:rotate-180 focus:rotate-180" />
@@ -191,7 +191,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 												v-for="child in section.children"
 												:key="child.id"
 												:to="child.page?.permalink || child.url || '#'"
-												class="text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-red-600 transition-colors"
+												class="text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-brand-red transition-colors"
 												@click="handleLinkClick"
 											>
 												{{ child.title }}
@@ -202,7 +202,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 									<NuxtLink
 										v-else
 										:to="section.page?.permalink || section.url || '#'"
-										class="text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-red-600 transition-colors"
+										class="text-xs font-bold tracking-widest uppercase text-slate-200 hover:text-brand-red transition-colors"
 										@click="handleLinkClick"
 									>
 										{{ section.title }}
@@ -213,7 +213,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer));
 					</DropdownMenu>
 				</div>
 
-				<ThemeToggle class-name="!border-neutral-700 !bg-transparent text-white hover:text-red-500" />
+				<ThemeToggle class-name="!border-neutral-700 !bg-transparent text-white hover:text-brand-red" />
 			</nav>
 		</Container>
 

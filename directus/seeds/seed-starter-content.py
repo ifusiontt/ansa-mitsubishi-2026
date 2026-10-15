@@ -59,7 +59,7 @@ print('1. globals singleton')
 st, d = req('PATCH', '/items/globals', {
     'title': 'ANSA Mitsubishi',
     'url': 'https://ansamitsubishi.com',
-    'accent_color': '#C3002F',
+    'accent_color': '#ED0008',
     'tagline': "Trinidad & Tobago's Authorised Mitsubishi Dealer",
     'description': ('ANSA Mitsubishi is the authorised distributor of Mitsubishi vehicles in '
                     'Trinidad and Tobago, offering the full 2026 lineup, factory-warranty service, '

@@ -3,17 +3,18 @@ import {
 	dealerLabel,
 	partsRequestSchema,
 	serviceBookingSchema,
+	testDriveSchema,
 	toInquiryMetadata,
 	type InquiryType,
 } from '#shared/types/contact';
 import type { Form } from '#shared/types/schema';
 
 /**
- * Service booking / parts request handler for /service and /parts.
+ * Service booking / parts request / quick test-drive handler for /service, /parts and the homepage.
  *
- * Body: `{ type: 'service' | 'parts', data: {...} }` (InquiryPayload). The data is
+ * Body: `{ type: 'service' | 'parts' | 'test_drive', data: {...} }` (InquiryPayload). The data is
  * re-validated with the same zod schema the form uses, then stored as one
- * `form_submissions` row: `form` → the "Service Booking" / "Parts Request" form,
+ * `form_submissions` row: `form` → the "Service Booking" / "Parts Request" / "Test Drive Request" form,
  * `submission_type`, and the structured `metadata` JSON. The form's email
  * templates are rendered with the metadata as `{# field #}` merge values.
  */
@@ -27,11 +28,15 @@ export default defineEventHandler(async (event) => {
 	const body = await readBody<{ type?: unknown; data?: unknown }>(event);
 	const type = body?.type as InquiryType;
 
-	if (type !== 'service' && type !== 'parts') {
+	const schemas = { service: serviceBookingSchema, parts: partsRequestSchema, test_drive: testDriveSchema };
+	// Own-key check so prototype keys ("constructor", "__proto__") are rejected rather than looked up.
+	const schema = typeof type === 'string' && Object.hasOwn(schemas, type) ? schemas[type] : undefined;
+
+	if (!schema) {
 		throw createError({ statusCode: 400, statusMessage: 'Invalid inquiry type' });
 	}
 
-	const parsed = type === 'service' ? serviceBookingSchema.safeParse(body.data) : partsRequestSchema.safeParse(body.data);
+	const parsed = schema.safeParse(body.data);
 
 	if (!parsed.success) {
 		throw createError({
@@ -44,7 +49,9 @@ export default defineEventHandler(async (event) => {
 	const metadata =
 		type === 'service'
 			? toInquiryMetadata({ type, data: parsed.data as typeof serviceBookingSchema._output })
-			: toInquiryMetadata({ type, data: parsed.data as typeof partsRequestSchema._output });
+			: type === 'parts'
+				? toInquiryMetadata({ type, data: parsed.data as typeof partsRequestSchema._output })
+				: toInquiryMetadata({ type, data: parsed.data as typeof testDriveSchema._output });
 
 	let form: Pick<Form, 'id' | 'title' | 'emails'> | undefined;
 
@@ -86,7 +93,7 @@ export default defineEventHandler(async (event) => {
 	// Best-effort, as in /api/forms/submit: the submission is already stored.
 	try {
 		const mergeValues = Object.fromEntries(
-			Object.entries({ ...metadata, dealer: dealerLabel(metadata.dealer_id) }).map(([key, value]) => [key, value == null ? '' : String(value)]),
+			Object.entries({ ...metadata, dealer: metadata.dealer_id ? dealerLabel(metadata.dealer_id) : '' }).map(([key, value]) => [key, value == null ? '' : String(value)]),
 		);
 		await dispatchFormEmails(renderFormEmails(form.emails, mergeValues), {
 			formId: form.id,

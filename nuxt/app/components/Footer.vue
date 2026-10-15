@@ -89,16 +89,16 @@ const forceWhiteLogo = computed(() => !darkLogoUrl.value);
 								<NuxtLink
 									v-if="item.page?.permalink"
 									:to="item.page.permalink"
-									class="text-xs font-bold tracking-widest uppercase text-slate-300 hover:text-red-600 transition-colors"
+									class="text-xs font-bold tracking-widest uppercase text-slate-300 hover:text-brand-red transition-colors"
 								>
 									{{ item.title }}
 								</NuxtLink>
-								<a v-else :href="item.url || '#'" class="text-xs font-bold tracking-widest uppercase text-slate-300 hover:text-red-600 transition-colors">
+								<a v-else :href="item.url || '#'" class="text-xs font-bold tracking-widest uppercase text-slate-300 hover:text-brand-red transition-colors">
 									{{ item.title }}
 								</a>
 							</li>
 						</ul>
-						<ThemeToggle class="mt-4" class-name="!border-neutral-700 !bg-transparent text-white hover:text-red-500" />
+						<ThemeToggle class="mt-4" class-name="!border-neutral-700 !bg-transparent text-white hover:text-brand-red" />
 					</nav>
 				</div>
 			</div>
@@ -115,9 +115,9 @@ const forceWhiteLogo = computed(() => !darkLogoUrl.value);
 					</span>
 					Corner Richmond &amp; Duke Streets, Port of Spain, Trinidad &amp; Tobago
 					<span class="block">
-						<a href="tel:+18686257231" class="text-white hover:text-red-500 transition-colors">+1 (868) 625-7231</a>
+						<a href="tel:+18686257231" class="text-white hover:text-brand-red transition-colors">+1 (868) 625-7231</a>
 						<span aria-hidden="true" class="mx-2">·</span>
-						<a href="mailto:mitsubishi.pos@ansamcl.com" class="text-white hover:text-red-500 transition-colors">mitsubishi.pos@ansamcl.com</a>
+						<a href="mailto:mitsubishi.pos@ansamcl.com" class="text-white hover:text-brand-red transition-colors">mitsubishi.pos@ansamcl.com</a>
 					</span>
 					<span class="block">Mon–Fri 8:00 AM – 4:30 PM · Sat 8:30 AM – 12:30 PM</span>
 				</address>

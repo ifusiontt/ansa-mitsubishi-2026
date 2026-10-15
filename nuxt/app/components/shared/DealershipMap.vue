@@ -15,7 +15,7 @@ const props = defineProps<{ dealers: Dealer[] }>();
 type Island = 'trinidad' | 'tobago';
 type IslandFilter = 'all' | Island;
 
-const BRAND_RED = '#C3002F';
+const BRAND_RED = '#ED0008';
 const BRANCH_ZOOM = 15; // Esri Dark Gray Base tiles stop at zoom 16
 const TIMEZONE = 'America/Port_of_Spain';
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
@@ -191,7 +191,7 @@ onBeforeUnmount(() => {
 	>
 		<div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 			<div>
-				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#C3002F]">Find a branch</p>
+				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-red">Find a branch</p>
 				<h2 id="dealership-map-heading" class="mt-2 text-2xl md:text-3xl font-bold tracking-tight">
 					ANSA Motors Locations
 				</h2>
@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
 					:aria-selected="activeFilter === filter.value"
 					:class="[
 						'px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors',
-						activeFilter === filter.value ? 'bg-[#C3002F] text-white' : 'text-neutral-400 hover:text-white',
+						activeFilter === filter.value ? 'bg-brand-red text-white' : 'text-neutral-400 hover:text-white',
 					]"
 					@click="activeFilter = filter.value"
 				>
@@ -225,7 +225,7 @@ onBeforeUnmount(() => {
 					:class="[
 						'rounded-xl border p-5 transition-colors cursor-pointer',
 						selectedId === branch.id
-							? 'border-[#C3002F] bg-neutral-950'
+							? 'border-brand-red bg-neutral-950'
 							: 'border-neutral-800 hover:border-neutral-600',
 					]"
 					@click="selectBranch(branch)"
@@ -241,7 +241,7 @@ onBeforeUnmount(() => {
 						</button>
 						<span
 							v-if="branch.isHeadquarters"
-							class="shrink-0 rounded-full bg-[#C3002F] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
+							class="shrink-0 rounded-full bg-brand-red px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
 						>
 							HQ
 						</span>
@@ -267,14 +267,14 @@ onBeforeUnmount(() => {
 							<dt class="sr-only">Phone</dt>
 							<Phone class="size-4 shrink-0 text-neutral-500" aria-hidden="true" />
 							<dd>
-								<a :href="telHref(branch.phone)" class="hover:text-[#C3002F]" @click.stop>{{ branch.phone }}</a>
+								<a :href="telHref(branch.phone)" class="hover:text-brand-red" @click.stop>{{ branch.phone }}</a>
 							</dd>
 						</div>
 						<div v-if="branch.email" class="flex items-center gap-2">
 							<dt class="sr-only">Email</dt>
 							<Mail class="size-4 shrink-0 text-neutral-500" aria-hidden="true" />
 							<dd class="min-w-0 truncate">
-								<a :href="`mailto:${branch.email}`" class="hover:text-[#C3002F]" @click.stop>{{ branch.email }}</a>
+								<a :href="`mailto:${branch.email}`" class="hover:text-brand-red" @click.stop>{{ branch.email }}</a>
 							</dd>
 						</div>
 					</dl>
@@ -294,7 +294,7 @@ onBeforeUnmount(() => {
 							:href="branch.directionsUrl"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="inline-flex items-center gap-2 rounded-full bg-[#C3002F] px-4 py-2 text-xs font-semibold uppercase tracking-wider hover:bg-[#A30027]"
+							class="inline-flex items-center gap-2 rounded-full bg-brand-red px-4 py-2 text-xs font-semibold uppercase tracking-wider hover:bg-brand-red-dark"
 							@click.stop
 						>
 							<Navigation class="size-3.5" aria-hidden="true" />

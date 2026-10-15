@@ -36,7 +36,7 @@ withDefaults(
 		<!-- Sloped panel: a red copy of the slope, nudged toward the dark field, peeks out as a thin stripe along the diagonal. -->
 		<div
 			aria-hidden="true"
-			class="about-hero-slope absolute inset-0 -z-10 -translate-y-1 bg-[#C3002F] md:-translate-x-1.5 md:translate-y-0"
+			class="about-hero-slope absolute inset-0 -z-10 -translate-y-1 bg-brand-red md:-translate-x-1.5 md:translate-y-0"
 		/>
 		<div aria-hidden="true" class="about-hero-slope absolute inset-0 -z-10 bg-[#121212]" />
 
@@ -44,7 +44,7 @@ withDefaults(
 			<!-- Left: title + vehicle cutout -->
 			<div class="flex flex-col justify-between gap-8 px-4 pt-12 md:px-8 md:pt-16 lg:pt-20">
 				<div>
-					<p class="text-xs font-semibold uppercase tracking-[0.25em] text-[#C3002F]">{{ eyebrow }}</p>
+					<p class="text-xs font-semibold uppercase tracking-[0.25em] text-brand-red">{{ eyebrow }}</p>
 					<h1 class="mt-3 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">{{ title }}</h1>
 				</div>
 				<img
@@ -67,9 +67,9 @@ withDefaults(
 							:aria-current="link.key === active ? 'true' : undefined"
 							:class="[
 								'group relative flex items-baseline gap-4 border-l-2 py-3 pl-5 transition-colors duration-200',
-								'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212]',
+								'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212]',
 								link.key === active
-									? 'border-[#C3002F] text-[#C3002F]'
+									? 'border-brand-red text-brand-red'
 									: 'border-transparent text-neutral-400 hover:border-neutral-600 hover:text-white',
 							]"
 						>

@@ -12,4 +12,4 @@
 2. **Environment Protection:** Never commit or output secrets from `directus/.env` or root `.env` files.
 3. **M2M Relational Paths:** Expand Directus M2M junction tables deeply in API routes (e.g., `images.directus_files_id.*` instead of bare `images.*`).
 4. **Validation Routine:** Validate frontend changes by running `npm run typecheck` inside `./nuxt` and API contracts using `node scripts/test-vehicle-api.mjs`.
-5. **Brand Tokens:** Mitsubishi Red (`#C3002F`) accent paired with Dark Slate (`#0A0A0A`).
+5. **Brand Tokens:** Mitsubishi Motors Red (`#ED0008`, Tailwind `brand-red`) accent paired with Dark Slate (`#0A0A0A`).

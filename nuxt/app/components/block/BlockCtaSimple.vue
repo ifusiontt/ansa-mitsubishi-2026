@@ -108,7 +108,7 @@ function resolveVariant(directusVariant?: string | null) {
 section a.nuxt-link-active,
 section a:not(.nuxt-link-active):hover,
 section button:hover {
-  border-color: #C3002F !important;
+  border-color: #ED0008 !important;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 </style>

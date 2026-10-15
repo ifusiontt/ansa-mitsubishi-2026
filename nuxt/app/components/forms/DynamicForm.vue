@@ -146,7 +146,7 @@ const onSubmitForm = handleSubmit(async (formValues) => {
 						type="submit"
 						:label="submitLabel"
 						:disabled="isSubmitting"
-						:class-name="theme === 'dark' ? 'bg-[#C3002F] text-white hover:bg-[#A30027]' : undefined"
+						:class-name="theme === 'dark' ? 'bg-brand-red text-white hover:bg-brand-red-dark' : undefined"
 						icon="arrow"
 						icon-position="right"
 					/>

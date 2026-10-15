@@ -180,7 +180,7 @@ const swiper = useSwiper(containerRef, {
 							<!-- Video fallback -->
 							<div v-if="media.type === 'video'" class="aspect-video bg-gray-900 flex items-center justify-center">
 								<div class="text-center text-white">
-									<div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-600 flex items-center justify-center">
+									<div class="w-16 h-16 mx-auto mb-4 rounded-full bg-brand-red flex items-center justify-center">
 										<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
 											<path
 												d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"

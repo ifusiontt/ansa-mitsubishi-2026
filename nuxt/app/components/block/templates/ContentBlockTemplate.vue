@@ -53,7 +53,7 @@ const getItemTo = (item: any): string | undefined => {
 // Industries CTA variant — sector-specific card styling
 const getCardBackgroundClass = (index: number): string => {
 	if (index === 0) {
-		return 'bg-accent'; // Transportation - Mitsubishi Red (#C3002F)
+		return 'bg-accent'; // Transportation - Mitsubishi Red (#ED0008)
 	}
 	return 'bg-gray-200'; // All others - light gray
 };

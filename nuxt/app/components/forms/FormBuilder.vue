@@ -79,7 +79,7 @@ const handleSubmit = async (data: Record<string, any>) => {
 			aria-live="polite"
 			class="flex flex-col items-center justify-center space-y-4 p-6 text-center"
 		>
-			<CheckCircle :class="['size-12', isDark ? 'text-[#C3002F]' : 'text-green-500']" />
+			<CheckCircle :class="['size-12', isDark ? 'text-brand-red' : 'text-green-500']" />
 			<p :class="isDark ? 'text-neutral-300' : 'text-gray-600'">
 				{{ form.success_message || 'Your form has been submitted successfully.' }}
 			</p>
@@ -90,7 +90,7 @@ const handleSubmit = async (data: Record<string, any>) => {
 				role="alert"
 				:class="[
 					'p-4 rounded-md',
-					isDark ? 'text-white bg-[#C3002F]/15 border border-[#C3002F]/50' : 'text-red-500 bg-red-100',
+					isDark ? 'text-white bg-brand-red/15 border border-brand-red/50' : 'text-red-500 bg-red-100',
 				]"
 			>
 				<strong>Error:</strong>

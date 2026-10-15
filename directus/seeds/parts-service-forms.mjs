@@ -2,20 +2,22 @@
 /**
  * parts-service-forms.mjs
  *
- * Schema + content for the /service and /parts inquiry flows
- * (nuxt/app/components/forms/ServiceBookingForm.vue, PartsRequestForm.vue):
+ * Schema + content for the /service, /parts and homepage test-drive inquiry flows
+ * (nuxt/app/components/forms/ServiceBookingForm.vue, PartsRequestForm.vue,
+ * nuxt/app/components/home/HomeContactBanner.vue):
  *
  *   1. form_submissions gains two fields:
- *        - submission_type  (string dropdown: contact | service | parts)
+ *        - submission_type  (string dropdown: contact | service | parts | test_drive)
  *        - metadata         (json) — the structured request: contact details plus
  *          service_type, vehicle_model, registration_number, vehicle_mileage,
  *          vehicle_year, chassis_number, part_number, part_description,
  *          request_date, dealer_id (see nuxt/shared/types/contact.ts)
- *   2. forms rows "Service Booking" and "Parts Request" (no form_fields — the
- *      Vue components own their fields) so submissions are grouped per form and
- *      carry a `{# field #}` confirmation email template.
+ *   2. forms rows "Service Booking", "Parts Request" and "Test Drive Request" (no
+ *      form_fields — the Vue components own their fields) so submissions are grouped
+ *      per form. Service/parts carry a `{# field #}` confirmation email template; the
+ *      test-drive request collects no email address, so it has none.
  *   3. Public policy: create-only on form_submissions, limited to
- *      form / submission_type / metadata and validated to service | parts.
+ *      form / submission_type / metadata and validated to service | parts | test_drive.
  *      No public read — seed-permissions.py still keeps submissions private.
  *   4. Left-column rich-text blocks appended to the /service and /parts pages
  *      (created by sync-nav-service-parts.py); matched by headline, never overwritten.
@@ -78,6 +80,7 @@ const FIELDS = [
 					{ text: 'Contact', value: 'contact' },
 					{ text: 'Service Booking', value: 'service' },
 					{ text: 'Parts Request', value: 'parts' },
+					{ text: 'Test Drive Request', value: 'test_drive' },
 				],
 			},
 		},
@@ -101,7 +104,16 @@ console.log('1. form_submissions fields');
 for (const def of FIELDS) {
 	const existing = await api('GET', `/fields/form_submissions/${def.field}`, undefined, { allow404: true });
 	if (existing?.data) {
-		console.log(`   -> ${def.field} exists; skipping`);
+		// Keep dropdown choices current (e.g. test_drive added after the field was first created).
+		const choices = def.meta.options?.choices;
+		if (choices && JSON.stringify(existing.data.meta?.options?.choices) !== JSON.stringify(choices)) {
+			await api('PATCH', `/fields/form_submissions/${def.field}`, {
+				meta: { options: { ...existing.data.meta?.options, choices } },
+			});
+			console.log(`   -> ${def.field} exists; choices updated`);
+		} else {
+			console.log(`   -> ${def.field} exists; skipping`);
+		}
 		continue;
 	}
 	await api('POST', '/fields/form_submissions', def);
@@ -136,6 +148,12 @@ const FORMS = [
 			},
 		],
 	},
+	{
+		title: 'Test Drive Request',
+		submit_label: 'REQUEST TEST DRIVE',
+		success_message: 'Thank you! A sales consultant will call you to arrange your test drive.',
+		emails: [],
+	},
 ];
 
 console.log('2. forms');
@@ -160,7 +178,7 @@ if (!publicPolicy) throw new Error('public policy not found');
 const permission = {
 	fields: ['form', 'submission_type', 'metadata'],
 	permissions: {},
-	validation: { _and: [{ submission_type: { _in: ['service', 'parts'] } }] },
+	validation: { _and: [{ submission_type: { _in: ['service', 'parts', 'test_drive'] } }] },
 	presets: {},
 };
 const existingPerm = await api(

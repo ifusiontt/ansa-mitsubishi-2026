@@ -184,7 +184,7 @@ useSeoMeta({
 
 			<div class="vp-container relative z-10 py-24 md:py-32">
 				<div class="max-w-2xl text-left z-10 relative">
-					<p v-if="heroKicker" class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">{{ heroKicker }}</p>
+					<p v-if="heroKicker" class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">{{ heroKicker }}</p>
 					<h1 id="hero-heading" class="text-4xl md:text-6xl font-extrabold uppercase tracking-tight text-white mb-3">
 						{{ displayTitle }}
 					</h1>
@@ -195,7 +195,7 @@ useSeoMeta({
 					<div class="flex flex-wrap gap-4 justify-start">
 						<a
 							href="#trims"
-							class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors shadow-lg shadow-red-950/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+							class="inline-block bg-brand-red hover:bg-brand-red-dark text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
 							@click.prevent="scrollToSection('trims')"
 						>
 							View Trims &amp; Pricing
@@ -221,7 +221,7 @@ useSeoMeta({
 			<div class="vp-container">
 				<div class="grid gap-6 md:grid-cols-2 md:gap-12 md:items-end">
 					<div>
-						<p v-if="vehicle.tagline" class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">{{ vehicle.tagline }}</p>
+						<p v-if="vehicle.tagline" class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">{{ vehicle.tagline }}</p>
 						<h2 id="overview-heading" class="text-2xl md:text-4xl font-bold uppercase tracking-wider text-slate-900">
 							{{ vehicle.hero_headline || vehicle.title }}
 						</h2>
@@ -250,7 +250,7 @@ useSeoMeta({
 
 					<NuxtLink
 						:to="{ path: '/contact', query: { vehicle: vehicle.slug } }"
-						class="mt-10 inline-block w-fit px-8 py-3.5 border-2 border-slate-900 text-slate-900 font-bold tracking-widest text-xs uppercase hover:bg-slate-900 hover:text-white transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2"
+						class="mt-10 inline-block w-fit px-8 py-3.5 border-2 border-slate-900 text-slate-900 font-bold tracking-widest text-xs uppercase hover:bg-slate-900 hover:text-white transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
 					>
 						Book a test drive
 					</NuxtLink>
@@ -323,7 +323,7 @@ useSeoMeta({
 								role="radio"
 								:aria-checked="index === selectedColorIdx"
 								:aria-label="color.color_name"
-								class="h-7 w-7 rounded-full shadow-md transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+								class="h-7 w-7 rounded-full shadow-md transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
 								:class="index === selectedColorIdx ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-slate-950' : 'hover:scale-110'"
 								:style="{ background: color.hex_code }"
 								@click="selectedColorIdx = index"
@@ -387,7 +387,7 @@ useSeoMeta({
 						<ul v-if="trim.key_features?.length" class="vp-trim__features">
 							<li v-for="(feature, featureIndex) in trim.key_features" :key="featureIndex">
 								<svg
-									class="w-4 h-4 text-red-600 shrink-0 mr-2 mt-0.5"
+									class="w-4 h-4 text-brand-red shrink-0 mr-2 mt-0.5"
 									viewBox="0 0 20 20"
 									fill="none"
 									stroke="currentColor"
@@ -429,7 +429,7 @@ useSeoMeta({
 		<section id="specs" class="vp-section vp-section--dark" aria-labelledby="specs-heading">
 			<div class="vp-container">
 				<header>
-					<p class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">Under the Hood</p>
+					<p class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">Under the Hood</p>
 					<h2 id="specs-heading" class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-white mb-8">Key Specifications</h2>
 				</header>
 				<!-- Engine / transmission / drivetrain come from the selected trim (Part 5);
@@ -452,7 +452,7 @@ useSeoMeta({
 		<section id="brochure" class="vp-section vp-section--white" aria-labelledby="brochure-heading">
 			<div class="vp-container vp-brochure">
 				<div>
-					<p class="text-xs font-bold tracking-widest text-red-500 uppercase mb-2">Learn More</p>
+					<p class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">Learn More</p>
 					<h2 id="brochure-heading" class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-slate-900 mb-4">Brochure</h2>
 					<p class="max-w-lg text-slate-600 leading-relaxed">
 						Explore the full feature list, dimensions, and technical specifications for the
@@ -463,7 +463,7 @@ useSeoMeta({
 						:href="vehicle.brochure_url"
 						target="_blank"
 						rel="noopener"
-						class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors inline-block mt-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+						class="bg-brand-red hover:bg-brand-red-dark text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors inline-block mt-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
 					>
 						Download Brochure
 					</a>
@@ -488,9 +488,9 @@ useSeoMeta({
 		     PART 8 · CTA — dealer / contact call to action
 	     ════════════════════════════════════════════════════════════ -->
 		<section id="cta" class="bg-slate-950 text-white py-20 md:py-24 px-4 text-center border-t border-slate-900" aria-labelledby="cta-heading">
-			<p class="text-xs font-bold tracking-widest text-red-500 uppercase mb-3">Next Step</p>
+			<p class="text-xs font-bold tracking-widest text-brand-red uppercase mb-3">Next Step</p>
 			<h2 id="cta-heading" class="text-3xl md:text-5xl font-bold uppercase tracking-wider text-white mb-4">
-				Ready to <span class="text-red-600">{{ displayTitle }}</span>?
+				Ready to <span class="text-brand-red">{{ displayTitle }}</span>?
 			</h2>
 			<p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-8 leading-relaxed">
 				Visit a dealer to take a test drive, or talk to our sales team about the {{ vehicle.model_year }} {{ vehicle.title }}.
@@ -498,7 +498,7 @@ useSeoMeta({
 			<div class="flex flex-wrap justify-center gap-4">
 				<NuxtLink
 					:to="contactHref('dealer')"
-					class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors shadow-lg shadow-red-950/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+					class="inline-block bg-brand-red hover:bg-brand-red-dark text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
 				>
 					Visit a Dealer
 				</NuxtLink>
@@ -521,7 +521,7 @@ useSeoMeta({
      (computed body/h1/h2 + --wp--preset--font-size / --spacing / --shadow)
    · container / padding / gap / colors: live theme stylesheet
      (wp-content/themes/mitsubishi-2/components/assets/index.css)
-   · primary red: project brand token #C3002F (AGENTS.md); the reference
+   · primary red: project brand token #ED0008 (AGENTS.md); the reference
      site's own accent (#ED0000) is superseded per project branding rules.
    · font stacks: display headings on the brand display face Montserrat
      (700/800 via @nuxt/fonts, Poppins fallback); body Inter; the reference
@@ -541,8 +541,8 @@ useSeoMeta({
 	--vp-label-track: 0.125em; /* theme .vehicle-select__label letter-spacing */
 
 	/* — Colour (extracted from live theme CSS) — */
-	--vp-red: #c3002f; /* project brand red (AGENTS.md) */
-	--vp-red-bright: color-mix(in srgb, #c3002f 70%, white); /* brand red on dark bgs (contrast) */
+	--vp-red: #ED0008; /* project brand red (AGENTS.md) */
+	--vp-red-bright: color-mix(in srgb, #ED0008 70%, white); /* brand red on dark bgs (contrast) */
 	--vp-black: #000000;
 	--vp-white: #ffffff;
 	--vp-ink: #1a1a1a; /* body ink (computed page text: #000, softened) */

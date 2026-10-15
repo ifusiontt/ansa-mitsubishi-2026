@@ -32,7 +32,7 @@ const toggle = (id: number) => {
 		<section v-for="group in groups" :key="group.category" :aria-labelledby="`faq-group-${group.category}`">
 			<h2
 				:id="`faq-group-${group.category}`"
-				class="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-[#C3002F]"
+				class="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-brand-red"
 			>
 				{{ group.label }}
 			</h2>
@@ -47,8 +47,8 @@ const toggle = (id: number) => {
 							:aria-controls="`faq-a-${faq.id}`"
 							:class="[
 								'group flex w-full items-center justify-between gap-6 px-5 py-5 text-left transition-colors duration-200 md:px-6',
-								'hover:text-[#C3002F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C3002F]',
-								openId === faq.id ? 'text-[#C3002F]' : 'text-white',
+								'hover:text-brand-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-red',
+								openId === faq.id ? 'text-brand-red' : 'text-white',
 							]"
 							@click="toggle(faq.id)"
 						>
@@ -58,8 +58,8 @@ const toggle = (id: number) => {
 								:class="[
 									'flex size-8 shrink-0 items-center justify-center rounded-full border transition-all duration-300 motion-reduce:transition-none',
 									openId === faq.id
-										? 'rotate-45 border-[#C3002F] bg-[#C3002F] text-white'
-										: 'border-[#1F1F1F] text-neutral-400 group-hover:border-[#C3002F] group-hover:text-[#C3002F]',
+										? 'rotate-45 border-brand-red bg-brand-red text-white'
+										: 'border-[#1F1F1F] text-neutral-400 group-hover:border-brand-red group-hover:text-brand-red',
 								]"
 							>
 								<Icon name="lucide:plus" class="size-4" />
@@ -80,7 +80,7 @@ const toggle = (id: number) => {
 						<div class="overflow-hidden">
 							<!-- Answers are CMS-authored rich text (same trust level as block_richtext). -->
 							<div
-								class="prose prose-invert max-w-none px-5 pb-6 text-neutral-300 prose-p:my-2 prose-a:text-[#C3002F] prose-strong:text-white md:px-6"
+								class="prose prose-invert max-w-none px-5 pb-6 text-neutral-300 prose-p:my-2 prose-a:text-brand-red prose-strong:text-white md:px-6"
 								v-html="faq.answer"
 							/>
 						</div>
