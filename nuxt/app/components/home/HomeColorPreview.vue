@@ -5,7 +5,7 @@ import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
 
 /**
  * Homepage colour switcher: pick a model, then a vehicle_colors swatch.
- * OEM split stage — copy, model dropdown and CTA on the light side; the render,
+ * OEM split stage — copy, segmented model switcher and CTA on the light side; the render,
  * floor shadow and swatches framed by a dark wedge with a slanted left edge
  * (full-bleed dark panel when stacked on mobile).
  * The selected model's colours come from /api/vehicles/:slug (the index endpoint
@@ -23,6 +23,9 @@ const { data: vehicle } = await useFetch<VehiclePage>(() => `/api/vehicles/${sel
 
 const colors = computed(() => [...(vehicle.value?.colors ?? [])].sort((a, b) => a.sort - b.sort));
 const selectedColor = computed(() => colors.value[selectedColorIdx.value] ?? null);
+// From the already-loaded fleet list, so the tabs and CTA update on click, before the colour fetch lands.
+const selectedModel = computed(() => props.vehicles.find((model) => model.slug === selectedSlug.value));
+const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 
 watch(selectedSlug, () => {
 	selectedColorIdx.value = 0;
@@ -52,28 +55,31 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 				<h2 id="home-colors-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Explore colour options</h2>
 				<p class="mt-4 text-neutral-600 dark:text-neutral-400">Preview factory paint options across the 2026 lineup.</p>
 
-				<label for="home-colors-model" class="mt-8 block text-xs font-bold uppercase tracking-widest text-neutral-500">Model</label>
-				<div class="relative mt-2 max-w-xs">
-					<select
-						id="home-colors-model"
-						v-model="selectedSlug"
-						class="w-full appearance-none rounded-md border border-neutral-300 bg-white py-3 pl-4 pr-10 text-sm font-bold uppercase tracking-widest text-neutral-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+				<div class="mt-8 flex flex-wrap gap-2" role="group" aria-label="Choose a model">
+					<button
+						v-for="model in vehicles"
+						:key="model.slug"
+						type="button"
+						:aria-pressed="model.slug === selectedSlug"
+						class="rounded-full px-4 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+						:class="
+							model.slug === selectedSlug
+								? 'flex items-center gap-1.5 bg-neutral-900 font-semibold text-white shadow-sm ring-1 ring-black dark:bg-white dark:text-neutral-950 dark:ring-white'
+								: 'bg-neutral-100 text-neutral-600 transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700'
+						"
+						@click="selectedSlug = model.slug"
 					>
-						<option v-for="model in vehicles" :key="model.slug" :value="model.slug">{{ model.title }}</option>
-					</select>
-					<Icon
-						name="lucide:chevron-down"
-						class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
-						aria-hidden="true"
-					/>
+						<span v-if="model.slug === selectedSlug" class="h-1.5 w-1.5 rounded-full bg-brand-red" aria-hidden="true" />
+						{{ shortName(model.title) }}
+					</button>
 				</div>
 
 				<NuxtLink
-					v-if="vehicle"
-					:to="`/showroom/${vehicle.slug}#colors`"
+					v-if="selectedModel"
+					:to="`/showroom/${selectedModel.slug}#colors`"
 					class="mt-10 inline-flex items-center gap-2 rounded-md bg-brand-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark hover:text-white"
 				>
-					Explore the {{ vehicle.title }}
+					Explore the {{ shortName(selectedModel.title) }}
 					<Icon name="lucide:arrow-right" class="h-4 w-4" />
 				</NuxtLink>
 			</div>

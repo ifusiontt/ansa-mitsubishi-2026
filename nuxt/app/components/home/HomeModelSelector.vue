@@ -8,7 +8,7 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  * Cutouts share one studio framing (4000x2800 canvas, car ~69% wide between ~24% and ~74% of the
  * height — directus/seeds/add-vehicle-menu-image.mjs normalises any that differ), so the stage
  * sizes the image by that framing: every car fills ~90% of the fixed-height stage, tyres on the
- * ground shadow, at the same scale.
+ * contact shadow, at the same scale.
  */
 defineProps<{ vehicles: VehicleSummary[] }>();
 
@@ -30,23 +30,29 @@ const cutoutUrl = (vehicle: VehicleSummary) => {
 <template>
 	<section
 		id="models"
-		class="scroll-mt-20 bg-[#F4F5F7] py-24 text-neutral-950 dark:bg-black dark:text-white md:py-32"
+		class="scroll-mt-20 bg-[#F6F7F9] py-24 text-neutral-950 dark:bg-black dark:text-white md:py-32"
 		aria-labelledby="home-models-heading"
 	>
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
 			<p class="text-xs font-bold uppercase tracking-[0.3em] text-brand-red">The Lineup</p>
 			<h2 id="home-models-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Find your Mitsubishi</h2>
+			<p class="mt-4 max-w-2xl text-base leading-relaxed tracking-wide text-neutral-600 dark:text-neutral-400 md:text-lg">
+				Engineered for performance, capability, and reliability across Trinidad &amp; Tobago.
+			</p>
 
-			<ul class="mt-12 flex flex-wrap justify-center gap-6">
+			<ul class="mt-14 flex flex-wrap justify-center gap-6">
 				<li v-for="vehicle in vehicles" :key="vehicle.id" class="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc((100%-3rem)/3)]">
 					<NuxtLink
 						:to="`/showroom/${vehicle.slug}`"
-						class="group flex h-full flex-col rounded-lg border border-t-2 border-neutral-200 border-t-brand-red bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900 dark:shadow-black/40"
+						class="group flex h-full min-h-[480px] flex-col justify-between overflow-hidden rounded-xl border border-t-2 border-neutral-200/80 border-t-brand-red bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900"
 					>
-						<!-- Vehicle stage -->
-						<div class="rounded-t-lg bg-neutral-50/70 p-4 dark:bg-neutral-800/40">
-							<div class="relative h-36">
-								<div class="absolute inset-x-0 bottom-[3%] mx-auto h-3 w-3/5 rounded-full bg-black/15 blur-md dark:bg-black/60" aria-hidden="true" />
+						<!-- Studio stage -->
+						<div class="relative flex h-52 items-center justify-center bg-gradient-to-b from-neutral-100/70 to-transparent p-6 dark:from-neutral-800/50">
+							<div class="relative h-full w-full">
+								<div
+									class="absolute inset-x-0 bottom-[-2%] mx-auto h-5 w-[85%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.1)_45%,transparent_72%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.8)_0%,transparent_72%)]"
+									aria-hidden="true"
+								/>
 								<img
 									v-if="cutoutUrl(vehicle)"
 									:src="cutoutUrl(vehicle)"
@@ -58,18 +64,23 @@ const cutoutUrl = (vehicle: VehicleSummary) => {
 						</div>
 
 						<div class="flex flex-1 flex-col p-6">
-							<p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-								{{ CATEGORIES[vehicle.slug] ?? '' }}<span v-if="CATEGORIES[vehicle.slug] && vehicle.model_year"> · </span>{{ vehicle.model_year ?? '' }}
-							</p>
-							<h3 class="mt-1.5 text-xl font-black uppercase tracking-tight">{{ vehicle.title }}</h3>
-							<p v-if="vehicle.starting_price" class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-								From <span class="font-bold text-neutral-950 dark:text-white">{{ formatTtdPrice(vehicle.starting_price) }}</span>
-							</p>
 							<span
-								class="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase tracking-widest text-neutral-950 transition-colors group-hover:text-brand-red dark:text-white"
+								v-if="CATEGORIES[vehicle.slug]"
+								class="mb-3 w-fit rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
 							>
-								Explore
-								<Icon name="lucide:arrow-right" class="h-4 w-4 text-brand-red transition-transform group-hover:translate-x-1" />
+								{{ CATEGORIES[vehicle.slug] }}
+							</span>
+							<h3 class="text-xl font-bold text-neutral-950 dark:text-white">{{ vehicle.title }}</h3>
+							<p v-if="vehicle.model_year" class="mt-1 text-xs uppercase tracking-widest text-neutral-400">{{ vehicle.model_year }} model</p>
+							<p v-if="vehicle.starting_price" class="mb-4 mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+								From {{ formatTtdPrice(vehicle.starting_price) }}
+							</p>
+
+							<!-- The whole card is the link; this is its visual button -->
+							<span
+								class="mt-auto w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-center text-sm font-medium text-neutral-800 transition-colors group-hover:border-brand-red group-hover:text-brand-red dark:border-neutral-700 dark:text-white"
+							>
+								Explore {{ vehicle.title.replace(/^Mitsubishi\s+/, '') }}
 							</span>
 						</div>
 					</NuxtLink>

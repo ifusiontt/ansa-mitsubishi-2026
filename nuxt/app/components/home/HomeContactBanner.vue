@@ -2,7 +2,6 @@
 import { VEHICLE_MODEL_OPTIONS, testDriveSchema, type TestDriveInput } from '#shared/types/contact';
 import type { Dealer } from '#shared/types/schema';
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
-import { inquiryInputClass as inputClass } from '~/composables/useInquiryForm';
 
 /**
  * Dealership hub: quick test-drive request (left) + branch directory (right).
@@ -66,6 +65,15 @@ const imageUrl = computed(() =>
 	props.image ? `${getDirectusAssetURL(props.image)}?width=1000&height=1400&fit=cover&quality=78&format=webp` : '',
 );
 
+/**
+ * Dark-glass inputs over the photo. Ring offset and stacking are explicit so the global
+ * `input:focus` rule in main.css (ring-2 + offset) can't override them.
+ */
+const inputClass =
+	'relative z-10 block w-full rounded-md border border-white/25 bg-black/50 px-3 py-2.5 text-sm text-white caret-brand-red ' +
+	'placeholder-neutral-400 backdrop-blur-sm transition-colors hover:border-white/40 focus:border-brand-red focus:outline-none ' +
+	'focus:ring-1 focus:ring-brand-red focus:ring-offset-0 aria-[invalid=true]:border-brand-red/80 [color-scheme:dark]';
+
 const initial = (): TestDriveInput => ({
 	full_name: '',
 	phone: '',
@@ -82,9 +90,10 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 		>
 			<!-- Left: quick test-drive request over the showroom photo -->
 			<div class="relative isolate p-8 text-white md:p-10 lg:col-span-5">
-				<img v-if="imageUrl" :src="imageUrl" alt="" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover" />
+				<img v-if="imageUrl" :src="imageUrl" alt="" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover brightness-125" />
 				<div v-else class="absolute inset-0 -z-20 bg-gradient-to-br from-neutral-800 to-neutral-950" aria-hidden="true" />
-				<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/95 via-black/75 to-black/40" aria-hidden="true" />
+				<!-- Directional scrim: solid behind the headline and the form buttons, open through the middle so the car shows -->
+				<div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/85 via-black/35 to-black/90" aria-hidden="true" />
 
 				<p class="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em]">
 					<span class="h-1.5 w-1.5 rounded-full bg-brand-red" aria-hidden="true" />
