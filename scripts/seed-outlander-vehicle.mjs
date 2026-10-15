@@ -123,6 +123,11 @@ const HIGHLIGHTS = [
 
 /** trim renames: id → new name (ids are stable from mitsubishi-initial-data.json) */
 const TRIM_RENAMES = { 15: 'SE S-AWC', 16: 'SEL Premium S-AWC' };
+/**
+ * Drivetrain per trim id: the S-AWC trims are all-wheel drive (the initial data had them as FWD).
+ * "<short> (<detail>)" like the Triton's "4WD (Super Select 4WD-II)"; the homepage cards show the short part.
+ */
+const TRIM_DRIVETRAINS = { 15: 'AWD (S-AWC)', 16: 'AWD (S-AWC)' };
 
 const BLOCK_TAGLINE = 'Outlander Key Highlights';
 
@@ -444,11 +449,15 @@ for (const spec of HIGHLIGHTS) {
 }
 
 // ---------------------------------------------------------------------------
-// step 5 — trim renames (ES stays; LE → SE S-AWC, SEL → SEL Premium S-AWC)
+// step 5 — trim renames (ES stays; LE → SE S-AWC, SEL → SEL Premium S-AWC) + S-AWC drivetrains
 // ---------------------------------------------------------------------------
 
 for (const [id, newName] of Object.entries(TRIM_RENAMES)) {
-	const trims = await search('vehicle_trims', { filter: { id: { _eq: Number(id) } }, fields: ['id', 'trim_name', 'vehicle'], limit: 1 });
+	const trims = await search('vehicle_trims', {
+		filter: { id: { _eq: Number(id) } },
+		fields: ['id', 'trim_name', 'drivetrain', 'vehicle'],
+		limit: 1,
+	});
 	const trim = trims.data?.[0];
 	if (!trim) {
 		console.error(`ERROR: trim #${id} not found`);
@@ -459,6 +468,11 @@ for (const [id, newName] of Object.entries(TRIM_RENAMES)) {
 	} else {
 		await api('PATCH', `/items/vehicle_trims/${id}`, { trim_name: newName });
 		console.log(`trim: renamed #${id} "${trim.trim_name}" → "${newName}"`);
+	}
+	const drivetrain = TRIM_DRIVETRAINS[id];
+	if (drivetrain && trim.drivetrain !== drivetrain) {
+		await api('PATCH', `/items/vehicle_trims/${id}`, { drivetrain });
+		console.log(`trim: drivetrain #${id} "${trim.drivetrain}" → "${drivetrain}"`);
 	}
 }
 
