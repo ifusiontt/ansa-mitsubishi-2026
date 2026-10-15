@@ -131,18 +131,33 @@ const VALUE_ITEMS = [
 		tagline: 'Heritage',
 		headline: 'Brand Philosophy',
 		description: 'Built on Japanese engineering precision backed by ANSA McAL heritage.',
+		image: {
+			file: 'Xpander_Cross/Extracted from video/xpander_front_shield.png',
+			title: 'Mitsubishi Dynamic Shield front fascia and LED headlamp',
+			focal: [1250, 600],
+		},
 	},
 	{
 		status: 'published',
 		tagline: 'Safety',
 		headline: 'All-Round Advanced Safety Technology',
 		description: 'RISE body construction and active collision mitigation.',
+		image: {
+			file: 'Xpander_Cross/Extracted from video/xpander_taillight_led.png',
+			title: 'Mitsubishi Xpander Cross LED taillight blade',
+			focal: [480, 620],
+		},
 	},
 	{
 		status: 'published',
 		tagline: 'Financing',
 		headline: 'In-House ANSA Financing',
 		description: 'Tailored automotive loans and flexible payment structures.',
+		image: {
+			file: 'Triton/Extracted from video/triton_sunset_flats.png',
+			title: 'Mitsubishi Triton on an open road at sunset',
+			focal: [1176, 580],
+		},
 	},
 ];
 
@@ -159,23 +174,40 @@ if (home) {
 // --- 2. media ---------------------------------------------------------------
 const MIME = { '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg' };
 
-/** Directus file id for a content-library image — reuses a same-name, same-size upload and keeps its title current. */
-async function ensureFile({ file: relPath, title }) {
+/**
+ * Directus file id for a content-library image — reuses a same-name, same-size upload and keeps its title current.
+ * `focal` ([x, y] in source pixels) steers Directus `fit=cover` crops, e.g. 16:9 stills in the 3:4 value cards.
+ */
+async function ensureFile({ file: relPath, title, focal }) {
 	const abs = path.join(MODELS, relPath);
 	const name = path.basename(abs);
 	const size = fs.statSync(abs).size;
 	// SEARCH, not GET: a GET list read straight after an upload can come back stale here.
 	const { data: found } = await api('SEARCH', '/files', {
-		query: { filter: { filename_download: { _eq: name } }, fields: ['id', 'filesize', 'title'], sort: ['uploaded_on'], limit: -1 },
+		query: {
+			filter: { filename_download: { _eq: name } },
+			fields: ['id', 'filesize', 'title', 'focal_point_x', 'focal_point_y'],
+			sort: ['uploaded_on'],
+			limit: -1,
+		},
 	});
 	const existing = found.find((f) => Number(f.filesize) === size);
 	if (existing) {
-		if (existing.title !== title) await api('PATCH', `/files/${existing.id}`, { title });
-		console.log(`= file ${name} (${existing.id})${existing.title === title ? '' : ' — title updated'}`);
+		const patch = {};
+		if (existing.title !== title) patch.title = title;
+		if (focal && (existing.focal_point_x !== focal[0] || existing.focal_point_y !== focal[1])) {
+			[patch.focal_point_x, patch.focal_point_y] = focal;
+		}
+		if (Object.keys(patch).length) await api('PATCH', `/files/${existing.id}`, patch);
+		console.log(`= file ${name} (${existing.id})${Object.keys(patch).length ? ` — ${Object.keys(patch).join(', ')} updated` : ''}`);
 		return existing.id;
 	}
 	const form = new FormData();
 	form.append('title', title);
+	if (focal) {
+		form.append('focal_point_x', String(focal[0]));
+		form.append('focal_point_y', String(focal[1]));
+	}
 	form.append('file', new Blob([fs.readFileSync(abs)], { type: MIME[path.extname(name).toLowerCase()] }), name);
 	const res = await fetch(`${BASE}/files`, { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body: form });
 	const text = await res.text();
@@ -188,6 +220,8 @@ async function ensureFile({ file: relPath, title }) {
 const heroStillIds = [];
 for (const still of HERO_STILLS) heroStillIds.push(await ensureFile(still));
 const ascMediaId = process.env.HOME_ASC_FILE || (await ensureFile(ASC_IMAGE));
+const valueImageIds = new Map();
+for (const { headline, image } of VALUE_ITEMS) valueImageIds.set(headline, await ensureFile(image));
 
 // --- 3. blocks on the Home page -----------------------------------------------
 const homeBlocks = await search('page_blocks', {
@@ -257,7 +291,7 @@ async function ensureContentBlock(block, items, imageId) {
 
 	// Items are created first, then the image is linked as a junction row with explicit
 	// FKs — this build misreads nested M2M file payloads (see seed-outlander-vehicle.mjs).
-	async function createItem({ withImage, ...item }, sort, blockId) {
+	async function createItem({ withImage, image: _image, ...item }, sort, blockId) {
 		const row = (await api('POST', '/items/block_content_items', { ...item, sort, item: blockId })).data;
 		if (withImage && imageId) {
 			await api('PATCH', `/items/block_content_items/${row.id}`, {
@@ -286,6 +320,29 @@ async function ensureContentBlock(block, items, imageId) {
 
 const ascBlockId = await ensureContentBlock(ASC_BLOCK, ASC_ITEMS, ascMediaId);
 await ensureContentBlock(VALUE_BLOCK, VALUE_ITEMS, null);
+
+// Value cards: photograph each pillar that has no image yet — images picked in Directus are kept.
+const [valueBlock] = await search('block_content_block', {
+	filter: { tagline: { _eq: VALUE_BLOCK.tagline }, template: { _eq: VALUE_BLOCK.template } },
+	fields: ['id'],
+	limit: 1,
+});
+if (valueBlock) {
+	const valueItems = await search('block_content_items', {
+		filter: { item: { _eq: valueBlock.id }, headline: { _in: [...valueImageIds.keys()] } },
+		fields: ['id', 'headline', 'images'],
+		limit: -1,
+	});
+	for (const item of valueItems) {
+		if (item.images?.length) {
+			console.log(`  = "${item.headline}" already has an image`);
+			continue;
+		}
+		const fileId = valueImageIds.get(item.headline);
+		await api('POST', '/items/block_content_items_files', { block_content_items_id: item.id, directus_files_id: fileId });
+		console.log(`  + "${item.headline}" image set to ${fileId}`);
+	}
+}
 
 // ASC item on an existing block: re-point the image, retire the AYC copy.
 if (ascBlockId) {

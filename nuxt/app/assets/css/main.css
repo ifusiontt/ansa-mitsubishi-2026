@@ -24,7 +24,7 @@
 
 @layer base {
 	html {
-		@apply bg-[var(--background-color)] text-[var(--foreground-color)];
+		@apply bg-white text-neutral-950 dark:bg-black dark:text-white;
 	}
 }
 

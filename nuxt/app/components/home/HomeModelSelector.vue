@@ -12,7 +12,7 @@ const cutoutUrl = (vehicle: VehicleSummary) => {
 </script>
 
 <template>
-	<section id="models" class="scroll-mt-20 bg-black py-20 text-white lg:py-28" aria-labelledby="home-models-heading">
+	<section id="models" class="scroll-mt-20 bg-white py-20 text-neutral-950 dark:bg-black dark:text-white lg:py-28" aria-labelledby="home-models-heading">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-16">
 			<p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C3002F]">The Lineup</p>
 			<h2 id="home-models-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Find your Mitsubishi</h2>
@@ -21,10 +21,10 @@ const cutoutUrl = (vehicle: VehicleSummary) => {
 				<li v-for="vehicle in vehicles" :key="vehicle.id">
 					<NuxtLink
 						:to="`/showroom/${vehicle.slug}`"
-						class="group flex h-full flex-col rounded-xl border border-white/10 bg-neutral-900/60 p-6 shadow-lg shadow-black/40 backdrop-blur-md transition-colors hover:border-[#C3002F]/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F]"
+						class="group flex h-full flex-col rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-black/40"
 					>
 						<div class="relative aspect-[16/9]">
-							<div class="absolute inset-x-6 bottom-1 h-4 rounded-[50%] bg-black/80 blur-md" aria-hidden="true" />
+							<div class="absolute inset-x-6 bottom-1 h-4 rounded-[50%] bg-neutral-900/25 blur-md dark:bg-black/80" aria-hidden="true" />
 							<img
 								v-if="cutoutUrl(vehicle)"
 								:src="cutoutUrl(vehicle)"
@@ -35,10 +35,10 @@ const cutoutUrl = (vehicle: VehicleSummary) => {
 						</div>
 						<p v-if="vehicle.model_year" class="mt-6 text-xs font-bold uppercase tracking-widest text-neutral-500">{{ vehicle.model_year }}</p>
 						<h3 class="mt-1 text-xl font-black uppercase tracking-tight">{{ vehicle.title }}</h3>
-						<p v-if="vehicle.starting_price" class="mt-2 text-sm text-neutral-400">
-							From <span class="font-bold text-white">{{ formatTtdPrice(vehicle.starting_price) }}</span>
+						<p v-if="vehicle.starting_price" class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+							From <span class="font-bold text-neutral-950 dark:text-white">{{ formatTtdPrice(vehicle.starting_price) }}</span>
 						</p>
-						<span class="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase tracking-widest text-white">
+						<span class="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase tracking-widest text-neutral-950 dark:text-white">
 							Explore
 							<Icon name="lucide:arrow-right" class="h-4 w-4 text-[#C3002F] transition-transform group-hover:translate-x-1" />
 						</span>

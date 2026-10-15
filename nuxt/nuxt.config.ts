@@ -81,8 +81,10 @@ export default defineNuxtConfig({
 		},
 	},
 
+	// OEM light theme by default; the header ThemeToggle still switches to dark.
 	colorMode: {
-		preference: 'system',
+		preference: 'light',
+		fallback: 'light',
 		classSuffix: '',
 		storage: 'cookie',
 	},

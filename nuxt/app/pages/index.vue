@@ -9,7 +9,7 @@ import HomeModelSelector from '~/components/home/HomeModelSelector.vue';
 import HomeValueGrid from '~/components/home/HomeValueGrid.vue';
 
 /**
- * Pitch-black homepage. Takes precedence over [...permalink].vue for "/".
+ * OEM light homepage (dark via the colour-mode toggle). Takes precedence over [...permalink].vue for "/".
  *
  * Section order: Hero → Model selector → Feature spotlight → Value grid →
  * Colour preview → Contact banner.
@@ -85,7 +85,7 @@ useSeoMeta({
 </script>
 
 <template>
-	<div class="bg-black text-white">
+	<div class="bg-white text-neutral-950 dark:bg-black dark:text-white">
 		<HomeHero :hero="hero" />
 		<HomeModelSelector v-if="vehicles?.length" :vehicles="vehicles" />
 		<HomeFeatureSpotlight
