@@ -2,8 +2,10 @@
 /**
  * Layout-stable vehicle render stage with crossfading colour switches.
  *
- * - The stage has a fixed aspect ratio and the renders are absolutely positioned
- *   inside it, so its height never depends on an image's dimensions or load state.
+ * - The stage is height-bounded (320px, 380px on desktop) and full width; renders are absolutely
+ *   positioned inside it and contained, so its height never depends on an image's dimensions or
+ *   load state, and no body shape (long pickup or tall MPV) can outgrow it. Renders are bottom-aligned so
+ *   every car rests on the floor shadow beneath the stage.
  * - Two stacked <img> layers: a new render is preloaded + decoded off-screen and
  *   only then faded in over the current one (300ms), so the previous colour stays
  *   visible until the next is ready. Rapid swatch clicks only ever show the latest
@@ -40,6 +42,7 @@ const loads = new Map<string, Promise<void>>();
 /** Resolves once `url` is downloaded and decoded (or failed — a broken image must not block switching). */
 function load(url: string): Promise<void> {
 	let pending = loads.get(url);
+
 	if (!pending) {
 		pending = new Promise<void>((resolve) => {
 			const img = new Image();
@@ -50,6 +53,7 @@ function load(url: string): Promise<void> {
 		});
 		loads.set(url, pending);
 	}
+
 	return pending;
 }
 
@@ -94,12 +98,13 @@ onMounted(() => {
 		const url = queue.shift();
 		if (url) load(url).then(() => idle(warmNext));
 	};
+
 	idle(warmNext);
 });
 </script>
 
 <template>
-	<div class="relative aspect-[16/9] w-full">
+	<div class="relative h-[320px] w-full lg:h-[380px]">
 		<template v-for="(layer, index) in layers" :key="index">
 			<img
 				v-if="layer.src"
@@ -109,7 +114,7 @@ onMounted(() => {
 				decoding="async"
 				draggable="false"
 				:class="[
-					'absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ease-in-out motion-reduce:transition-none',
+					'absolute inset-0 h-full w-full object-contain object-bottom transition-opacity duration-300 ease-in-out motion-reduce:transition-none',
 					index === active ? 'opacity-100' : 'opacity-0',
 					imgClass,
 				]"

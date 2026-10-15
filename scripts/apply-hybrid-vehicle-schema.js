@@ -43,7 +43,10 @@
  *        - vehicles row (title/slug/starting_price 255000 TTD + full context)
  *        - block_hero_custom row ("Drive Your Ambition" / "Outlander Sport")
  *          with a generated hero media image (ImageMagick PNG, uploaded once)
- *        - 3 x vehicle_colors (Octane Blue, Energetic Yellow, Diamond White)
+ *        - 5 x vehicle_colors — the 2026 2-tone palette (X4Y, X5P, X8W, JH3, XEU);
+ *          this script never sets `image`: the transparent renders
+ *          (2_Tone_Front_Left/transparent_webp/outlander_front_left_<code>.webp)
+ *          are uploaded and linked by scripts/seed-outlander-vehicle.mjs
  *        - 3 x block_content_items highlights (PERFORMANCE / DESIGN / INTERIOR)
  *        - 3 x vehicle_trims (ES / LE / SEL) linked to the vehicle
  *        - key_features string-array -> {value}-object migration (all trims)
@@ -195,7 +198,7 @@ const VEHICLE = {
   tagline: 'Compact Crossover Ambition For The Urban Explorer',
   hero_headline: 'Outdrive The Limits In Compact Crossover Form',
   starting_price: 255000, // TTD
-  primary_color: '#003399',
+  primary_color: '#C9A332', // X4Y Energetic Yellow
   brochure_url: 'https://ansamitsubishi.com/brochures/2025-mitsubishi-outlander-sport.pdf',
   status: 'published',
   model_year: 2025,
@@ -218,10 +221,14 @@ const HERO_BLOCK = {
   container_width: 'contained',
 };
 
+// Must match COLORS in scripts/seed-outlander-vehicle.mjs, which also links each code's
+// transparent render (outlander_front_left_<code>.webp) — no `image` here, so a re-run keeps it.
 const COLORS = [
-  { sort: 1, color_name: 'Octane Blue', hex_code: '#003399' },
-  { sort: 2, color_name: 'Energetic Yellow', hex_code: '#E5C100' },
-  { sort: 3, color_name: 'Diamond White', hex_code: '#FFFFFF' },
+  { sort: 1, color_code: 'X4Y', color_name: 'Energetic Yellow', hex_code: '#C9A332' },
+  { sort: 2, color_code: 'X5P', color_name: 'Red Metallic', hex_code: '#B92428' },
+  { sort: 3, color_code: 'X8W', color_name: 'White Solid', hex_code: '#E8E9EC' },
+  { sort: 4, color_code: 'JH3', color_name: 'Gray Metallic', hex_code: '#4A4E52' },
+  { sort: 5, color_code: 'XEU', color_name: 'Silver Metallic', hex_code: '#A3A5AE' },
 ];
 
 const HIGHLIGHTS = [
@@ -831,10 +838,10 @@ const PUBLIC_READ_WHITELISTS = {
     'primary_color', 'brochure_url', 'status', 'model_year', 'category',
     'body_type', 'seating_capacity', 'fuel_type', 'warranty', 'overview',
     // hybrid vehicle schema (new):
-    'hero_block', 'colors', 'highlights', 'trims',
+    'hero_block', 'colors', 'highlights', 'trims', 'menu_image',
   ],
   // new collection from the hybrid vehicle schema:
-  vehicle_colors: ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'image'],
+  vehicle_colors: ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'color_code', 'image'],
 };
 
 async function applyPublicReadPermissions() {
@@ -1014,7 +1021,7 @@ async function seedData() {
     await upsertItem(
       'vehicle_colors',
       { vehicle_id: String(vehicleId), color_name: color.color_name },
-      { ...color, vehicle_id: vehicleId, image: null },
+      { ...color, vehicle_id: vehicleId },
       `color "${color.color_name}"`
     );
   }

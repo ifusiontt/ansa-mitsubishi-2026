@@ -3,8 +3,15 @@
  * vehicle-colors.mjs
  *
  * Seeds the `vehicle_colors` rows for the Mitsubishi Triton and Xpander Cross
- * showroom pages: exact paint names, hex codes, sort order and the banner-
- * cleaned WebP render for each colour (Triton front-left, Xpander Cross side).
+ * showroom pages: exact paint names, paint codes, hex codes, sort order and a
+ * transparent front-left WebP render per colour from the content library
+ * (CONTENT_DIR/.../transparent_webp/) — one camera angle per vehicle, so
+ * switching swatches never jumps perspective.
+ *
+ * Both palettes are exhaustive (PRUNE): Triton keeps only the two paints with
+ * real renders (U28, U33), Xpander Cross its seven; any other row is deleted.
+ * Rows are matched by paint code, then name, then a legacy name (`was`), so a
+ * rename keeps the row id.
  *
  * Behaviour (idempotent, re-runnable):
  *   1. Deletes orphan vehicle_colors rows (vehicle_id AND color_name null) —
@@ -34,6 +41,7 @@
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -78,28 +86,41 @@ const items = (collection, params) => api('GET', `/items/${collection}${params}`
 const itemsAll = (collection, fields) =>
 	items(collection, `?fields=${encodeURIComponent(fields.join(','))}&limit=-1&cache=false&x=${Date.now()}`);
 const colorRow = (id, fields) =>
-	api('GET', `/items/vehicle_colors/${id}?fields=${encodeURIComponent((fields || ['id', 'vehicle_id', 'color_name', 'hex_code', 'sort', 'image']).join(','))}&cache=false&x=${Date.now()}`);
+	api('GET', `/items/vehicle_colors/${id}?fields=${encodeURIComponent((fields || ['id', 'vehicle_id', 'color_name', 'color_code', 'hex_code', 'sort', 'image']).join(','))}&cache=false&x=${Date.now()}`);
 const colorsByVehicle = async (vehicleId, fields) => { const all = await itemsAll('vehicle_colors', fields); return { data: all.data.filter((r) => r.vehicle_id === vehicleId) }; };
 
 // ------------------------------------------------------------------ data
 
-const V = 'content-raw/optimized/02_Showroom_Models';
+const CONTENT_DIR =
+	process.env.CONTENT_DIR || path.join(os.homedir(), 'Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026');
+const TRITON_RENDERS = path.join(CONTENT_DIR, '02_Showroom_Models/Triton/Triton_Front_Left/transparent_webp');
+// Studio-canvas copies (4000x2800, same car box + ground line as Outlander/Triton) made from
+// transparent_webp/ by scripts/normalize-render-canvas.py — the tight 1920x966 exports render ~1.5x larger.
+const XPANDER_CROSS_RENDERS = path.join(CONTENT_DIR, '02_Showroom_Models/Xpander_Cross/Xpander Cross_RHD_Front_Left/transparent_webp_studio');
 
 const SPEC = {
 	// vehicle slug -> ordered colour palette (task order = sort order)
 	triton: [
-		{ name: 'Graphite Gray', hex: '#4A4D52', image: `${V}/Triton/Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U28.webp` },
-		{ name: 'Blade Silver', hex: '#B3B7BB', image: `${V}/Triton/Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U33.webp` },
-		{ name: 'Jet Black Mica', hex: '#1C1D21', image: `${V}/Triton/Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_X37.webp` },
-		{ name: 'White Diamond', hex: '#F2F4F5', image: `${V}/Triton/Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_W81.webp` },
+		{ code: 'U28', name: 'Graphite Gray', hex: '#4A4D52', image: path.join(TRITON_RENDERS, 'triton_front_left_U28.webp') },
+		{ code: 'U33', name: 'Blade Silver', hex: '#B3B7BB', image: path.join(TRITON_RENDERS, 'triton_front_left_U33.webp') },
 	],
 	'xpander-cross': [
-		{ name: 'Sunrise Orange', hex: '#C8501E', image: `${V}/Xpander_Cross/Xpander Cross_RHD_Side/26MY_XS_Exterior_side_RHD_X3M_Mid-Resolution-JPEG-rev-1.webp` },
-		{ name: 'Blade Silver Metallic', hex: '#B2B6BA', image: `${V}/Xpander_Cross/Xpander Cross_RHD_Side/26MY_XS_Exterior_side_RHD_U33_Mid-Resolution-JPEG-rev-1.webp` },
-		{ name: 'Quartz White Pearl', hex: '#F0F2F3', image: `${V}/Xpander_Cross/Xpander Cross_RHD_Side/26MY_XS_Exterior_side_RHD_W81_Mid-Resolution-JPEG-rev-1.webp` },
-		{ name: 'Jet Black Mica', hex: '#18191B', image: `${V}/Xpander_Cross/Xpander Cross_RHD_Side/26MY_XS_Exterior_side_RHD_X37_Mid-Resolution-JPEG-rev-1.webp` },
+		{ code: 'X3M', name: 'Sunrise Orange Metallic', was: ['Sunrise Orange'], hex: '#C8501E', image: path.join(XPANDER_CROSS_RENDERS, 'xpander_front_left_X3M.webp') },
+		{ code: 'X3N', name: 'Quartz White Pearl / Black Roof', hex: '#EEF0F1', image: path.join(XPANDER_CROSS_RENDERS, 'xpander_front_left_X3N.webp') },
+		{ code: 'X4C', name: 'Green Bronze Metallic', hex: '#6E6B5E', image: path.join(XPANDER_CROSS_RENDERS, 'xpander_front_left_X4C.webp') },
+		{ code: 'U28', name: 'Graphite Gray Metallic', hex: '#4A4D4E', image: path.join(XPANDER_CROSS_RENDERS, 'xpander_front_left_U28.webp') },
+		{ code: 'U33', name: 'Blade Silver Metallic', hex: '#B2B6BA', image: path.join(XPANDER_CROSS_RENDERS, 'xpander_front_left_U33.webp') },
+		{ code: 'W81', name: 'Quartz White Pearl', hex: '#F0F2F3', image: path.join(XPANDER_CROSS_RENDERS, 'xpander_front_left_W81.webp') },
+		{ code: 'X37', name: 'Jet Black Mica', hex: '#18191B', image: path.join(XPANDER_CROSS_RENDERS, 'xpander_front_left_X37.webp') },
 	],
 };
+
+/** vehicles whose SPEC palette is the complete list — any other row is deleted */
+const PRUNE = new Set(['triton', 'xpander-cross']);
+
+/** row ↔ spec: same paint code, else current or legacy name */
+const isRowFor = (row, spec) =>
+	(row.color_code != null && row.color_code === spec.code) || row.color_name === spec.name || (spec.was ?? []).includes(row.color_name);
 
 const FOLDER_NAMES = { triton: 'Triton', 'xpander-cross': 'Xpander Cross' };
 const ROOT = path.join(HERE, '..', '..');
@@ -183,7 +204,7 @@ async function main() {
 		for (let i = 0; i < palette.length; i++) {
 			const spec = palette[i];
 			const sort = i + 1;
-			const localPath = path.join(ROOT, spec.image);
+			const localPath = path.resolve(ROOT, spec.image);
 			let fileId = null;
 
 			if (fs.existsSync(localPath)) {
@@ -206,16 +227,17 @@ async function main() {
 			for (const c of candidates) {
 				try {
 					const fresh = (await colorRow(c.id)).data;
-					if (fresh && fresh.vehicle_id === vid && fresh.color_name === spec.name) existing = fresh;
+					if (fresh && fresh.vehicle_id === vid && isRowFor(fresh, spec)) existing = fresh;
 				} catch { /* row vanished mid-race — try the next candidate */ }
 				if (existing) break;
 			}
 
-			const patch = { hex_code: spec.hex, sort };
+			const patch = { color_name: spec.name, color_code: spec.code, hex_code: spec.hex, sort };
 			if (fileId) patch.image = fileId;
 			if (existing) {
 				const row = existing;
-				const changed = row.hex_code !== spec.hex || (fileId && row.image !== fileId) || row.sort !== sort;
+				const changed =
+					row.color_name !== spec.name || row.color_code !== spec.code || row.hex_code !== spec.hex || (fileId && row.image !== fileId) || row.sort !== sort;
 				if (changed) await api('PATCH', `/items/vehicle_colors/${row.id}`, patch);
 				console.log(`  ~ ${spec.name}: row ${row.id} ${changed ? 'updated' : 'ok (already at spec)'} → ${spec.hex} sort=${sort} image=${fileId || '(none)'}`);
 			} else if (listCandidates.length === 0 && junctionIds.length === 0) {
@@ -226,8 +248,8 @@ async function main() {
 				// NOTE: this build IGNORES m2o fields in create payloads
 				// (vehicle_id arrives null) — the link is established via a
 				// follow-up PATCH and verified.
-				const created = await api('POST', '/items/vehicle_colors?fields=id', { color_name: spec.name, ...patch });
-				await api('PATCH', `/items/vehicle_colors/${created.data.id}`, { vehicle_id: vid, color_name: spec.name, ...patch });
+				const created = await api('POST', '/items/vehicle_colors?fields=id', patch);
+				await api('PATCH', `/items/vehicle_colors/${created.data.id}`, { vehicle_id: vid, ...patch });
 				const linked = (await colorRow(created.data.id, ['id', 'vehicle_id', 'color_name'])).data;
 				if (linked && linked.vehicle_id !== vid) {
 					await api('DELETE', `/items/vehicle_colors/${created.data.id}`); // don't leave a null-vehicle orphan
@@ -241,7 +263,7 @@ async function main() {
 				for (const id of scan) {
 					try {
 						const other = (await colorRow(id, ['id', 'vehicle_id', 'color_name'])).data;
-						if (other && other.vehicle_id === vid && other.color_name === spec.name && id < created.data.id) {
+						if (other && other.vehicle_id === vid && isRowFor(other, spec) && id < created.data.id) {
 							await api('PATCH', `/items/vehicle_colors/${id}`, { vehicle_id: vid, ...patch }); // move spec state to the kept row
 							await api('DELETE', `/items/vehicle_colors/${created.data.id}`);
 							console.log(`  ! ${spec.name}: duplicate race detected — dropped fresh row ${created.data.id}, kept ${id} with spec values`);
@@ -253,8 +275,21 @@ async function main() {
 		}
 	}
 
-	// 4. renumber non-spec rows (sort 5,6,7… per vehicle, existing order)
+	// 4. non-spec rows: deleted for PRUNE vehicles, otherwise renumbered (sort 5,6,7…, existing order)
+	for (const slug of PRUNE) {
+		const vid = vehicleId.get(slug);
+		const specNames = new Set(SPEC[slug].map((c) => c.name));
+		// SEARCH, not the list GET: a stale list could hide a phantom row (or resurrect a deleted one)
+		const { data: rows } = await api('SEARCH', '/items/vehicle_colors', {
+			query: { filter: { vehicle_id: { _eq: vid } }, fields: ['id', 'color_name'], limit: -1 },
+		});
+		for (const row of rows.filter((r) => !specNames.has(r.color_name))) {
+			await api('DELETE', `/items/vehicle_colors/${row.id}`);
+			console.log(`  - ${slug}: deleted "${row.color_name}" (row ${row.id}) — no render`);
+		}
+	}
 	for (const [slug] of Object.entries(SPEC)) {
+		if (PRUNE.has(slug)) continue;
 		const vid = vehicleId.get(slug);
 		const specNames = new Set(SPEC[slug].map((c) => c.name));
 		const rows = (await colorsByVehicle(vid, ['id', 'color_name', 'sort']))
@@ -308,7 +343,7 @@ async function main() {
 
 /** Ensure the local (cleaned) asset exists in Directus; returns the file id. */
 async function ensureFile(relPath, folderId) {
-	const localPath = path.join(ROOT, relPath);
+	const localPath = path.resolve(ROOT, relPath);
 	const fileName = path.basename(relPath);
 	const localBuf = fs.readFileSync(localPath);
 	const localHash = sha256(localBuf);

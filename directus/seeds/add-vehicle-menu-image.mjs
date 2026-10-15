@@ -11,13 +11,18 @@
  *      (ON DELETE SET NULL, so deleting the file just clears the field).
  *   3. Appends `menu_image` to the public `vehicles` read whitelist.
  *      seed-permissions.py lists it too, so a permissions reseed keeps it.
+ *   4. Uploads the transparent (RGBA PNG) model cutouts from the content library and
+ *      assigns them as `menu_image` — used by the homepage "Find your Mitsubishi" cards
+ *      and the header mega menu, so they float on the dark cards without a white box.
  *
- * Idempotent: every step checks current state first.
+ * Idempotent: every step checks current state first (cutouts are matched by filename + size).
  *
  * Usage:  node directus/seeds/add-vehicle-menu-image.mjs
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
+ *         CONTENT_DIR (default ~/Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026)
  */
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -103,4 +108,49 @@ if (fields.includes('*') || fields.includes('menu_image')) {
 } else {
 	await api('PATCH', `/permissions/${perm.id}`, { fields: [...fields, 'menu_image'] });
 	console.log('+ public read granted on vehicles.menu_image');
+}
+
+// --- 4. cutouts ---------------------------------------------------------------
+const CONTENT_DIR =
+	process.env.CONTENT_DIR || path.join(os.homedir(), 'Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026');
+const CUTOUTS = {
+	'2025-outlander-sport': 'Outlander_Sport_HEV/outlander_menu_cutout.png',
+	triton: 'Triton/triton_menu_cutout.png',
+	'xpander-cross': 'Xpander_Cross/xpander_menu_cutout.png',
+};
+
+/** Directus file id for a cutout — reuses a same-name, same-size upload. */
+async function ensureCutout(relPath) {
+	const abs = path.join(CONTENT_DIR, '02_Showroom_Models', relPath);
+	const buf = fs.readFileSync(abs);
+	// PNG IHDR colour type 6 = RGBA; anything else would bring the white box back
+	if (buf[25] !== 6) throw new Error(`${relPath} is not an RGBA PNG (colour type ${buf[25]})`);
+	const name = path.basename(abs);
+	// SEARCH, not GET: a GET list read straight after an upload can come back stale here.
+	const { data: found } = await api('SEARCH', '/files', {
+		query: { filter: { filename_download: { _eq: name } }, fields: ['id', 'filesize'], sort: ['uploaded_on'], limit: -1 },
+	});
+	const existing = found.find((f) => Number(f.filesize) === buf.length);
+	if (existing) return existing.id;
+	const form = new FormData();
+	form.append('title', path.basename(name, '.png'));
+	form.append('file', new Blob([buf], { type: 'image/png' }), name);
+	const res = await fetch(`${BASE}/files`, { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body: form });
+	const text = await res.text();
+	if (!res.ok) throw new Error(`upload ${name} → ${res.status} ${text.slice(0, 300)}`);
+	console.log(`+ ${name} uploaded`);
+	return JSON.parse(text).data.id;
+}
+
+const { data: vehicles } = await api('SEARCH', '/items/vehicles', { query: { fields: ['id', 'slug', 'menu_image'], limit: -1 } });
+for (const [slug, relPath] of Object.entries(CUTOUTS)) {
+	const vehicle = vehicles.find((v) => v.slug === slug);
+	if (!vehicle) throw new Error(`vehicle not found: ${slug}`);
+	const fileId = await ensureCutout(relPath);
+	if (vehicle.menu_image === fileId) {
+		console.log(`= ${slug}: menu_image already ${path.basename(relPath)}`);
+	} else {
+		await api('PATCH', `/items/vehicles/${vehicle.id}`, { menu_image: fileId });
+		console.log(`+ ${slug}: menu_image → ${path.basename(relPath)} (${fileId})`);
+	}
 }

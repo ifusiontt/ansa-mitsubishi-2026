@@ -25,7 +25,7 @@ watch(selectedSlug, () => {
 	selectedColorIdx.value = 0;
 });
 
-const renderUrl = (uuid: string) => (uuid ? `${getDirectusAssetURL(uuid)}?width=1536&quality=82&format=webp` : '');
+const renderUrl = (uuid: string) => (uuid ? `${getDirectusAssetURL(uuid)}?${VEHICLE_RENDER_QUERY}` : '');
 const fallbackId = computed(() => directusFileId(vehicle.value?.hero_block?.media) || directusFileId(vehicle.value?.menu_image));
 const colorRenderUrl = (index: number) => renderUrl(directusFileId(colors.value[index]?.image) || fallbackId.value);
 const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(index)));
@@ -73,6 +73,11 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 
 			<div class="lg:col-span-8">
 				<div class="relative mx-auto w-full max-w-3xl">
+					<!-- Neutral ambient light so the render doesn't float on flat black -->
+					<div
+						class="pointer-events-none absolute -inset-x-16 -inset-y-12 bg-[radial-gradient(ellipse_65%_45%_at_50%_60%,rgba(255,255,255,0.07),transparent)]"
+						aria-hidden="true"
+					/>
 					<VehicleColorStage
 						class="relative z-10"
 						:src="colorRenderUrl(selectedColorIdx)"

@@ -2,14 +2,76 @@
 import type { BlockHeroCustom } from '#shared/types/schema';
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 
-/** Full-bleed pitch-black hero rendered from the Home page's block_hero_custom. */
+/**
+ * Full-bleed pitch-black hero rendered from the Home page's block_hero_custom.
+ *
+ * Immersive template: a 1920x800 (12:5) crossfading slider over `media_gallery`, auto-advancing
+ * every 5s with indicator buttons. Autoplay pauses while hovered / focused or the tab is hidden,
+ * and is off for prefers-reduced-motion. Falls back to the single `media` file without a gallery.
+ */
 const props = defineProps<{ hero: BlockHeroCustom }>();
+
+const SLIDE_INTERVAL_MS = 5000;
 
 const { setAttr } = useVisualEditing();
 
-const mediaId = computed(() => directusFileId(props.hero.media));
-const mediaUrl = computed(() => (mediaId.value ? `${getDirectusAssetURL(mediaId.value)}?width=2400&quality=85&format=webp` : ''));
 const isSplit = computed(() => props.hero.template === 'hero_split_screen');
+
+interface Slide {
+	id: string;
+	alt: string;
+}
+
+const slides = computed<Slide[]>(() => {
+	const fallbackAlt = props.hero.title || 'The 2026 Mitsubishi lineup';
+	const gallery = (props.hero.media_gallery ?? [])
+		.map((entry) => (typeof entry === 'object' ? entry.directus_files_id : null))
+		.map((file) => ({
+			id: directusFileId(file),
+			alt: (typeof file === 'object' && file?.title) || fallbackAlt,
+		}))
+		.filter((slide) => slide.id);
+	if (gallery.length) return gallery;
+	const mediaId = directusFileId(props.hero.media);
+	return mediaId ? [{ id: mediaId, alt: fallbackAlt }] : [];
+});
+
+const assetUrl = (id: string, width: number) => `${getDirectusAssetURL(id)}?width=${width}&quality=85&format=webp`;
+const srcset = (id: string) => `${assetUrl(id, 960)} 960w, ${assetUrl(id, 1920)} 1920w`;
+
+// --- slider -------------------------------------------------------------------
+const active = ref(0);
+const hovered = ref(false);
+const focused = ref(false);
+const visibility = useDocumentVisibility();
+const reducedMotion = usePreferredReducedMotion();
+
+const autoplay = computed(
+	() => slides.value.length > 1 && !hovered.value && !focused.value && visibility.value === 'visible' && reducedMotion.value !== 'reduce',
+);
+
+const { pause, resume } = useIntervalFn(() => (active.value = (active.value + 1) % slides.value.length), SLIDE_INTERVAL_MS, {
+	immediate: false,
+});
+
+// Client only — the server renders slide 0 and never ticks.
+watch(autoplay, (on) => (on ? resume() : pause()), { immediate: import.meta.client });
+
+watch(
+	() => slides.value.length,
+	(count) => {
+		if (active.value >= count) active.value = 0;
+	},
+);
+
+/** Manual pick — restarts the 5s countdown so the chosen slide gets its full time. */
+function goTo(index: number) {
+	active.value = index;
+	if (autoplay.value) {
+		pause();
+		resume();
+	}
+}
 
 /** Headline split around the highlight keyword so it can be painted Mitsubishi Red without v-html. */
 const headlineParts = computed(() => {
@@ -24,25 +86,41 @@ const headlineParts = computed(() => {
 <template>
 	<section
 		class="relative isolate overflow-hidden bg-black text-white"
-		:class="isSplit ? '' : 'min-h-[calc(100svh-4rem)] flex items-end'"
-		:data-directus="setAttr({ collection: 'block_hero_custom', item: hero.id, fields: ['headline', 'highlight_keyword', 'body', 'media', 'template'], mode: 'drawer' })"
+		:class="isSplit ? '' : 'flex aspect-[12/5] min-h-[600px] w-full items-end'"
+		:aria-roledescription="!isSplit && slides.length > 1 ? 'carousel' : undefined"
+		:aria-label="!isSplit && slides.length > 1 ? 'Featured models' : undefined"
+		:data-directus="
+			setAttr({ collection: 'block_hero_custom', item: hero.id, fields: ['headline', 'highlight_keyword', 'body', 'media_gallery', 'media', 'template'], mode: 'drawer' })
+		"
+		@mouseenter="hovered = true"
+		@mouseleave="hovered = false"
+		@focusin="focused = true"
+		@focusout="focused = false"
 	>
-		<!-- Immersive: full-bleed image under a bottom-weighted fade -->
+		<!-- Immersive: crossfading full-bleed stills under a bottom-weighted fade -->
 		<template v-if="!isSplit">
 			<img
-				v-if="mediaUrl"
-				:src="mediaUrl"
-				:alt="hero.title || 'The 2026 Mitsubishi lineup'"
-				class="absolute inset-0 -z-10 h-full w-full object-cover"
-				fetchpriority="high"
+				v-for="(slide, index) in slides"
+				:key="slide.id"
+				:src="assetUrl(slide.id, 1920)"
+				:srcset="srcset(slide.id)"
+				sizes="100vw"
+				width="1920"
+				height="800"
+				:alt="slide.alt"
+				:aria-hidden="index !== active"
+				:fetchpriority="index === 0 ? 'high' : 'low'"
+				decoding="async"
+				class="absolute inset-0 -z-10 h-full w-full object-cover transition-opacity duration-1000 ease-in-out motion-reduce:transition-none"
+				:class="index === active ? 'opacity-100' : 'opacity-0'"
 			/>
-			<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/60 to-black/10" aria-hidden="true" />
+			<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/50 to-black/10" aria-hidden="true" />
 			<div class="absolute inset-0 -z-10 bg-gradient-to-r from-black/80 via-transparent to-transparent" aria-hidden="true" />
 		</template>
 
 		<div
 			class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-16"
-			:class="isSplit ? 'grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-28' : 'pb-20 pt-40 lg:pb-28'"
+			:class="isSplit ? 'grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-28' : 'pb-20 pt-28 lg:pb-24'"
 		>
 			<div class="max-w-2xl">
 				<p class="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em] text-neutral-400">
@@ -70,11 +148,41 @@ const headlineParts = computed(() => {
 				</div>
 			</div>
 
-			<!-- Split screen: framed image beside the copy -->
-			<div v-if="isSplit && mediaUrl" class="relative">
+			<!-- Split screen: framed first still beside the copy -->
+			<div v-if="isSplit && slides[0]" class="relative">
 				<div class="absolute -inset-4 -z-10 rounded-2xl bg-[radial-gradient(ellipse_at_center,rgba(195,0,47,0.25),transparent_70%)]" aria-hidden="true" />
-				<img :src="mediaUrl" :alt="hero.title || 'The 2026 Mitsubishi lineup'" class="w-full rounded-xl object-cover" fetchpriority="high" />
+				<img
+					:src="assetUrl(slides[0].id, 1920)"
+					:srcset="srcset(slides[0].id)"
+					sizes="(min-width: 1024px) 50vw, 100vw"
+					:alt="slides[0].alt"
+					class="w-full rounded-xl object-cover"
+					fetchpriority="high"
+				/>
 			</div>
+		</div>
+
+		<!-- Slide indicators -->
+		<div
+			v-if="!isSplit && slides.length > 1"
+			class="absolute bottom-8 right-4 flex items-center gap-2 sm:right-6 lg:right-16"
+			role="group"
+			aria-label="Choose slide"
+		>
+			<button
+				v-for="(slide, index) in slides"
+				:key="slide.id"
+				type="button"
+				class="group flex h-6 items-center focus:outline-none"
+				:aria-label="`Show slide ${index + 1} of ${slides.length}: ${slide.alt}`"
+				:aria-current="index === active ? 'true' : undefined"
+				@click="goTo(index)"
+			>
+				<span
+					class="block h-1 rounded-full transition-all duration-500 group-focus-visible:ring-2 group-focus-visible:ring-white group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-black"
+					:class="index === active ? 'w-10 bg-[#C3002F]' : 'w-5 bg-white/40 group-hover:bg-white/70'"
+				/>
+			</button>
 		</div>
 	</section>
 </template>

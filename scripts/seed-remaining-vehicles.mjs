@@ -32,11 +32,13 @@
  *
  * Paint-code → render mapping (verified against the brochure VARIATIONS page
  * and HSV sampling of the renders):
- *   C31 = Green Bronze Metallic   W81 = Quartz White Pearl
- *   U33 = Blade Silver Metallic   U28 = Graphite Gray Metallic
- *   X37 = Jet Black Mica          M13 = Sunrise Orange Metallic
- *   Triton renders only exist for U28 + U33 (other colours fall back to the
- *   hero image on the frontend, which handles null color images).
+ *   Xpander Cross (2026 palette, transparent front-left renders):
+ *   X3M = Sunrise Orange Metallic   X3N = Quartz White Pearl / Black Roof
+ *   X4C = Green Bronze Metallic     U28 = Graphite Gray Metallic
+ *   U33 = Blade Silver Metallic     W81 = Quartz White Pearl
+ *   X37 = Jet Black Mica
+ *   (The archived Xpander entry still uses the legacy C31 / M13 press renders.)
+ *   Triton renders only exist for U28 + U33, so those are its only colours.
  *
  * Idempotent: safe to re-run. Files are tracked in scripts/.seed-remaining-assets.json
  * (this build 403s GET /items/directus_files, so the state file is the source
@@ -101,7 +103,7 @@ const VEHICLES = [
 		seating_capacity: 5,
 		starting_price: 295000,
 		warranty: '5-Year / 100,000 km Manufacturer Warranty',
-		primary_color: '#4A3B32',
+		primary_color: '#4A4D52', // U28 Graphite Gray
 		brochure_url: 'https://ansamitsubishi.com/brochures/2026-mitsubishi-triton.pdf',
 		tagline: 'The All-New 4x4 Legend',
 		hero_headline: 'Built For The Toughest Terrain',
@@ -116,14 +118,11 @@ const VEHICLES = [
 			body: 'All-New 2.4L Turbo Diesel pickup with Super Select 4WD-II and 3,500 kg towing capacity.',
 			media: 'Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U28_Mid-Resolution-JPEG-rev-1.jpeg',
 		},
+		// Only the paints with renders. The transparent renders are linked (and any other
+		// Triton row pruned) by directus/seeds/vehicle-colors.mjs, so no `image` here.
 		colors: [
-			{ sort: 1, color_name: 'Deep Bronze Metallic', hex_code: '#4A3B32' },
-			{ sort: 2, color_name: 'Impuls Blue', hex_code: '#0047AB' },
-			{ sort: 3, color_name: 'Yamabuki Orange Metallic', hex_code: '#D86B27' },
-			{ sort: 4, color_name: 'Graphite Gray', hex_code: '#4A4D52', color_code: 'U28', image: 'Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U28_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 5, color_name: 'Blade Silver', hex_code: '#B3B7BB', color_code: 'U33', image: 'Triton_Front_Left/26MY_TR_THA_DCAB_Prime_2WD_AT_front-left_U33_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 6, color_name: 'Jet Black Mica', hex_code: '#1C1D21', color_code: 'X37' }, // no Triton X37 render
-			{ sort: 7, color_name: 'White Diamond', hex_code: '#F2F4F5', color_code: 'W81' }, // no Triton W81 render
+			{ sort: 1, color_name: 'Graphite Gray', hex_code: '#4A4D52', color_code: 'U28' },
+			{ sort: 2, color_name: 'Blade Silver', hex_code: '#B3B7BB', color_code: 'U33' },
 		],
 		blockTagline: 'Triton Key Highlights',
 		highlights: [
@@ -201,7 +200,7 @@ const VEHICLES = [
 		seating_capacity: 7,
 		starting_price: 195000,
 		warranty: '5-Year / 100,000 km Manufacturer Warranty',
-		primary_color: '#4B5320',
+		primary_color: '#C8501E', // X3M Sunrise Orange Metallic
 		brochure_url: 'https://ansamitsubishi.com/brochures/2026-mitsubishi-xpander-cross.pdf',
 		tagline: 'Confidence For Every Adventure',
 		hero_headline: 'The All-New Xpander Cross',
@@ -216,13 +215,16 @@ const VEHICLES = [
 			body: 'A robust 7-seater crossover with top-tier 225 mm ground clearance and Active Yaw Control.',
 			media: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_W81_Mid-Resolution-JPEG-rev-1 (1).jpeg',
 		},
+		// Must match SPEC['xpander-cross'] in directus/seeds/vehicle-colors.mjs, which links the
+		// transparent front-left renders (and prunes any other row) — so no `image` here.
 		colors: [
-			{ sort: 1, color_name: 'Green Bronze Metallic', hex_code: '#4B5320', image: 'Xpander Cross_RHD_Front_Right/26MY_XS_Exterior_front-right_RHD_C31_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 2, color_name: 'Quartz White Pearl', hex_code: '#F0F2F3', color_code: 'W81', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_W81_Mid-Resolution-JPEG-rev-1 (1).jpeg' },
-			{ sort: 3, color_name: 'Blade Silver Metallic', hex_code: '#B2B6BA', color_code: 'U33', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_U33_Mid-Resolution-JPEG-rev-1 (1).jpeg' },
-			{ sort: 4, color_name: 'Graphite Gray Metallic', hex_code: '#4A4D4E', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_U28_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 5, color_name: 'Jet Black Mica', hex_code: '#18191B', color_code: 'X37', image: 'Xpander Cross_RHD_Front_Left/26MY_XS_Exterior_front-left_RHD_X37_Mid-Resolution-JPEG-rev-1.jpeg' },
-			{ sort: 6, color_name: 'Sunrise Orange', hex_code: '#C8501E', color_code: 'M38', image: 'Xpander Cross_RHD_Rear_Right/26MY_XS_Exterior_rear-right_RHD_M13_Mid-Resolution-JPEG-rev-1.jpeg' },
+			{ sort: 1, color_name: 'Sunrise Orange Metallic', hex_code: '#C8501E', color_code: 'X3M' },
+			{ sort: 2, color_name: 'Quartz White Pearl / Black Roof', hex_code: '#EEF0F1', color_code: 'X3N' },
+			{ sort: 3, color_name: 'Green Bronze Metallic', hex_code: '#6E6B5E', color_code: 'X4C' },
+			{ sort: 4, color_name: 'Graphite Gray Metallic', hex_code: '#4A4D4E', color_code: 'U28' },
+			{ sort: 5, color_name: 'Blade Silver Metallic', hex_code: '#B2B6BA', color_code: 'U33' },
+			{ sort: 6, color_name: 'Quartz White Pearl', hex_code: '#F0F2F3', color_code: 'W81' },
+			{ sort: 7, color_name: 'Jet Black Mica', hex_code: '#18191B', color_code: 'X37' },
 		],
 		blockTagline: 'Xpander Cross Key Highlights',
 		highlights: [
@@ -630,7 +632,7 @@ async function ensureColors(vehicle, row) {
 				current.color_name !== spec.color_name ||
 				current.hex_code !== spec.hex_code ||
 				(spec.color_code ?? null) !== (current.color_code ?? null) ||
-				String(current.image ?? null) !== String(imgId ?? null);
+				(imgId != null && String(current.image ?? null) !== imgId);
 			if (changed) {
 				await api('PATCH', `/items/vehicle_colors/${current.id}`, payload);
 				console.log(`  color: updated "${spec.color_name}" (#${current.id})${imgId ? ` → ${imgId.slice(0, 8)}..` : ''}`);

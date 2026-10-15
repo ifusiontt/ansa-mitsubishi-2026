@@ -20,6 +20,10 @@
  *     (the frontend DirectusImage handles both strings and objects).
  *   - A single deep items query must stay well under ~15KB (HTTP 431 guard).
  *
+ * Also covers the homepage media contract (sections 7–8): the transparent
+ * menu_image cutouts on every published fleet vehicle, the 3-still hero
+ * gallery, the ASC spotlight image, and the absence of the retired blocks.
+ *
  * Usage:  node scripts/test-vehicle-api.mjs
  * Env:    DIRECTUS_URL (default http://localhost:8055)
  *         NUXT_URL     (default: tries localhost:3000, [::1]:3000, 127.0.0.1:3000)
@@ -34,11 +38,13 @@ const VEHICLE_SLUG = '2025-outlander-sport';
 // expected content (must match scripts/seed-outlander-vehicle.mjs)
 // ---------------------------------------------------------------------------
 
+// 2026 2-tone palette — each swatch shows its own Front-Left 2-tone render
 const EXPECTED_COLORS = [
-	{ sort: 1, name: 'Octane Blue', hex: '#003399' },
-	{ sort: 2, name: 'Energetic Yellow', hex: '#E5C100' },
-	{ sort: 3, name: 'Diamond White', hex: '#FFFFFF' },
-	{ sort: 4, name: 'Black Two-Tone', hex: '#1A1A1A' },
+	{ sort: 1, code: 'X4Y', name: 'Energetic Yellow', hex: '#C9A332' },
+	{ sort: 2, code: 'X5P', name: 'Red Metallic', hex: '#B92428' },
+	{ sort: 3, code: 'X8W', name: 'White Solid', hex: '#E8E9EC' },
+	{ sort: 4, code: 'JH3', name: 'Gray Metallic', hex: '#4A4E52' },
+	{ sort: 5, code: 'XEU', name: 'Silver Metallic', hex: '#A3A5AE' },
 ];
 
 const EXPECTED_HIGHLIGHTS = [
@@ -135,6 +141,44 @@ async function checkAsset(label, uuid) {
 	}
 }
 
+/**
+ * The colour-stage rendition (the exact transform HomeColorPreview / the showroom request)
+ * serves anonymously as a WebP that carries alpha (VP8X alpha flag, or the VP8L alpha bit).
+ */
+async function checkTransparentWebp(label, uuid) {
+	if (!uuid) {
+		check(label, false, 'no file uuid resolved');
+		return;
+	}
+	try {
+		// mirrors VEHICLE_RENDER_QUERY in nuxt/app/utils/directus-file.ts
+		const r = await fetch(`${BASE}/assets/${uuid}?width=1536&quality=82&format=webp`);
+		const buf = Buffer.from(await r.arrayBuffer());
+		const isWebp = buf.subarray(0, 4).toString('latin1') === 'RIFF' && buf.subarray(8, 12).toString('latin1') === 'WEBP';
+		const chunk = buf.subarray(12, 16).toString('latin1');
+		const alpha = (chunk === 'VP8X' && (buf[20] & 0x10) !== 0) || (chunk === 'VP8L' && ((buf.readUInt32LE(21) >>> 28) & 1) === 1);
+		check(label, r.status === 200 && isWebp && alpha, `status ${r.status}, webp=${isWebp}, chunk ${chunk}, alpha=${alpha}`);
+	} catch (e) {
+		check(label, false, String(e));
+	}
+}
+
+/** Serves anonymously as a PNG whose IHDR colour type carries alpha (4 = grey+alpha, 6 = RGBA). */
+async function checkTransparentPng(label, uuid) {
+	if (!uuid) {
+		check(label, false, 'no file uuid resolved');
+		return;
+	}
+	try {
+		const r = await fetch(`${BASE}/assets/${uuid}`);
+		const buf = Buffer.from(await r.arrayBuffer());
+		const isPng = buf.subarray(1, 4).toString('latin1') === 'PNG';
+		check(label, r.status === 200 && isPng && [4, 6].includes(buf[25]), `status ${r.status}, png=${isPng}, colour type ${buf[25]}`);
+	} catch (e) {
+		check(label, false, String(e));
+	}
+}
+
 // ---------------------------------------------------------------------------
 // 1. public deep query — task spec fields list
 // ---------------------------------------------------------------------------
@@ -180,7 +224,7 @@ const scalars = [
 	['brochure_url', null],
 	['tagline', null],
 	['hero_headline', null],
-	['primary_color', '#003399'],
+	['primary_color', EXPECTED_COLORS[0].hex],
 ];
 for (const [field, expected] of scalars) {
 	if (expected == null) {
@@ -215,10 +259,16 @@ EXPECTED_COLORS.forEach((exp, i) => {
 	check(`color #${exp.sort} name = ${exp.name}`, c && eqi(c.color_name, exp.name), `got ${c?.color_name}`);
 	check(`color #${exp.sort} hex = ${exp.hex}`, c && eqi(c.hex_code, exp.hex), `got ${c?.hex_code}`);
 	check(`color #${exp.sort} has image`, fileUuidFrom(c?.image) != null, JSON.stringify(c?.image)?.slice(0, 60));
+	check(`color #${exp.sort} code = ${exp.code}`, c && eq(c.color_code, exp.code), `got ${c?.color_code}`);
+	check(
+		`color #${exp.sort} image is the ${exp.code} transparent 2-tone render`,
+		c?.image?.filename_download === `outlander_front_left_${exp.code}.webp`,
+		`got ${c?.image?.filename_download}`,
+	);
 	void exp;
 });
 for (const c of colors) {
-	await checkAsset(`color image "${c?.color_name}" serves (anonymous)`, fileUuidFrom(c?.image));
+	await checkTransparentWebp(`color image "${c?.color_name}" serves as transparent WebP (anonymous)`, fileUuidFrom(c?.image));
 }
 
 // ---------------------------------------------------------------------------
@@ -309,6 +359,133 @@ try {
 	check('SSR page renders highlights section', html.includes('OUTDRIVE THE LIMITS WITH PREVAILING PERFORMANCE') || html.includes('Outdrive The Limits With Prevailing Performance'));
 } catch (e) {
 	check('Nuxt SSR page /showroom/:slug → 200', false, String(e));
+}
+
+// ---------------------------------------------------------------------------
+// 7. fleet menu cutouts ("Find Your Mitsubishi" + header mega menu)
+// ---------------------------------------------------------------------------
+
+console.log('\n── 7. fleet menu cutouts ─────────────────────────────────────────');
+const EXPECTED_CUTOUTS = {
+	'2025-outlander-sport': 'outlander_menu_cutout.png',
+	triton: 'triton_menu_cutout.png',
+	'xpander-cross': 'xpander_menu_cutout.png',
+};
+res = await fetch(`${BASE}/items/vehicles?filter[status][_eq]=published&fields=slug,menu_image.id,menu_image.filename_download&limit=-1`);
+check('published fleet query → 200 (anonymous)', res.status === 200, `status ${res.status}`);
+const fleet = res.status === 200 ? (await res.json()).data : [];
+for (const [slug, filename] of Object.entries(EXPECTED_CUTOUTS)) {
+	const v = fleet.find((row) => row.slug === slug);
+	check(`${slug}: menu_image = ${filename}`, v?.menu_image?.filename_download === filename, `got ${v?.menu_image?.filename_download}`);
+	await checkTransparentPng(`${slug}: cutout serves as transparent PNG (anonymous)`, fileUuidFrom(v?.menu_image));
+}
+
+// Showroom palettes: one transparent front-left WebP per paint (a single camera angle per vehicle)
+const EXPECTED_PALETTES = {
+	// only the two Triton paints with renders
+	triton: [
+		{ code: 'U28', name: 'Graphite Gray', file: 'triton_front_left_U28.webp' },
+		{ code: 'U33', name: 'Blade Silver', file: 'triton_front_left_U33.webp' },
+	],
+	'xpander-cross': ['X3M', 'X3N', 'X4C', 'U28', 'U33', 'W81', 'X37'].map((code) => ({
+		code,
+		name: {
+			X3M: 'Sunrise Orange Metallic',
+			X3N: 'Quartz White Pearl / Black Roof',
+			X4C: 'Green Bronze Metallic',
+			U28: 'Graphite Gray Metallic',
+			U33: 'Blade Silver Metallic',
+			W81: 'Quartz White Pearl',
+			X37: 'Jet Black Mica',
+		}[code],
+		file: `xpander_front_left_${code}.webp`,
+	})),
+};
+for (const [slug, palette] of Object.entries(EXPECTED_PALETTES)) {
+	res = await fetch(
+		`${BASE}/items/vehicles?filter[slug][_eq]=${slug}&fields=colors.sort,colors.color_code,colors.color_name,colors.image.id,colors.image.filename_download`,
+	);
+	const rows = res.status === 200 ? [...((await res.json()).data?.[0]?.colors ?? [])].sort((a, b) => a.sort - b.sort) : [];
+	check(
+		`${slug}: palette = ${palette.map((c) => c.code).join(' / ')} only`,
+		JSON.stringify(rows.map((c) => c.color_code)) === JSON.stringify(palette.map((c) => c.code)),
+		`got ${JSON.stringify(rows.map((c) => `${c.color_code ?? '-'} ${c.color_name}`))}`,
+	);
+	for (const [i, exp] of palette.entries()) {
+		const c = rows[i];
+		check(`${slug} ${exp.code}: name = ${exp.name}`, c && eqi(c.color_name, exp.name), `got ${c?.color_name}`);
+		check(`${slug} ${exp.code}: image = ${exp.file}`, c?.image?.filename_download === exp.file, `got ${c?.image?.filename_download}`);
+		await checkTransparentWebp(`${slug} ${exp.code}: render serves as transparent WebP (anonymous)`, fileUuidFrom(c?.image));
+	}
+}
+
+// ---------------------------------------------------------------------------
+// 8. homepage media (hero gallery, ASC spotlight, retired blocks)
+// ---------------------------------------------------------------------------
+
+console.log('\n── 8. homepage media ─────────────────────────────────────────────');
+const EXPECTED_HERO_STILLS = ['outlander_hero_banner.png', 'triton_hero_banner.png', 'xpander_hero_forest.png'];
+const EXPECTED_ASC_IMAGE = 'outlander_asc_curve_clean.png';
+const RETIRED_HEADLINES = ['Mitsubishi 2026 — Built for Trinidad & Tobago', 'Five Models. Every Kind of Drive.'];
+
+const homeFields = [
+	'blocks.collection',
+	'blocks.item:block_hero_custom.media_gallery.directus_files_id.id',
+	'blocks.item:block_hero_custom.media_gallery.directus_files_id.filename_download',
+	'blocks.item:block_hero_custom.media_gallery.directus_files_id.width',
+	'blocks.item:block_hero_custom.media_gallery.directus_files_id.height',
+	'blocks.item:block_content_block.tagline',
+	'blocks.item:block_content_block.items.headline',
+	'blocks.item:block_content_block.items.description',
+	'blocks.item:block_content_block.items.images.directus_files_id.id',
+	'blocks.item:block_content_block.items.images.directus_files_id.filename_download',
+	'blocks.item:block_hero.headline',
+	'blocks.item:block_richtext.headline',
+];
+res = await fetch(`${BASE}/items/pages?filter[permalink][_eq]=/&fields=${homeFields.map(encodeURIComponent).join(',')}&limit=1`);
+check('Home page query → 200 (anonymous)', res.status === 200, `status ${res.status}`);
+const homeBlocks = res.status === 200 ? ((await res.json()).data?.[0]?.blocks ?? []) : [];
+
+const heroItem = homeBlocks.find((b) => b.collection === 'block_hero_custom')?.item;
+const stills = (heroItem?.media_gallery ?? []).map((j) => j?.directus_files_id).filter(Boolean);
+check(
+	'hero gallery = outlander / triton / xpander stills (in order)',
+	JSON.stringify(stills.map((f) => f.filename_download)) === JSON.stringify(EXPECTED_HERO_STILLS),
+	`got ${JSON.stringify(stills.map((f) => f.filename_download))}`,
+);
+for (const f of stills) {
+	check(`hero still ${f.filename_download} is 1920x800`, f.width === 1920 && f.height === 800, `got ${f.width}x${f.height}`);
+	await checkAsset(`hero still ${f.filename_download} serves (anonymous)`, f.id);
+}
+
+const ascItem = homeBlocks
+	.filter((b) => b.collection === 'block_content_block' && b.item?.tagline === 'TECHNOLOGY')
+	.flatMap((b) => b.item.items ?? [])
+	.find((i) => i?.headline === 'Introducing Active Stability Control (ASC)');
+check('ASC spotlight item on Home', !!ascItem);
+const ascFile = ascItem?.images?.[0]?.directus_files_id;
+check(`ASC image = ${EXPECTED_ASC_IMAGE}`, ascFile?.filename_download === EXPECTED_ASC_IMAGE, `got ${ascFile?.filename_download}`);
+await checkAsset('ASC image serves (anonymous)', ascFile?.id);
+check(
+	'ASC copy describes ASC, not AYC',
+	/\bstab(le|ility)\b/i.test(ascItem?.description ?? '') && !/\bAYC\b/.test(ascItem?.description ?? ''),
+	(ascItem?.description ?? '').slice(0, 80),
+);
+
+const headlinesOnHome = homeBlocks.map((b) => b.item?.headline).filter(Boolean);
+for (const headline of RETIRED_HEADLINES) {
+	check(`retired block "${headline}" not on Home`, !headlinesOnHome.includes(headline));
+}
+
+try {
+	const { r } = await nuxtFetch('/');
+	const html = r.status === 200 ? await r.text() : '';
+	check('Nuxt SSR homepage / → 200', r.status === 200, `status ${r.status}`);
+	check('SSR homepage renders first hero still', !!stills[0] && html.includes(stills[0].id));
+	check('SSR homepage renders ASC spotlight image', !!ascFile && html.includes(ascFile.id));
+	check('SSR homepage drops retired blocks', !RETIRED_HEADLINES.some((h) => html.includes(h)));
+} catch (e) {
+	check('Nuxt SSR homepage / → 200', false, String(e));
 }
 
 // ---------------------------------------------------------------------------

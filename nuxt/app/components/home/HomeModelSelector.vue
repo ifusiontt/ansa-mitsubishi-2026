@@ -21,7 +21,7 @@ const cutoutUrl = (vehicle: VehicleSummary) => {
 				<li v-for="vehicle in vehicles" :key="vehicle.id">
 					<NuxtLink
 						:to="`/showroom/${vehicle.slug}`"
-						class="group flex h-full flex-col rounded-xl border border-neutral-900 bg-neutral-950 p-6 transition-colors hover:border-[#C3002F]/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F]"
+						class="group flex h-full flex-col rounded-xl border border-white/10 bg-neutral-900/60 p-6 shadow-lg shadow-black/40 backdrop-blur-md transition-colors hover:border-[#C3002F]/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C3002F]"
 					>
 						<div class="relative aspect-[16/9]">
 							<div class="absolute inset-x-6 bottom-1 h-4 rounded-[50%] bg-black/80 blur-md" aria-hidden="true" />

@@ -12,21 +12,23 @@
  *     ├── Interior/            (press interior + BKZ showroom shots)
  *     └── Mono_Tone_Front_Left/(6 paint variants × jpg/webp/mid-res)
  *
- * Paint-code mapping (verified via HSV dominant-color analysis of the renders):
- *   W85 = white (65% white px)   Y37 = yellow/gold (13% yellow px)
- *   U28/X37 = black/charcoal     JH3 = dark two-tone   X8W = white two-tone
- *   DSC showroom photos = the only imagery with genuine blue pixels
- *   (the vehicle's primary color is Octane Blue #003399)
+ * Colour configurator: the official 2026 2-tone palette (black roof), one
+ * transparent Front-Left WebP per paint code from the content library
+ * (CONTENT_DIR/.../2_Tone_Front_Left/transparent_webp/), so the renders sit on the
+ * dark colour stage without a white box. Hex codes were sampled from the body
+ * panels of the 2-tone renders.
  *
  * Idempotent: safe to re-run. Files are matched by (folder, filename_download),
- * colors by (vehicle, color_name), highlights by (vehicle, sort), the parent
+ * colors by (vehicle, color_code → color_name), highlights by (vehicle, sort), the parent
  * content block by tagline, and trims are patched only when the name differs.
  *
  * Usage:  node scripts/seed-outlander-vehicle.mjs
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
+ *         CONTENT_DIR (default ~/Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026)
  */
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -72,25 +74,26 @@ const MIME = {
 /** rel paths (under Outlander_Sport_HEV/) of the images used for records */
 const PICKS = {
 	hero: 'Exterior/DSC04357_Mitsubishi Outlander Sport_Front_Level.webp',
-	colors: {
-		'Octane Blue': 'Exterior/DSC04370_Mitsubishi Outlander Sport_QTR Front_Low.webp',
-		'Energetic Yellow': 'Mono_Tone_Front_Left/26MY_XFH_THA_P_front-left_Y37_v2_Mid-Resolution-JPEG-rev-1.jpeg',
-		'Diamond White': 'Exterior/26MY_XFH_THA_P2_front-left_W85_Mid-Resolution-JPEG-rev-1.jpeg',
-		'Black Two-Tone': '2_Tone_Front_Left/26MY_XFH_THA_P_2tone_front-left_JH3_v2_Mid-Resolution-JPEG-rev-1.jpeg',
-	},
 	highlights: {
 		1: 'Exterior/DSC04390_Mitsubishi Outlander Sport_HEV_closeup.webp',
 		2: 'Exterior/DSC04357_Mitsubishi Outlander Sport_Back Qtr_Level_1.webp',
-		3: 'Interior/26MY_XFH_THA_H_MC21_black_instrument-panel_Mid-Resolution-JPEG-rev-1.jpeg',
+		3: 'Interior/BKZ07950_Mitsubishi Outlander Sport_Interior 1.png',
 	},
 };
 
-/** colors that must exist on the vehicle (idempotent by name) */
+/** transparent 2-tone renders, one per paint code: <dir>/outlander_front_left_<code>.webp */
+const CONTENT_DIR =
+	process.env.CONTENT_DIR || path.join(os.homedir(), 'Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026');
+const COLOR_RENDER_DIR = path.join(CONTENT_DIR, '02_Showroom_Models/Outlander_Sport_HEV/2_Tone_Front_Left/transparent_webp');
+const colorRenderPath = (code) => path.join(COLOR_RENDER_DIR, `outlander_front_left_${code}.webp`);
+
+/** the vehicle's complete colour palette — rows not listed here are reused or removed */
 const COLORS = [
-	{ sort: 1, color_name: 'Octane Blue', hex_code: '#003399' },
-	{ sort: 2, color_name: 'Energetic Yellow', hex_code: '#E5C100' },
-	{ sort: 3, color_name: 'Diamond White', hex_code: '#FFFFFF' },
-	{ sort: 4, color_name: 'Black Two-Tone', hex_code: '#1A1A1A' },
+	{ sort: 1, color_code: 'X4Y', color_name: 'Energetic Yellow', hex_code: '#C9A332' },
+	{ sort: 2, color_code: 'X5P', color_name: 'Red Metallic', hex_code: '#B92428' },
+	{ sort: 3, color_code: 'X8W', color_name: 'White Solid', hex_code: '#E8E9EC' },
+	{ sort: 4, color_code: 'JH3', color_name: 'Gray Metallic', hex_code: '#4A4E52' },
+	{ sort: 5, color_code: 'XEU', color_name: 'Silver Metallic', hex_code: '#A3A5AE' },
 ];
 
 /** highlight copy — exact task spec (headline rendered uppercase by the frontend CSS) */
@@ -167,6 +170,10 @@ async function api(method, p, body) {
 	return data;
 }
 
+// Item reads go through SEARCH (query in the body): GET reads on this instance — single-item
+// ones included, cache-buster or not — can be served stale right after a write.
+const search = async (collection, query) => ({ data: (await api('SEARCH', `/items/${collection}`, { query })).data });
+
 async function uploadFile(absPath, folderId) {
 	const name = path.basename(absPath);
 	const ext = path.extname(name).toLowerCase();
@@ -185,7 +192,11 @@ async function uploadFile(absPath, folderId) {
 // step 0 — resolve vehicle
 // ---------------------------------------------------------------------------
 
-const vehicles = await api('GET', `/items/vehicles?filter[slug][_eq]=${VEHICLE_SLUG}&fields=id,title,hero_block`);
+const vehicles = await search('vehicles', {
+	filter: { slug: { _eq: VEHICLE_SLUG } },
+	fields: ['id', 'title', 'hero_block', 'primary_color'],
+	limit: 1,
+});
 const vehicle = vehicles.data?.[0];
 if (!vehicle) {
 	console.error(`ERROR: vehicle with slug ${VEHICLE_SLUG} not found`);
@@ -263,43 +274,83 @@ const fileByRel = (relPath) => {
 };
 
 // ---------------------------------------------------------------------------
-// step 3 — colors (upsert by name, set sort + image)
+// step 3 — colors (upsert by code → name; reuse or remove rows not in COLORS)
 // ---------------------------------------------------------------------------
 
-const existingColors = await api('GET', `/items/vehicle_colors?filter[vehicle_id][_eq]=${vehicle.id}&fields=id,sort,color_name,hex_code,image`);
-const colorByName = new Map(existingColors.data.map((c) => [c.color_name, c]));
-for (const spec of COLORS) {
-	const imgId = fileByRel(PICKS.colors[spec.color_name]);
-	const current = colorByName.get(spec.color_name);
-	const payload = {
-		vehicle_id: vehicle.id,
-		sort: spec.sort,
-		color_name: spec.color_name,
-		hex_code: spec.hex_code,
-		image: imgId,
-	};
-	if (current) {
-		const changed =
-			current.sort !== spec.sort ||
-			current.hex_code !== spec.hex_code ||
-			(String(current.image ?? '') !== imgId);
+/** Directus file id for a content-library render — reuses a same-name, same-size upload. */
+async function ensureRender(absPath) {
+	const name = path.basename(absPath);
+	const size = fs.statSync(absPath).size;
+	const found = await api('SEARCH', '/files', {
+		query: { filter: { filename_download: { _eq: name } }, fields: ['id', 'filesize'], sort: ['uploaded_on'], limit: -1 },
+	});
+	const existing = found.data.find((f) => Number(f.filesize) === size);
+	if (existing) return existing.id;
+	const id = await uploadFile(absPath, FOLDER_ID);
+	await assignFolder(id);
+	console.log(`color render: uploaded ${name} (${id})`);
+	return id;
+}
+
+const colorImage = {};
+for (const { color_code } of COLORS) colorImage[color_code] = await ensureRender(colorRenderPath(color_code));
+
+const { data: existingColors } = await search('vehicle_colors', {
+	filter: { vehicle_id: { _eq: vehicle.id } },
+	fields: ['id', 'vehicle_id', 'sort', 'color_name', 'color_code', 'hex_code', 'image'],
+	sort: ['sort', 'id'],
+	limit: -1,
+});
+
+// pair each spec with its row: same code, then same name, then any leftover row (reused in sort order)
+const unclaimed = new Set(existingColors);
+const claim = (pred) => {
+	const row = [...unclaimed].find(pred);
+	if (row) unclaimed.delete(row);
+	return row;
+};
+const pairs = COLORS.map((spec) => ({ spec, row: claim((r) => r.color_code === spec.color_code) }));
+for (const p of pairs) p.row ??= claim((r) => r.color_name === p.spec.color_name);
+for (const p of pairs) p.row ??= claim(() => true);
+
+// primary_color follows the lead paint
+if (vehicle.primary_color !== COLORS[0].hex_code) {
+	await api('PATCH', `/items/vehicles/${vehicle.id}`, { primary_color: COLORS[0].hex_code });
+	console.log(`vehicle: primary_color → ${COLORS[0].hex_code} (${COLORS[0].color_code})`);
+}
+
+for (const { spec, row } of pairs) {
+	const payload = { ...spec, image: colorImage[spec.color_code] };
+	if (row) {
+		const changed = Object.entries(payload).some(([k, v]) => String(row[k] ?? '') !== String(v));
 		if (changed) {
-			await api('PATCH', `/items/vehicle_colors/${current.id}`, payload);
-			console.log(`color: updated "${spec.color_name}" (#${current.id}) → image ${imgId.slice(0, 8)}..`);
+			await api('PATCH', `/items/vehicle_colors/${row.id}`, payload);
+			console.log(`color: updated #${row.id} "${row.color_name}" → ${spec.color_code} "${spec.color_name}"`);
 		} else {
-			console.log(`color: ok "${spec.color_name}" (#${current.id})`);
+			console.log(`color: ok ${spec.color_code} "${spec.color_name}" (#${row.id})`);
 		}
-	} else {
-		const created = await api('POST', '/items/vehicle_colors', payload);
-		console.log(`color: created "${spec.color_name}" (#${created.data?.id ?? created.id})`);
+		continue;
 	}
+	// this build ignores m2o fields in create payloads — link with a follow-up PATCH and verify
+	const created = (await api('POST', '/items/vehicle_colors?fields=id', payload)).data;
+	await api('PATCH', `/items/vehicle_colors/${created.id}`, { vehicle_id: vehicle.id, ...payload });
+	const [linked] = (await search('vehicle_colors', { filter: { id: { _eq: created.id } }, fields: ['vehicle_id'], limit: 1 })).data;
+	if (linked?.vehicle_id !== vehicle.id) {
+		await api('DELETE', `/items/vehicle_colors/${created.id}`);
+		throw new Error(`could not link color ${spec.color_code} to vehicle ${vehicle.id} — deleted the orphan row; re-run`);
+	}
+	console.log(`color: created ${spec.color_code} "${spec.color_name}" (#${created.id})`);
+}
+for (const row of unclaimed) {
+	await api('DELETE', `/items/vehicle_colors/${row.id}`);
+	console.log(`color: removed #${row.id} "${row.color_name}" (not in the 2026 palette)`);
 }
 
 // ---------------------------------------------------------------------------
 // step 4 — highlight parent block (block_content_block) + highlight items
 // ---------------------------------------------------------------------------
 
-let blocks = await api('GET', `/items/block_content_block?filter[tagline][_eq]=${encodeURIComponent(BLOCK_TAGLINE)}&fields=id`);
+let blocks = await search('block_content_block', { filter: { tagline: { _eq: BLOCK_TAGLINE } }, fields: ['id'], limit: 1 });
 let block = blocks.data?.[0];
 if (!block) {
 	const created = await api('POST', '/items/block_content_block', {
@@ -314,12 +365,15 @@ if (!block) {
 	console.log(`block: reusing "${BLOCK_TAGLINE}" (${block.id})`);
 }
 
-const items = await api(
-	'GET',
-	`/items/block_content_items?filter[vehicle][_eq]=${vehicle.id}&fields=id,sort,tagline,headline,description,item&sort=sort`,
-);
-if (items.data.length !== HIGHLIGHTS.length) {
-	console.error(`ERROR: expected ${HIGHLIGHTS.length} highlight rows for vehicle, found ${items.data.length}`);
+const items = await search('block_content_items', {
+	filter: { vehicle: { _eq: vehicle.id } },
+	fields: ['id', 'sort', 'tagline', 'headline', 'description', 'item'],
+	sort: ['sort'],
+	limit: -1,
+});
+// rows 4+ belong to directus/seeds/vehicle-content-blocks.mjs
+if (items.data.length < HIGHLIGHTS.length) {
+	console.error(`ERROR: expected at least ${HIGHLIGHTS.length} highlight rows for vehicle, found ${items.data.length}`);
 	process.exit(1);
 }
 // NOTE (this Directus build): M2M fields expand to JUNCTION ROWS, not related
@@ -334,10 +388,11 @@ for (const spec of HIGHLIGHTS) {
 	const imgId = fileByRel(PICKS.highlights[spec.sort]);
 
 	// current junction rows for this item (full objects incl. file FK)
-	const junctions = await api(
-		'GET',
-		`/items/block_content_items_files?filter[block_content_items_id][_eq]=${row.id}&fields=id,directus_files_id`,
-	);
+	const junctions = await search('block_content_items_files', {
+		filter: { block_content_items_id: { _eq: row.id } },
+		fields: ['id', 'directus_files_id'],
+		limit: -1,
+	});
 	const currentFileIds = new Set((junctions.data ?? []).map((j) => j.directus_files_id));
 	const wantOnly = currentFileIds.size === 1 && currentFileIds.has(imgId);
 
@@ -359,10 +414,11 @@ for (const spec of HIGHLIGHTS) {
 		}
 		// this build can leave junction rows with a NULL item FK — purge any that
 		// reference one of this vehicle's highlight files
-		const stray = await api(
-			'GET',
-			`/items/block_content_items_files?filter[block_content_items_id][_null]=true&fields=id,directus_files_id`,
-		);
+		const stray = await search('block_content_items_files', {
+			filter: { block_content_items_id: { _null: true } },
+			fields: ['id', 'directus_files_id'],
+			limit: -1,
+		});
 		const highlightFileIds = new Set(Object.values(PICKS.highlights).map((r) => fileByRel(r)));
 		for (const j of stray.data ?? []) {
 			if (highlightFileIds.has(j.directus_files_id)) {
@@ -392,7 +448,7 @@ for (const spec of HIGHLIGHTS) {
 // ---------------------------------------------------------------------------
 
 for (const [id, newName] of Object.entries(TRIM_RENAMES)) {
-	const trims = await api('GET', `/items/vehicle_trims?filter[id][_eq]=${id}&fields=id,trim_name,vehicle`);
+	const trims = await search('vehicle_trims', { filter: { id: { _eq: Number(id) } }, fields: ['id', 'trim_name', 'vehicle'], limit: 1 });
 	const trim = trims.data?.[0];
 	if (!trim) {
 		console.error(`ERROR: trim #${id} not found`);
@@ -424,7 +480,7 @@ console.log('\n── summary ────────────────�
 console.log(`vehicle slug      : ${VEHICLE_SLUG} (id ${vehicle.id})`);
 console.log(`folder            : ${FOLDER_NAME} (${folder.id})`);
 console.log(`files             : ${files.length} in folder (${uploadedCount} new)`);
-console.log(`colors            : ${COLORS.length} (with exterior images)`);
+console.log(`colors            : ${COLORS.map((c) => c.color_code).join(' / ')} (transparent 2-tone front-left renders)`);
 console.log(`highlights        : ${HIGHLIGHTS.length} (copy + images + parent block)`);
 console.log(`trims             : ES / SE S-AWC / SEL Premium S-AWC`);
 console.log(`hero media        : ${PICKS.hero}`);

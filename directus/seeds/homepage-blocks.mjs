@@ -6,31 +6,33 @@
  *
  *   1. `pages` record for permalink "/" ("Home", published) — created if missing.
  *   2. block_hero_custom — "Smarter. Smoother. Sassier." (hero_immersive, dark_industrial,
- *      full width) with the fleet lineup banner as `media`.
+ *      full width). `media_gallery` holds the three 1920x800 hero stills HomeHero cycles
+ *      through (Outlander Sport, Triton, Xpander Cross); `media` mirrors the first one.
  *   3. block_content_block "TECHNOLOGY" (template content_block_template_one) — one
- *      ASC feature-spotlight item with a driving render.
+ *      ASC feature-spotlight item over outlander_asc_curve_clean.
  *   4. block_content_block "THE ANSA DIFFERENCE" (template features_grid) — three
  *      value-proposition items.
  *   5. page_blocks junction rows linking all three blocks to the Home page (dark background).
+ *   6. Prunes the retired starter blocks (RETIRED_BLOCKS) from the Home page.
  *
  * The homepage picks blocks by collection + template, so keep those two templates
  * if the content is edited in the CMS.
  *
- * Images are NOT uploaded here — existing Directus files are matched by whole words in
- * the filename (lineup for the hero; asc/driving/drive for the spotlight), falling back
- * to the Triton / Outlander Sport hero media. Override with explicit file ids:
- *   HOME_HERO_FILE=<uuid> HOME_ASC_FILE=<uuid> node directus/seeds/homepage-blocks.mjs
+ * Images are uploaded from the client content library (CONTENT_DIR) once, matched by
+ * filename_download afterwards. Override with explicit file ids:
+ *   HOME_ASC_FILE=<uuid> node directus/seeds/homepage-blocks.mjs
  *
- * HOME_HERO_FILE also re-points an already-seeded hero (the only update this script makes).
- *
- * Idempotent and create-only: blocks are matched on the Home page by headline / tagline,
- * missing child items are matched by headline, and existing (possibly CMS-edited)
- * content is never overwritten.
+ * Idempotent. Blocks are matched on the Home page by headline / tagline and missing child
+ * items by headline. Existing content is left alone except for: the hero gallery + media
+ * and the ASC item's image (always re-pointed at the files above), the ASC description
+ * (rewritten only while it still holds the retired AYC copy), and the retired blocks.
  *
  * Usage:  node directus/seeds/homepage-blocks.mjs
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
+ *         CONTENT_DIR (default ~/Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026)
  */
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -64,10 +66,23 @@ async function api(method, urlPath, body) {
 
 // SEARCH (query in the body) bypasses the stale GET cache seen on this instance (see contact-form.mjs).
 const search = async (collection, query) => (await api('SEARCH', `/items/${collection}`, { query })).data;
-// /files is read via GET with a cache-buster, as in vehicle-colors.mjs.
-const getFiles = async (params) => (await api('GET', `/files?${params}&cache=false&x=${Date.now()}`)).data;
+
+const CONTENT_DIR =
+	process.env.CONTENT_DIR || path.join(os.homedir(), 'Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026');
+const MODELS = path.join(CONTENT_DIR, '02_Showroom_Models');
 
 // --- content ----------------------------------------------------------------
+/** Hero slides, in display order — 1920x800 stills extracted from the launch films. Titles double as alt text. */
+const HERO_STILLS = [
+	{ file: 'Outlander_Sport_HEV/Extracted from video/outlander_hero_banner.png', title: 'Mitsubishi Outlander Sport in Energetic Yellow on a forest road' },
+	{ file: 'Triton/Extracted from video/triton_hero_banner.png', title: 'Mitsubishi Triton climbing a steep red-earth trail' },
+	{ file: 'Xpander_Cross/Extracted from video/xpander_hero_forest.png', title: 'Mitsubishi Xpander Cross parked in a misty pine forest' },
+];
+const ASC_IMAGE = {
+	file: 'Outlander_Sport_HEV/Extracted from video/outlander_asc_curve_clean.png',
+	title: 'Mitsubishi Outlander Sport rounding a curve on a country road',
+};
+
 const HERO = {
 	title: 'Home Hero',
 	headline: 'Smarter. Smoother. Sassier.',
@@ -90,9 +105,18 @@ const ASC_ITEMS = [
 		tagline: 'ASC',
 		headline: 'Introducing Active Stability Control (ASC)',
 		description:
-			'AYC reads your inputs and adjusts engine output and brake force to spinning wheels, sharpening cornering stability.',
+			'ASC monitors wheel slip and your steering input, then trims engine power and brakes individual wheels to keep the car stable and on your chosen line — on wet roads, loose gravel and sudden swerves alike.',
 		withImage: true,
 	},
+];
+/** Spotlight copy from before the ASC rewrite — replaced when found unedited. */
+const RETIRED_ASC_DESCRIPTION =
+	'AYC reads your inputs and adjusts engine output and brake force to spinning wheels, sharpening cornering stability.';
+
+/** Starter-kit blocks whose copy predates the 2026 fleet — unlinked from Home and deleted. */
+const RETIRED_BLOCKS = [
+	{ collection: 'block_hero', headline: 'Mitsubishi 2026 — Built for Trinidad & Tobago' },
+	{ collection: 'block_richtext', headline: 'Five Models. Every Kind of Drive.' },
 ];
 
 const VALUE_BLOCK = {
@@ -133,49 +157,37 @@ if (home) {
 }
 
 // --- 2. media ---------------------------------------------------------------
-/** "SeatArrange_4.jpg" → "seatarrange 4 jpg" — terms then match whole words only. */
-const normalize = (value) => String(value ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const MIME = { '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg' };
 
-/**
- * First image whose download filename contains any of `terms` as whole words
- * (in priority order) — so "range" never matches "SeatArrange".
- */
-async function findImage(terms) {
-	for (const term of terms) {
-		const filter = JSON.stringify({ filename_download: { _icontains: term.split(' ')[0] }, type: { _starts_with: 'image/' } });
-		const files = await getFiles(`filter=${encodeURIComponent(filter)}&fields=id,filename_download&sort=-width&limit=-1`);
-		const wanted = ` ${normalize(term)} `;
-		const file = files.find((f) => ` ${normalize(f.filename_download)} `.includes(wanted));
-		if (file) return file;
-	}
-	return null;
-}
-
-/** hero_block.media of the first fleet vehicle (by slug order) that has one. */
-async function vehicleHeroMedia(slugs) {
-	const vehicles = await search('vehicles', {
-		filter: { slug: { _in: slugs } },
-		fields: ['slug', 'hero_block.media'],
-		limit: -1,
+/** Directus file id for a content-library image — reuses a same-name, same-size upload and keeps its title current. */
+async function ensureFile({ file: relPath, title }) {
+	const abs = path.join(MODELS, relPath);
+	const name = path.basename(abs);
+	const size = fs.statSync(abs).size;
+	// SEARCH, not GET: a GET list read straight after an upload can come back stale here.
+	const { data: found } = await api('SEARCH', '/files', {
+		query: { filter: { filename_download: { _eq: name } }, fields: ['id', 'filesize', 'title'], sort: ['uploaded_on'], limit: -1 },
 	});
-	for (const slug of slugs) {
-		const media = vehicles.find((v) => v.slug === slug)?.hero_block?.media;
-		if (media) return { id: typeof media === 'string' ? media : media.id, filename_download: `${slug} hero media` };
+	const existing = found.find((f) => Number(f.filesize) === size);
+	if (existing) {
+		if (existing.title !== title) await api('PATCH', `/files/${existing.id}`, { title });
+		console.log(`= file ${name} (${existing.id})${existing.title === title ? '' : ' — title updated'}`);
+		return existing.id;
 	}
-	return null;
+	const form = new FormData();
+	form.append('title', title);
+	form.append('file', new Blob([fs.readFileSync(abs)], { type: MIME[path.extname(name).toLowerCase()] }), name);
+	const res = await fetch(`${BASE}/files`, { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body: form });
+	const text = await res.text();
+	if (!res.ok) throw new Error(`upload ${name} → ${res.status} ${text.slice(0, 300)}`);
+	const id = JSON.parse(text).data.id;
+	console.log(`+ file ${name} uploaded (${id})`);
+	return id;
 }
 
-async function resolveMedia(label, envKey, terms, fallbackSlugs) {
-	const file =
-		(process.env[envKey] && { id: process.env[envKey], filename_download: `${envKey} override` }) ||
-		(await findImage(terms)) ||
-		(await vehicleHeroMedia(fallbackSlugs));
-	console.log(file ? `= ${label} image: ${file.filename_download} (${file.id})` : `  ! ${label} image: none found — block created without media`);
-	return file?.id ?? null;
-}
-
-const heroMediaId = await resolveMedia('hero', 'HOME_HERO_FILE', ['lineup', 'line up'], ['triton', '2025-outlander-sport']);
-const ascMediaId = await resolveMedia('ASC', 'HOME_ASC_FILE', ['asc', 'driving', 'drive'], ['2025-outlander-sport', 'triton']);
+const heroStillIds = [];
+for (const still of HERO_STILLS) heroStillIds.push(await ensureFile(still));
+const ascMediaId = process.env.HOME_ASC_FILE || (await ensureFile(ASC_IMAGE));
 
 // --- 3. blocks on the Home page -----------------------------------------------
 const homeBlocks = await search('page_blocks', {
@@ -203,18 +215,33 @@ const heroIds = idsOn('block_hero_custom');
 const [existingHero] = heroIds.length
 	? await search('block_hero_custom', { filter: { id: { _in: heroIds }, headline: { _eq: HERO.headline } }, fields: ['id'], limit: 1 })
 	: [];
-if (existingHero) {
-	console.log(`= hero block exists on Home (${existingHero.id})`);
-	// An explicit override is the one case where existing CMS content is updated.
-	if (process.env.HOME_HERO_FILE) {
-		await api('PATCH', `/items/block_hero_custom/${existingHero.id}`, { media: process.env.HOME_HERO_FILE });
-		console.log(`  ~ hero media set to HOME_HERO_FILE (${process.env.HOME_HERO_FILE})`);
-	}
+let heroId = existingHero?.id;
+if (heroId) {
+	console.log(`= hero block exists on Home (${heroId})`);
 } else {
-	const hero = (await api('POST', '/items/block_hero_custom', { ...HERO, media: heroMediaId })).data;
-	await linkBlock('block_hero_custom', hero.id);
-	console.log(`+ hero block created and linked (${hero.id})`);
+	heroId = (await api('POST', '/items/block_hero_custom', { ...HERO, media: heroStillIds[0] })).data.id;
+	await linkBlock('block_hero_custom', heroId);
+	console.log(`+ hero block created and linked (${heroId})`);
 }
+
+// Gallery junction rows are rewritten with explicit FKs (in slide order) whenever they drift —
+// this build misreads nested M2M file payloads (see seed-outlander-vehicle.mjs).
+const galleryRows = await search('block_hero_custom_files', {
+	filter: { block_hero_custom_id: { _eq: heroId } },
+	fields: ['id', 'directus_files_id'],
+	sort: ['id'],
+	limit: -1,
+});
+if (JSON.stringify(galleryRows.map((r) => r.directus_files_id)) === JSON.stringify(heroStillIds)) {
+	console.log(`  = hero gallery already holds the ${heroStillIds.length} stills`);
+} else {
+	for (const row of galleryRows) await api('DELETE', `/items/block_hero_custom_files/${row.id}`);
+	for (const fileId of heroStillIds) {
+		await api('POST', '/items/block_hero_custom_files', { block_hero_custom_id: heroId, directus_files_id: fileId });
+	}
+	console.log(`  ~ hero gallery set to ${heroStillIds.length} stills`);
+}
+await api('PATCH', `/items/block_hero_custom/${heroId}`, { media: heroStillIds[0] });
 
 // Content blocks
 const contentIds = idsOn('block_content_block');
@@ -254,9 +281,55 @@ async function ensureContentBlock(block, items, imageId) {
 	for (const item of items) {
 		if (!have.has(item.headline)) await createItem(item, ++sort, existing.id);
 	}
+	return existing.id;
 }
 
-await ensureContentBlock(ASC_BLOCK, ASC_ITEMS, ascMediaId);
+const ascBlockId = await ensureContentBlock(ASC_BLOCK, ASC_ITEMS, ascMediaId);
 await ensureContentBlock(VALUE_BLOCK, VALUE_ITEMS, null);
+
+// ASC item on an existing block: re-point the image, retire the AYC copy.
+if (ascBlockId) {
+	const [ascSpec] = ASC_ITEMS;
+	const [ascItem] = await search('block_content_items', {
+		filter: { item: { _eq: ascBlockId }, headline: { _eq: ascSpec.headline } },
+		fields: ['id', 'description'],
+		limit: 1,
+	});
+	if (ascItem) {
+		if (ascItem.description === RETIRED_ASC_DESCRIPTION) {
+			await api('PATCH', `/items/block_content_items/${ascItem.id}`, { description: ascSpec.description });
+			console.log('  ~ ASC description rewritten (AYC → ASC copy)');
+		}
+		const imageRows = await search('block_content_items_files', {
+			filter: { block_content_items_id: { _eq: ascItem.id } },
+			fields: ['id', 'directus_files_id'],
+			limit: -1,
+		});
+		if (imageRows.length === 1 && imageRows[0].directus_files_id === ascMediaId) {
+			console.log('  = ASC image already linked');
+		} else {
+			for (const row of imageRows) await api('DELETE', `/items/block_content_items_files/${row.id}`);
+			await api('POST', '/items/block_content_items_files', { block_content_items_id: ascItem.id, directus_files_id: ascMediaId });
+			console.log(`  ~ ASC image set to ${ascMediaId}`);
+		}
+	}
+}
+
+// --- 4. retired blocks --------------------------------------------------------
+for (const { collection, headline } of RETIRED_BLOCKS) {
+	const ids = idsOn(collection);
+	const matches = ids.length
+		? await search(collection, { filter: { id: { _in: ids }, headline: { _eq: headline } }, fields: ['id'], limit: -1 })
+		: [];
+	for (const { id } of matches) {
+		for (const link of homeBlocks.filter((b) => b.collection === collection && b.item === id)) {
+			await api('DELETE', `/items/page_blocks/${link.id}`);
+		}
+		// only delete the block itself when no other page still uses it
+		const elsewhere = await search('page_blocks', { filter: { collection: { _eq: collection }, item: { _eq: id } }, fields: ['id'], limit: 1 });
+		if (!elsewhere.length) await api('DELETE', `/items/${collection}/${id}`);
+		console.log(`- retired ${collection} "${headline}" removed from Home${elsewhere.length ? ' (still used elsewhere — kept)' : ' and deleted'}`);
+	}
+}
 
 console.log('\nDone. Homepage blocks are linked to pages.blocks for "/".');

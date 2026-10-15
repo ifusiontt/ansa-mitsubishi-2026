@@ -66,8 +66,8 @@ const colorImageUuid = (color: VehiclePageColor | null) => {
 
 const activeColorImageUuid = computed(() => colorImageUuid(selectedColor.value));
 
-// Renders are resized by Directus for the ~768px stage (2x for high-DPI screens).
-const colorRenderUrl = (uuid: string) => (uuid ? `${getDirectusAssetURL(uuid)}?width=1536&quality=82&format=webp` : '');
+// Renders are trimmed + resized by Directus for the ~768px stage (see VEHICLE_RENDER_QUERY).
+const colorRenderUrl = (uuid: string) => (uuid ? `${getDirectusAssetURL(uuid)}?${VEHICLE_RENDER_QUERY}` : '');
 const colorRenderUrls = computed(() => colors.value.map((color) => colorRenderUrl(colorImageUuid(color))));
 
 function stepColor(delta: number) {
