@@ -1,16 +1,4 @@
 {
-  "directus/schema/directus-snapshot.json": {
-    "mtime": 1789913685.3741937,
-    "seen": 1789915988.299299,
-    "ast_hash": "4f8b2f8c1ba62bb5bd8c0c8e321a3680",
-    "semantic_hash": "4f8b2f8c1ba62bb5bd8c0c8e321a3680"
-  },
-  "directus/schema/previous-custom-snapshot.json": {
-    "mtime": 1789915366.5105934,
-    "seen": 1789915988.299304,
-    "ast_hash": "7e1ff145f0e76bbe9bed37902b1075eb",
-    "semantic_hash": "7e1ff145f0e76bbe9bed37902b1075eb"
-  },
   "nuxt/.prettierrc.json": {
     "mtime": 1789864171.1970007,
     "seen": 1789915988.2993062,
@@ -30,28 +18,28 @@
     "semantic_hash": "0ab29b3ef16b7b8da474fe3a55e7b397"
   },
   "nuxt/app/components/Footer.vue": {
-    "mtime": 1789864171.1973608,
-    "seen": 1789915988.2993116,
-    "ast_hash": "95bf78cc5539f157d23e6fefba7c8057",
-    "semantic_hash": "95bf78cc5539f157d23e6fefba7c8057"
+    "mtime": 1792079373.8444846,
+    "seen": 1792154080.3061082,
+    "ast_hash": "88423bf0e9010669103ad6ea3263e27f",
+    "semantic_hash": ""
   },
   "nuxt/app/components/NavigationBar.vue": {
-    "mtime": 1789864171.1974006,
-    "seen": 1789915988.299314,
-    "ast_hash": "93f017a50f6af97ee0fc22049f332d00",
-    "semantic_hash": "93f017a50f6af97ee0fc22049f332d00"
+    "mtime": 1792079373.844273,
+    "seen": 1792154080.306109,
+    "ast_hash": "f7aaadc54846ba4f039f02f333395874",
+    "semantic_hash": ""
   },
   "nuxt/app/components/PageBuilder.vue": {
-    "mtime": 1789864171.1974373,
-    "seen": 1789915988.2993312,
-    "ast_hash": "e85f31738b2735af19e3cab7a44dba7e",
-    "semantic_hash": "e85f31738b2735af19e3cab7a44dba7e"
+    "mtime": 1790259559.1634748,
+    "seen": 1792154080.3061094,
+    "ast_hash": "1e160a0058a55ca4ca7ff849902df4ba",
+    "semantic_hash": ""
   },
   "nuxt/app/components/base/BaseBlock.vue": {
-    "mtime": 1789864171.1975093,
-    "seen": 1789915988.299335,
-    "ast_hash": "924ab190a54771f539d9ed91a52a0d56",
-    "semantic_hash": "924ab190a54771f539d9ed91a52a0d56"
+    "mtime": 1790291401.3203402,
+    "seen": 1792154080.3061109,
+    "ast_hash": "bf28b9f010c8160c03d48459f8b01dfa",
+    "semantic_hash": ""
   },
   "nuxt/app/components/base/BaseButton.vue": {
     "mtime": 1789864171.1975322,
@@ -66,10 +54,10 @@
     "semantic_hash": "b30ffb13a6ef02b58d8a9cf3a0b6fb64"
   },
   "nuxt/app/components/base/Container.vue": {
-    "mtime": 1789864171.197576,
-    "seen": 1789915988.2993402,
-    "ast_hash": "89fbf6b535704b3098ce0c6825e316a0",
-    "semantic_hash": "89fbf6b535704b3098ce0c6825e316a0"
+    "mtime": 1790256903.624731,
+    "seen": 1792154080.306113,
+    "ast_hash": "36c2c14cc3730c6d2dd8ef47778d075c",
+    "semantic_hash": ""
   },
   "nuxt/app/components/base/Headline.vue": {
     "mtime": 1789864171.197598,
@@ -78,10 +66,10 @@
     "semantic_hash": "5be9159a0e12c689c6c334af3514c3bb"
   },
   "nuxt/app/components/base/SearchModel.vue": {
-    "mtime": 1789864171.19762,
-    "seen": 1789915988.2993429,
-    "ast_hash": "cc3c2b849221801acf8f75c3629a9a9d",
-    "semantic_hash": "cc3c2b849221801acf8f75c3629a9a9d"
+    "mtime": 1790342044.126494,
+    "seen": 1792154080.3061142,
+    "ast_hash": "d3bc1d6565f3be5f8c5e2bdd9042b8f5",
+    "semantic_hash": ""
   },
   "nuxt/app/components/base/ShareDialog.vue": {
     "mtime": 1789864171.197643,
@@ -150,22 +138,22 @@
     "semantic_hash": "455d8a4eece405b7c1ba02a080718bcf"
   },
   "nuxt/app/components/forms/BaseFormField.vue": {
-    "mtime": 1789864171.1979854,
-    "seen": 1789915988.2993593,
-    "ast_hash": "b8b4ba18a892fae2e5c7dbab1f22d3a6",
-    "semantic_hash": "b8b4ba18a892fae2e5c7dbab1f22d3a6"
+    "mtime": 1792079373.848532,
+    "seen": 1792154080.30613,
+    "ast_hash": "11fe6edf9482b52c17d07af25ca22e42",
+    "semantic_hash": ""
   },
   "nuxt/app/components/forms/DynamicForm.vue": {
-    "mtime": 1789864171.1980126,
-    "seen": 1789915988.2993605,
-    "ast_hash": "08af3a817717f65b0d01aac765b632e0",
-    "semantic_hash": "08af3a817717f65b0d01aac765b632e0"
+    "mtime": 1792079373.848468,
+    "seen": 1792154080.3061304,
+    "ast_hash": "733dd449d84d37926ca584d4d0a4384d",
+    "semantic_hash": ""
   },
   "nuxt/app/components/forms/FormBuilder.vue": {
-    "mtime": 1789864171.19804,
-    "seen": 1789915988.2993615,
-    "ast_hash": "be3e27213347cac6f7c5f54fb4c1a1c0",
-    "semantic_hash": "be3e27213347cac6f7c5f54fb4c1a1c0"
+    "mtime": 1792079373.8486373,
+    "seen": 1792154080.306131,
+    "ast_hash": "c9cefb0be34d5015acc68ebf94fa401c",
+    "semantic_hash": ""
   },
   "nuxt/app/components/forms/fields/CheckboxField.vue": {
     "mtime": 1789864171.1980903,
@@ -222,10 +210,10 @@
     "semantic_hash": "c5f0608ed07cc7cb946c27c673f7d7be"
   },
   "nuxt/app/components/ui/button/index.ts": {
-    "mtime": 1789864171.198451,
-    "seen": 1789915988.2993753,
-    "ast_hash": "9add82ed4290424a4849c8f1222538d2",
-    "semantic_hash": "9add82ed4290424a4849c8f1222538d2"
+    "mtime": 1790301186.8262243,
+    "seen": 1792154080.306146,
+    "ast_hash": "8b2be99bcedadad1db11a1c75668e54f",
+    "semantic_hash": ""
   },
   "nuxt/app/components/ui/checkbox/Checkbox.vue": {
     "mtime": 1789864171.1984992,
@@ -828,10 +816,10 @@
     "semantic_hash": "ed8b3bdd6c1fbdc88bbe791b2adf7e29"
   },
   "nuxt/app/layouts/default.vue": {
-    "mtime": 1789864171.2010942,
-    "seen": 1789915988.2995353,
-    "ast_hash": "d84684d9468f9b60e483ea2539d6f601",
-    "semantic_hash": "d84684d9468f9b60e483ea2539d6f601"
+    "mtime": 1792079373.8445506,
+    "seen": 1792154080.306205,
+    "ast_hash": "d4487b18ea8ed2cb7f590d6d0752f144",
+    "semantic_hash": ""
   },
   "nuxt/app/lib/directus/validateFormSubmission.ts": {
     "mtime": 1789864171.2011657,
@@ -900,16 +888,16 @@
     "semantic_hash": "d11bc0556bb46641228802c52520d960"
   },
   "nuxt/nuxt.config.ts": {
-    "mtime": 1789864171.2014816,
-    "seen": 1789915988.2995512,
-    "ast_hash": "83663738b9bc21e06acb48f96d75d4ca",
-    "semantic_hash": "83663738b9bc21e06acb48f96d75d4ca"
+    "mtime": 1792076914.3006623,
+    "seen": 1792154080.3062158,
+    "ast_hash": "42e827d86b4e0d15c028d1291b83781b",
+    "semantic_hash": ""
   },
   "nuxt/package.json": {
-    "mtime": 1789864171.2015002,
-    "seen": 1789915988.2995524,
-    "ast_hash": "27461b648e769f492819e54ca1cb5f58",
-    "semantic_hash": "27461b648e769f492819e54ca1cb5f58"
+    "mtime": 1790871351.6899061,
+    "seen": 1792154080.3062165,
+    "ast_hash": "4e598578424657af949ff8cd927de779",
+    "semantic_hash": ""
   },
   "nuxt/scripts/generate-types.js": {
     "mtime": 1789864171.2022398,
@@ -918,16 +906,16 @@
     "semantic_hash": "384533ab7dd9f2b2c1866ce9c5b731d2"
   },
   "nuxt/server/api/forms/submit.post.ts": {
-    "mtime": 1789864171.2023263,
-    "seen": 1789915988.2995553,
-    "ast_hash": "a676ff5d44c2831677747741d6c616ef",
-    "semantic_hash": "a676ff5d44c2831677747741d6c616ef"
+    "mtime": 1790844603.3208036,
+    "seen": 1792154080.3062196,
+    "ast_hash": "8d16c0f9684a94de3606ff544d6bc589",
+    "semantic_hash": ""
   },
   "nuxt/server/api/pages/one.get.ts": {
-    "mtime": 1789864171.202365,
-    "seen": 1789915988.2995565,
-    "ast_hash": "5117a9973bed45095b9d69f4ff2274db",
-    "semantic_hash": "5117a9973bed45095b9d69f4ff2274db"
+    "mtime": 1790342380.0462427,
+    "seen": 1792154080.30622,
+    "ast_hash": "fcd0a5f803be3620662c99a0d695480a",
+    "semantic_hash": ""
   },
   "nuxt/server/api/posts/[slug].get.ts": {
     "mtime": 1789864171.202418,
@@ -936,10 +924,10 @@
     "semantic_hash": "5dd87dca2acd142ad8a38de995181f32"
   },
   "nuxt/server/api/posts/index.get.ts": {
-    "mtime": 1789864171.2024412,
-    "seen": 1789915988.2995589,
-    "ast_hash": "d940c6cf19c9f8c55d10f04834758e45",
-    "semantic_hash": "d940c6cf19c9f8c55d10f04834758e45"
+    "mtime": 1790342044.1266892,
+    "seen": 1792154080.306221,
+    "ast_hash": "cc2389d192aae3d7612d8f569fb93a4f",
+    "semantic_hash": ""
   },
   "nuxt/server/api/search.get.ts": {
     "mtime": 1789864171.2024627,
@@ -972,10 +960,10 @@
     "semantic_hash": "bc870f811ee30e9e6f888138b2063317"
   },
   "nuxt/shared/types/schema.ts": {
-    "mtime": 1789864171.2026129,
-    "seen": 1789915988.2995675,
-    "ast_hash": "a111bd1ab7d189e6d4b0b0b837816d84",
-    "semantic_hash": "a111bd1ab7d189e6d4b0b0b837816d84"
+    "mtime": 1791023474.0269785,
+    "seen": 1792154080.3062274,
+    "ast_hash": "864e7d3f07f99d454f13aa1dfbcfd0a4",
+    "semantic_hash": ""
   },
   "nuxt/shared/utils.ts": {
     "mtime": 1789864171.2026417,
@@ -984,10 +972,10 @@
     "semantic_hash": "aa118902f8d4b543fcffbbd07c927bdc"
   },
   "nuxt/tailwind.config.ts": {
-    "mtime": 1789864171.2026658,
-    "seen": 1789915988.29957,
-    "ast_hash": "226f38f1b7cb4dbc687169e7a5583727",
-    "semantic_hash": "226f38f1b7cb4dbc687169e7a5583727"
+    "mtime": 1792079373.8508222,
+    "seen": 1792154080.3062289,
+    "ast_hash": "e9a3cf0bb3a8492de5804776201c9681",
+    "semantic_hash": ""
   },
   "nuxt/tsconfig.json": {
     "mtime": 1789864171.2026849,
@@ -1000,5 +988,737 @@
     "seen": 1789915988.299573,
     "ast_hash": "604c70fae553f76540e9ed94406073ad",
     "semantic_hash": "604c70fae553f76540e9ed94406073ad"
+  },
+  ".claude/settings.json": {
+    "mtime": 1790773094.5494027,
+    "seen": 1792154080.3060827,
+    "ast_hash": "22a109fef7d003fe4c4cff034d496051",
+    "semantic_hash": ""
+  },
+  "directus/schema/ansa-commercial-directus-snapshot.json": {
+    "mtime": 1789913685.3741937,
+    "seen": 1792154080.3060849,
+    "ast_hash": "4f8b2f8c1ba62bb5bd8c0c8e321a3680",
+    "semantic_hash": ""
+  },
+  "directus/schema/current-mitsubishi-schema-sep-25th.json": {
+    "mtime": 1790290231.9814537,
+    "seen": 1792154080.3060856,
+    "ast_hash": "65453fd84cab99044d8229eb58c1916a",
+    "semantic_hash": ""
+  },
+  "directus/schema/merge-mitsubishi-schema.js": {
+    "mtime": 1790303221.086391,
+    "seen": 1792154080.306086,
+    "ast_hash": "8742bff51b93df16991ad24b02f7dc52",
+    "semantic_hash": ""
+  },
+  "directus/schema/merged-mitsubishi-schema.json": {
+    "mtime": 1790339530.3348174,
+    "seen": 1792154080.3060865,
+    "ast_hash": "c76a7a1286ba0b78761f125d563a7e4e",
+    "semantic_hash": ""
+  },
+  "directus/schema/patch-mitsubishi-collections.js": {
+    "mtime": 1790017637.2032306,
+    "seen": 1792154080.3060873,
+    "ast_hash": "ebcce7c955deff4acc25f81a69779bab",
+    "semantic_hash": ""
+  },
+  "directus/seeds/_reconcile-colors.mjs": {
+    "mtime": 1790884010.7431087,
+    "seen": 1792154080.3060944,
+    "ast_hash": "3a9a0df9a280d8e4aaa2f8aa7964a0fb",
+    "semantic_hash": ""
+  },
+  "directus/seeds/about-and-faqs.mjs": {
+    "mtime": 1790960287.4887495,
+    "seen": 1792154080.3060946,
+    "ast_hash": "3bfbaf4d78573cf71e67878613d625d7",
+    "semantic_hash": ""
+  },
+  "directus/seeds/add-vehicle-menu-image.mjs": {
+    "mtime": 1792080642.5632584,
+    "seen": 1792154080.3060954,
+    "ast_hash": "ff7d73b3a9ba1cceed35faaf38e747f8",
+    "semantic_hash": ""
+  },
+  "directus/seeds/clean-color-images.py": {
+    "mtime": 1790874835.2924252,
+    "seen": 1792154080.3060958,
+    "ast_hash": "9f0c1eeec713cdad98b98b96d18536a0",
+    "semantic_hash": ""
+  },
+  "directus/seeds/contact-form.mjs": {
+    "mtime": 1790844952.4051614,
+    "seen": 1792154080.306096,
+    "ast_hash": "8129dc17cf7ce9bc00e06e56ab78a1fc",
+    "semantic_hash": ""
+  },
+  "directus/seeds/dealers.mjs": {
+    "mtime": 1790871342.2014139,
+    "seen": 1792154080.3060966,
+    "ast_hash": "0dbe0a7114c9b4f673f9c87e28c1fc27",
+    "semantic_hash": ""
+  },
+  "directus/seeds/homepage-blocks.mjs": {
+    "mtime": 1792077775.7069476,
+    "seen": 1792154080.3060973,
+    "ast_hash": "33dc6d8048a86a5dca8a30d52656f0ab",
+    "semantic_hash": ""
+  },
+  "directus/seeds/mitsubishi-initial-data.json": {
+    "mtime": 1789916405.6391344,
+    "seen": 1792154080.3060975,
+    "ast_hash": "473cdd2538d4908ceebe7904eda059b5",
+    "semantic_hash": ""
+  },
+  "directus/seeds/parts-service-forms.mjs": {
+    "mtime": 1792080276.8275793,
+    "seen": 1792154080.306098,
+    "ast_hash": "0347be304240e9d2c24cec52207739f0",
+    "semantic_hash": ""
+  },
+  "directus/seeds/populate-form-fields.mjs": {
+    "mtime": 1791032686.885276,
+    "seen": 1792154080.3060985,
+    "ast_hash": "0bfd2ae263cda1058afa0dfd1192b913",
+    "semantic_hash": ""
+  },
+  "directus/seeds/seed-mitsubishi-data.py": {
+    "mtime": 1790080437.1593225,
+    "seen": 1792154080.306099,
+    "ast_hash": "24b85020edb4914c23c915b0e59ea6e3",
+    "semantic_hash": ""
+  },
+  "directus/seeds/seed-permissions.py": {
+    "mtime": 1791023745.698558,
+    "seen": 1792154080.3060994,
+    "ast_hash": "5d966cd9645049d3deae9cd00b2ba024",
+    "semantic_hash": ""
+  },
+  "directus/seeds/seed-starter-content.py": {
+    "mtime": 1792079388.5858476,
+    "seen": 1792154080.3060997,
+    "ast_hash": "6a077cabcee470265655fae877b41f5d",
+    "semantic_hash": ""
+  },
+  "directus/seeds/sync-nav-service-parts.py": {
+    "mtime": 1790249155.741759,
+    "seen": 1792154080.3061001,
+    "ast_hash": "c2fd42e87bdfa261905a14521513d807",
+    "semantic_hash": ""
+  },
+  "directus/seeds/vehicle-colors.mjs": {
+    "mtime": 1791994122.4250853,
+    "seen": 1792154080.3061008,
+    "ast_hash": "93d4ae7fd9664c2d4aac970d58b9e53b",
+    "semantic_hash": ""
+  },
+  "directus/seeds/vehicle-content-blocks.mjs": {
+    "mtime": 1791213841.90206,
+    "seen": 1792154080.3061013,
+    "ast_hash": "c1ba83a2c7a94add8ff4cdebf6acb9b3",
+    "semantic_hash": ""
+  },
+  "nuxt/.flat-test.tmp.mjs": {
+    "mtime": 1790313619.3083904,
+    "seen": 1792154080.3061018,
+    "ast_hash": "35b6487b3728f98bb726086d349a914f",
+    "semantic_hash": ""
+  },
+  "nuxt/.flat-test2.tmp.mjs": {
+    "mtime": 1790314182.8073187,
+    "seen": 1792154080.3061023,
+    "ast_hash": "59ee612ea7158e913cdab8cac5180a67",
+    "semantic_hash": ""
+  },
+  "nuxt/.flat-test3.tmp.mjs": {
+    "mtime": 1790314506.124657,
+    "seen": 1792154080.3061028,
+    "ast_hash": "691034c301b3920ae7220077bf2faf2b",
+    "semantic_hash": ""
+  },
+  "nuxt/.merge-test.tmp.mjs": {
+    "mtime": 1790307562.9688673,
+    "seen": 1792154080.3061032,
+    "ast_hash": "9404444bb21fc4cd15bbb76d7b379b72",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/about/AboutHeroNav.vue": {
+    "mtime": 1792079373.8489373,
+    "seen": 1792154080.30611,
+    "ast_hash": "bcde68d98ce9b6c26d117630c52f7836",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/about/FaqAccordion.vue": {
+    "mtime": 1792079373.8488803,
+    "seen": 1792154080.3061104,
+    "ast_hash": "a70ee66a36cef7760bb07b96be2a1305",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/BlockCtaSimple.vue": {
+    "mtime": 1792079373.846601,
+    "seen": 1792154080.3061178,
+    "ast_hash": "75606d6f25431585c82552d90fcddf7c",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/BlockHeroCustom.vue": {
+    "mtime": 1792079373.8468304,
+    "seen": 1792154080.3061185,
+    "ast_hash": "50f9c78a4d055dfdacfeea8bfb58331b",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/BlockLayoutWrapper.vue": {
+    "mtime": 1790259559.1633532,
+    "seen": 1792154080.306119,
+    "ast_hash": "65e1d982a831c7b8eaf13270b72fcd2b",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/ContentBlock.vue": {
+    "mtime": 1790874643.4411535,
+    "seen": 1792154080.3061192,
+    "ast_hash": "3033b7b4ade55724d9a76aeec16d4c1b",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/ContentBlockFallback.vue": {
+    "mtime": 1790301186.8252244,
+    "seen": 1792154080.3061197,
+    "ast_hash": "d1fa83d0723f5c7d7c20fcfed8ba3ead",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/ContentBlockTemplateFeaturesGrid.vue": {
+    "mtime": 1790301186.8252244,
+    "seen": 1792154080.3061202,
+    "ast_hash": "02b7f7a57d94c6033d2a2a18072e32f0",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/ContentBlockTemplateServicesList.vue": {
+    "mtime": 1790291261.7160952,
+    "seen": 1792154080.3061206,
+    "ast_hash": "9ab733b5e534b7499b796da6002949c1",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/templates/ContentBlockTemplate.vue": {
+    "mtime": 1792079373.8495972,
+    "seen": 1792154080.3061259,
+    "ast_hash": "8a5a987fc284ad5e36be46519fb4c263",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/templates/ContentBlockTemplateCarousel.vue": {
+    "mtime": 1790301238.9451904,
+    "seen": 1792154080.3061266,
+    "ast_hash": "83651c66c9709c85e692f542af1fa431",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/templates/ContentBlockTemplateContactInfo.vue": {
+    "mtime": 1790301186.8252244,
+    "seen": 1792154080.306127,
+    "ast_hash": "6dd5198d05b7afb7ad0650eabcc1e1ee",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/templates/ContentBlockTemplateHeroSlider.vue": {
+    "mtime": 1792079373.8494651,
+    "seen": 1792154080.3061275,
+    "ast_hash": "0807bf155ae0333cd4127af12a8571c1",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/templates/ContentBlockTemplateMediaCarousel.vue": {
+    "mtime": 1792079373.8493555,
+    "seen": 1792154080.306128,
+    "ast_hash": "e391acc8ac992a0c234adc4b3d326944",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/templates/ContentBlockTemplateTestimonials.vue": {
+    "mtime": 1790301186.8252244,
+    "seen": 1792154080.3061287,
+    "ast_hash": "94218d347081296549b82792f5d36571",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/block/templates/ContentBlockTemplateYoutube.vue": {
+    "mtime": 1790301186.8252244,
+    "seen": 1792154080.306129,
+    "ast_hash": "19e760d86a34969267efc0873d72b4a7",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/forms/InquiryField.vue": {
+    "mtime": 1792081460.7931013,
+    "seen": 1792154080.3061314,
+    "ast_hash": "9032d9be3c006cd768740343c0e43087",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/forms/InquiryFormShell.vue": {
+    "mtime": 1792079373.8486905,
+    "seen": 1792154080.306132,
+    "ast_hash": "38f84abc87a1e99d308b85a60eb93f89",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/forms/PartsRequestForm.vue": {
+    "mtime": 1791032852.20102,
+    "seen": 1792154080.3061326,
+    "ast_hash": "275b78717034042e581c57c77c897442",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/forms/ServiceBookingForm.vue": {
+    "mtime": 1791032852.2007754,
+    "seen": 1792154080.3061328,
+    "ast_hash": "f2ce0d03b4440549305a26efa7b21546",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/home/HomeColorPreview.vue": {
+    "mtime": 1792084890.978675,
+    "seen": 1792154080.3061366,
+    "ast_hash": "d6a7dae78e0cbc9faecaf0d298d18d9c",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/home/HomeContactBanner.vue": {
+    "mtime": 1792084890.9788115,
+    "seen": 1792154080.306137,
+    "ast_hash": "d5828b079d5d0ce54aaa70db21124d33",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/home/HomeFeatureSpotlight.vue": {
+    "mtime": 1792152849.5806139,
+    "seen": 1792154080.3061376,
+    "ast_hash": "aab818ea28732c3ea1f1b825c3f76fb2",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/home/HomeHero.vue": {
+    "mtime": 1792152794.5547082,
+    "seen": 1792154080.306138,
+    "ast_hash": "6ecef11602308174fbd3bbb5dbcd3635",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/home/HomeModelSelector.vue": {
+    "mtime": 1792084890.978355,
+    "seen": 1792154080.306139,
+    "ast_hash": "da07176172e7777b548ba29743c4667c",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/home/HomeValueGrid.vue": {
+    "mtime": 1792084890.9784925,
+    "seen": 1792154080.3061395,
+    "ast_hash": "10a02eb7e7acfe8e0dd54acb95160d46",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/layout/HeaderMegaMenu.vue": {
+    "mtime": 1792079373.8475196,
+    "seen": 1792154080.30614,
+    "ast_hash": "3a23f9c41f2f8e399f3623e9484f5921",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/layout/PartsServiceHeroNav.vue": {
+    "mtime": 1792079373.8470707,
+    "seen": 1792154080.3061404,
+    "ast_hash": "4c7bb5e3e49da8278c44ac3999cc2d01",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/layout/PartsServicePage.vue": {
+    "mtime": 1791032777.7793288,
+    "seen": 1792154080.306141,
+    "ast_hash": "d564768b83217d5adb2ae403360d2b4e",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/shared/DealershipMap.vue": {
+    "mtime": 1792079373.8478584,
+    "seen": 1792154080.3061414,
+    "ast_hash": "51d3e908e5c9804ccc8d751f34b459e9",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/showroom/VehicleColorStage.vue": {
+    "mtime": 1791993906.0947878,
+    "seen": 1792154080.3061428,
+    "ast_hash": "17f28400e589887a0c6179d9f46f1dfa",
+    "semantic_hash": ""
+  },
+  "nuxt/app/components/showroom/VehicleHighlights.vue": {
+    "mtime": 1792079373.8487706,
+    "seen": 1792154080.3061433,
+    "ast_hash": "b3f62f05dd5bfa9561e48d9bbd78051d",
+    "semantic_hash": ""
+  },
+  "nuxt/app/composables/useButtonStyles.ts": {
+    "mtime": 1792079373.8437593,
+    "seen": 1792154080.306201,
+    "ast_hash": "bc0e16d97b2490ab80a3487217444dca",
+    "semantic_hash": ""
+  },
+  "nuxt/app/composables/useGlobalSearch.ts": {
+    "mtime": 1790256903.6131465,
+    "seen": 1792154080.306202,
+    "ast_hash": "cdbf3d3ae2e689130c4f5b6a5533e1ff",
+    "semantic_hash": ""
+  },
+  "nuxt/app/composables/useInquiryForm.ts": {
+    "mtime": 1792079373.8436444,
+    "seen": 1792154080.3062022,
+    "ast_hash": "0c57b1b38f468d4033beeb05aebc1440",
+    "semantic_hash": ""
+  },
+  "nuxt/app/pages/about/index.vue": {
+    "mtime": 1792079373.8461115,
+    "seen": 1792154080.3062072,
+    "ast_hash": "67da1138b9bb085e2d9a644f841e87a1",
+    "semantic_hash": ""
+  },
+  "nuxt/app/pages/contact.vue": {
+    "mtime": 1792079373.8434715,
+    "seen": 1792154080.3062084,
+    "ast_hash": "3309a6a0660555fad20907e4246c4b6e",
+    "semantic_hash": ""
+  },
+  "nuxt/app/pages/index.vue": {
+    "mtime": 1792152849.582094,
+    "seen": 1792154080.3062088,
+    "ast_hash": "5b67cf691f31eae001d7d341a81b787c",
+    "semantic_hash": ""
+  },
+  "nuxt/app/pages/parts.vue": {
+    "mtime": 1791023658.2884247,
+    "seen": 1792154080.3062093,
+    "ast_hash": "84e0c2635f0b44107396c7e6b32094ea",
+    "semantic_hash": ""
+  },
+  "nuxt/app/pages/service.vue": {
+    "mtime": 1791023658.2291145,
+    "seen": 1792154080.3062098,
+    "ast_hash": "5e92aa3cc0ab0dd456144131d62d66d2",
+    "semantic_hash": ""
+  },
+  "nuxt/app/pages/showroom/[slug].vue": {
+    "mtime": 1792079461.155875,
+    "seen": 1792154080.30621,
+    "ast_hash": "dd99b04ac6a4e93371cb94e8048070c4",
+    "semantic_hash": ""
+  },
+  "nuxt/app/utils/directus-file.ts": {
+    "mtime": 1791993906.0935748,
+    "seen": 1792154080.3062105,
+    "ast_hash": "5773aa9f428642a21a84e94d28928e70",
+    "semantic_hash": ""
+  },
+  "nuxt/server/api/dealers/index.get.ts": {
+    "mtime": 1790871355.8595786,
+    "seen": 1792154080.3062177,
+    "ast_hash": "d1017316751f0d5dc94a85a0c0efeac5",
+    "semantic_hash": ""
+  },
+  "nuxt/server/api/faqs/index.get.ts": {
+    "mtime": 1790960305.249266,
+    "seen": 1792154080.306218,
+    "ast_hash": "3223c7db325f4d9d919824c985ac1ed8",
+    "semantic_hash": ""
+  },
+  "nuxt/server/api/forms/one.get.ts": {
+    "mtime": 1790844609.893146,
+    "seen": 1792154080.3062184,
+    "ast_hash": "c89b306614791e760d89397d812c7c8a",
+    "semantic_hash": ""
+  },
+  "nuxt/server/api/forms/parts-service.post.ts": {
+    "mtime": 1792080263.135186,
+    "seen": 1792154080.306219,
+    "ast_hash": "def0830f97eff4f86955ecdeb9a5436d",
+    "semantic_hash": ""
+  },
+  "nuxt/server/api/vehicles/[slug].get.ts": {
+    "mtime": 1791213867.243873,
+    "seen": 1792154080.3062234,
+    "ast_hash": "6d2c51bcf66199012083731fcfa84dc4",
+    "semantic_hash": ""
+  },
+  "nuxt/server/api/vehicles/index.get.ts": {
+    "mtime": 1792082143.693859,
+    "seen": 1792154080.3062239,
+    "ast_hash": "65385456ae3fe1bca7dd6517634c6ba1",
+    "semantic_hash": ""
+  },
+  "nuxt/server/utils/form-emails.ts": {
+    "mtime": 1790844585.2540073,
+    "seen": 1792154080.3062253,
+    "ast_hash": "c507421754763d7222c99d5b23640bb1",
+    "semantic_hash": ""
+  },
+  "nuxt/shared/types/contact.ts": {
+    "mtime": 1792080257.7885005,
+    "seen": 1792154080.306226,
+    "ast_hash": "970241f924ca280fac055af5f567f72e",
+    "semantic_hash": ""
+  },
+  "nuxt/shared/types/content-block.ts": {
+    "mtime": 1790874643.4576252,
+    "seen": 1792154080.3062265,
+    "ast_hash": "1a187d57a8a516b7a4785389ca6a3cb6",
+    "semantic_hash": ""
+  },
+  "nuxt/shared/types/faq.ts": {
+    "mtime": 1790960305.1791189,
+    "seen": 1792154080.306227,
+    "ast_hash": "1e7983eb2799445cc75c6f7decd1411b",
+    "semantic_hash": ""
+  },
+  "nuxt/shared/types/vehicle.ts": {
+    "mtime": 1792082143.6937523,
+    "seen": 1792154080.306228,
+    "ast_hash": "dea15e03b5ebdb537f788cc91d237d2b",
+    "semantic_hash": ""
+  },
+  "project-manifest.json": {
+    "mtime": 1790888372.7877724,
+    "seen": 1792154080.306231,
+    "ast_hash": "63535e7148325c0a9a86fb857f661e98",
+    "semantic_hash": ""
+  },
+  "scripts/.seed-remaining-assets.json": {
+    "mtime": 1790524413.702351,
+    "seen": 1792154080.3062315,
+    "ast_hash": "1534527e9ae176ae5f446009e24bc974",
+    "semantic_hash": ""
+  },
+  "scripts/apply-hybrid-vehicle-schema.js": {
+    "mtime": 1792079388.584206,
+    "seen": 1792154080.306232,
+    "ast_hash": "f5853465dff3781339f63012c9515566",
+    "semantic_hash": ""
+  },
+  "scripts/normalize-render-canvas.py": {
+    "mtime": 1792080503.2880237,
+    "seen": 1792154080.3062327,
+    "ast_hash": "888ca69f7e9060ba0a885b1f1cc676a1",
+    "semantic_hash": ""
+  },
+  "scripts/optimize-raw-images.py": {
+    "mtime": 1790354570.6104128,
+    "seen": 1792154080.306233,
+    "ast_hash": "f6e6136d0170e7d10a8171fa8ea64ded",
+    "semantic_hash": ""
+  },
+  "scripts/optimize-vehicle-assets.js": {
+    "mtime": 1790246042.5677745,
+    "seen": 1792154080.3062334,
+    "ast_hash": "cd36a93d2021483af1fb16aa0f523ccc",
+    "semantic_hash": ""
+  },
+  "scripts/restore-directus-uploads.mjs": {
+    "mtime": 1790874579.6265,
+    "seen": 1792154080.306234,
+    "ast_hash": "1da41856997766cb9a6fe28e13da1a4d",
+    "semantic_hash": ""
+  },
+  "scripts/seed-outlander-vehicle.mjs": {
+    "mtime": 1792084508.2588677,
+    "seen": 1792154080.3062344,
+    "ast_hash": "d3064ce3a470ed6527c568868e3c74dc",
+    "semantic_hash": ""
+  },
+  "scripts/seed-remaining-vehicles.mjs": {
+    "mtime": 1791992895.4104178,
+    "seen": 1792154080.3062346,
+    "ast_hash": "1a15b310cdc9e6eeae10b5d1e32117f1",
+    "semantic_hash": ""
+  },
+  "scripts/sync-clean-images.mjs": {
+    "mtime": 1790949373.4325485,
+    "seen": 1792154080.306235,
+    "ast_hash": "8b42deae75c339d24eaa6b151b7f4f79",
+    "semantic_hash": ""
+  },
+  "scripts/test-vehicle-api.mjs": {
+    "mtime": 1792152899.5947902,
+    "seen": 1792154080.3062356,
+    "ast_hash": "dd954573535f40cd46e17cea45b3d66b",
+    "semantic_hash": ""
+  },
+  "scripts/verify-parts-service-submissions.mjs": {
+    "mtime": 1791023741.8815928,
+    "seen": 1792154080.3062363,
+    "ast_hash": "90340e232ab8f1827d556651e7f14017",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1790080291.3235486,
+    "seen": 1792154080.3062367,
+    "ast_hash": "66708b1d2326b85ce13438d6e0e27bdc",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1792079388.5880902,
+    "seen": 1792154080.306237,
+    "ast_hash": "f5bc6e69643043f14c197a7e3b4358a3",
+    "semantic_hash": ""
+  },
+  "directus/DEPLOYMENT-NOTES.md": {
+    "mtime": 1790080341.8139324,
+    "seen": 1792154080.3062375,
+    "ast_hash": "62060a3ed73d4040e3193d3983597f06",
+    "semantic_hash": ""
+  },
+  "directus/docker-compose.yaml": {
+    "mtime": 1790874515.3454626,
+    "seen": 1792154080.306238,
+    "ast_hash": "44801673e35d5c53b161d276748251bb",
+    "semantic_hash": ""
+  },
+  "nuxt/README.md": {
+    "mtime": 1789864171.1970267,
+    "seen": 1792154080.3062384,
+    "ast_hash": "2b0e6d2dcbb635ddd879b17d652c220d",
+    "semantic_hash": ""
+  },
+  "nuxt/pnpm-workspace.yaml": {
+    "mtime": 1789864171.201782,
+    "seen": 1792154080.306239,
+    "ast_hash": "d93b8c7042ada66e102b8fe2e2d92d3e",
+    "semantic_hash": ""
+  },
+  "optimization-report.txt": {
+    "mtime": 1790354600.294917,
+    "seen": 1792154080.3062396,
+    "ast_hash": "a981412c6facb73a8d11d7973b11143a",
+    "semantic_hash": ""
+  },
+  "nuxt/app/assets/images/directus-logo-white.svg": {
+    "mtime": 1789864171.1972876,
+    "seen": 1792154080.30624,
+    "ast_hash": "400cfd3ac7cd132552d28a55bd355b8d",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/discord.svg": {
+    "mtime": 1789864171.2019296,
+    "seen": 1792154080.3062403,
+    "ast_hash": "092dda95a783596dec08ffeb42f9b986",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/facebook.svg": {
+    "mtime": 1789864171.201949,
+    "seen": 1792154080.3062408,
+    "ast_hash": "e4e9a2173656a39df687e7c0dd6335db",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/github.svg": {
+    "mtime": 1789864171.2019637,
+    "seen": 1792154080.3062413,
+    "ast_hash": "8dc66f6f6f62dcd1661b79ac93910a05",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/instagram.svg": {
+    "mtime": 1789864171.201979,
+    "seen": 1792154080.3062418,
+    "ast_hash": "8e8d554c282bd215a21fa0bcf813f097",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/linkedin.svg": {
+    "mtime": 1789864171.2019947,
+    "seen": 1792154080.3062422,
+    "ast_hash": "452cf4225585a79e57b269f4ccee0128",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/reddit.svg": {
+    "mtime": 1789864171.2020092,
+    "seen": 1792154080.3062427,
+    "ast_hash": "3e25571b50e3005929a3e4abdc353442",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/x.svg": {
+    "mtime": 1789864171.2020242,
+    "seen": 1792154080.3062434,
+    "ast_hash": "43bb60bd4599d879e70ebb27e2356898",
+    "semantic_hash": ""
+  },
+  "nuxt/public/icons/social/youtube.svg": {
+    "mtime": 1789864171.20204,
+    "seen": 1792154080.306244,
+    "ast_hash": "c253244e206129776dab7e6fb9a44518",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/about/triton-blade-silver-cutout.webp": {
+    "mtime": 1790960680.0726233,
+    "seen": 1792154080.3062444,
+    "ast_hash": "c6d99c0a6a98a8ed4537ea2ed19c1ff2",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/features/22MY_XS_RHD_MV_SlippyCorner-1536x1024.jpg": {
+    "mtime": 1792143099.4056838,
+    "seen": 1792154080.3062449,
+    "ast_hash": "344b26a904eb4dc90377750e13c924e2",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/logo.svg": {
+    "mtime": 1789864171.2020793,
+    "seen": 1792154080.3062453,
+    "ast_hash": "dd682a073c66e0295c8e64f27ab02c7e",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/main-hero/2023-xpander-glamour1.jpg": {
+    "mtime": 1792143495.7372644,
+    "seen": 1792154080.3062458,
+    "ast_hash": "92e8c78bb9852f9f50fcd33c55caf962",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/main-hero/2025-outlander-sport-glamour-1-2048x1447.webp": {
+    "mtime": 1792143448.1809897,
+    "seen": 1792154080.3062465,
+    "ast_hash": "d8abd02a12d8f961479ccbbb9c06e3ae",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/main-hero/24MY_TRITON_ALL-NEW_LHD_MV_Intro_P_proxy.png": {
+    "mtime": 1792143405.5155756,
+    "seen": 1792154080.306247,
+    "ast_hash": "c3dc35d08af17f3fc1c364aa76381101",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/2023-xpander-cross-glamour3-1536x1025.jpg": {
+    "mtime": 1792078521.7495127,
+    "seen": 1792154080.3062475,
+    "ast_hash": "ee42e5c51dfdf12c72e73836ad4ba80b",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/22MY_XS_RHD_MV_SlippyCorner-1536x1024.jpg": {
+    "mtime": 1792078456.4673574,
+    "seen": 1792154080.306248,
+    "ast_hash": "344b26a904eb4dc90377750e13c924e2",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/homepage-highlight-pajero-636x1024.webp": {
+    "mtime": 1792078566.321958,
+    "seen": 1792154080.3062484,
+    "ast_hash": "049421b2895c3f303e626c11fe5016b8",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/philosophy_hero-1024x576.webp": {
+    "mtime": 1792078573.6173487,
+    "seen": 1792154080.306249,
+    "ast_hash": "f55a1a7106ba5b53863660d17126325f",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/pillar_brand_philosophy.webp": {
+    "mtime": 1792078995.8497534,
+    "seen": 1792154080.3062491,
+    "ast_hash": "f55a1a7106ba5b53863660d17126325f",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/pillar_financing.webp": {
+    "mtime": 1792078996.0254402,
+    "seen": 1792154080.3062496,
+    "ast_hash": "2ccc6ad80d1aa601149ecbb87de8d53f",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/pillar_safety_tech.webp": {
+    "mtime": 1792078995.8513522,
+    "seen": 1792154080.3062503,
+    "ast_hash": "049421b2895c3f303e626c11fe5016b8",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/pillars/xpander-cross-header-image-1024x682.jpg": {
+    "mtime": 1792078551.0295289,
+    "seen": 1792154080.3062508,
+    "ast_hash": "db3cdedd0211faa6761b7b88fdef956e",
+    "semantic_hash": ""
+  },
+  "nuxt/public/images/thumbnail.png": {
+    "mtime": 1789864171.202122,
+    "seen": 1792154080.306251,
+    "ast_hash": "3d1bb376b2b22a222d61fa72d0236acf",
+    "semantic_hash": ""
   }
 }

@@ -94,7 +94,6 @@ useSeoMeta({
 		<HomeModelSelector v-if="vehicles?.length" :vehicles="vehicles" />
 		<HomeFeatureSpotlight
 			:block="spotlight"
-			:fallback-image="leadMedia"
 			:cta-to="leadVehicle ? `/showroom/${leadVehicle.slug}` : '#models'"
 		/>
 		<HomeValueGrid :block="valueGrid" />

@@ -477,12 +477,23 @@ for (const headline of RETIRED_HEADLINES) {
 	check(`retired block "${headline}" not on Home`, !headlinesOnHome.includes(headline));
 }
 
+const HERO_SLIDE_IMAGES = [
+	'/images/main-hero/2025-outlander-sport-glamour-1-2048x1447.webp',
+	'/images/main-hero/24MY_TRITON_ALL-NEW_LHD_MV_Intro_P_proxy.png',
+	'/images/main-hero/2023-xpander-glamour1.jpg',
+];
+// Only the active slide's CTA is server-rendered; the rest swap in client-side.
+const HERO_SLIDE_LINKS = ['/showroom/outlander-sport'];
+const ASC_SPOTLIGHT_IMAGE = '/images/features/22MY_XS_RHD_MV_SlippyCorner-1536x1024.jpg';
+
 try {
 	const { r } = await nuxtFetch('/');
 	const html = r.status === 200 ? await r.text() : '';
 	check('Nuxt SSR homepage / → 200', r.status === 200, `status ${r.status}`);
-	check('SSR homepage renders first hero still', !!stills[0] && html.includes(stills[0].id));
-	check('SSR homepage renders ASC spotlight image', !!ascFile && html.includes(ascFile.id));
+	// Hero slides and the ASC spotlight still ship from nuxt/public, not Directus.
+	for (const still of HERO_SLIDE_IMAGES) check(`SSR homepage renders hero slide ${still}`, html.includes(still));
+	for (const to of HERO_SLIDE_LINKS) check(`SSR homepage links hero CTA ${to}`, html.includes(`href="${to}"`));
+	check('SSR homepage renders ASC spotlight image', html.includes(ASC_SPOTLIGHT_IMAGE));
 	check('SSR homepage drops retired blocks', !RETIRED_HEADLINES.some((h) => html.includes(h)));
 } catch (e) {
 	check('Nuxt SSR homepage / → 200', false, String(e));

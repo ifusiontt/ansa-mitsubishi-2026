@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import type { BlockContentBlock, BlockContentItem } from '#shared/types/schema';
-import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 
 /**
- * Technology spotlight: a floating glass card over full-width driving photography. On desktop
- * the card sits on the right so the car (left lane of the ASC still) stays unobstructed.
- * Reads the first published item of the "TECHNOLOGY" block_content_block; falls back
- * to the default ASC copy (and `fallbackImage`) when the CMS block is missing.
+ * Technology spotlight: a floating glass card over full-width driving photography. The card sits
+ * on the left over the tunnel-rock shadow so the Xpander Cross, wet pavement and road spray on the
+ * centre-right of the ASC still stay clear. Copy comes from the first published item of the
+ * "TECHNOLOGY" block_content_block, falling back to the default ASC copy when the block is missing.
  */
 const props = withDefaults(
 	defineProps<{
 		block?: BlockContentBlock | null;
-		/** Directus file id used when the CMS item has no image. */
-		fallbackImage?: string;
 		ctaTo?: string;
 	}>(),
-	{ block: null, fallbackImage: '', ctaTo: '#models' },
+	{ block: null, ctaTo: '#models' },
 );
+
+const IMAGE = '/images/features/22MY_XS_RHD_MV_SlippyCorner-1536x1024.jpg';
 
 const DEFAULT_COPY = {
 	tagline: 'TECHNOLOGY',
@@ -33,26 +32,18 @@ const item = computed(() =>
 
 const eyebrow = computed(() => props.block?.tagline || DEFAULT_COPY.tagline);
 const headline = computed(() => item.value?.headline || DEFAULT_COPY.headline);
-const description = computed(() => item.value?.description || DEFAULT_COPY.description);
-
-const imageUrl = computed(() => {
-	const first = item.value?.images?.[0];
-	const id = (typeof first === 'object' ? directusFileId(first.directus_files_id) : '') || props.fallbackImage;
-	return id ? `${getDirectusAssetURL(id)}?width=1920&quality=82&format=webp` : '';
-});
-</script>
+const description = computed(() => item.value?.description || DEFAULT_COPY.description);</script>
 
 <template>
 	<section class="relative isolate w-full overflow-hidden bg-black text-white" aria-labelledby="home-spotlight-heading">
-		<img v-if="imageUrl" :src="imageUrl" alt="" loading="lazy" class="absolute inset-0 -z-10 h-full w-full object-cover" />
-		<div v-else class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_70%_50%,#1f1f1f_0%,#000_70%)]" aria-hidden="true" />
-		<!-- Shade sits under the card: bottom-up on mobile, right-to-left on desktop -->
-		<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-transparent lg:bg-gradient-to-l" aria-hidden="true" />
+		<img :src="IMAGE" alt="" loading="lazy" class="absolute inset-0 -z-10 h-full w-full object-cover" />
+		<!-- Shade sits under the card: bottom-up on mobile, left-to-right on desktop -->
+		<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-transparent lg:bg-gradient-to-r" aria-hidden="true" />
 
-		<div class="mx-auto flex min-h-[560px] max-w-7xl items-center px-4 py-12 sm:px-6 md:py-24 lg:py-32 lg:justify-end lg:px-16">
+		<div class="mx-auto flex min-h-[560px] max-w-7xl items-center justify-start py-12 pl-8 pr-4 sm:pr-6 md:py-24 md:pl-16 lg:py-32 lg:pl-24">
 			<article
 				class="max-w-md rounded-xl border border-white/10 bg-neutral-900/60 p-8 shadow-2xl shadow-black/50 backdrop-blur-md"
-				:data-directus="item ? setAttr({ collection: 'block_content_items', item: item.id, fields: ['headline', 'description', 'images'], mode: 'drawer' }) : undefined"
+				:data-directus="item ? setAttr({ collection: 'block_content_items', item: item.id, fields: ['headline', 'description'], mode: 'drawer' }) : undefined"
 			>
 				<p class="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-white">
 					<span class="h-1.5 w-1.5 rounded-full bg-brand-red" aria-hidden="true" />

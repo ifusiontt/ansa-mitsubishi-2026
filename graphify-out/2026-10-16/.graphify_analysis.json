@@ -1,0 +1,1273 @@
+{
+  "communities": {
+    "0": [
+      "nuxt_shared_types_schema_collectionnames",
+      "nuxt_shared_types_schema_collectionnames_ai_prompts",
+      "nuxt_shared_types_schema_collectionnames_block_button",
+      "nuxt_shared_types_schema_collectionnames_block_button_group",
+      "nuxt_shared_types_schema_collectionnames_block_form",
+      "nuxt_shared_types_schema_collectionnames_block_gallery",
+      "nuxt_shared_types_schema_collectionnames_block_gallery_items",
+      "nuxt_shared_types_schema_collectionnames_block_hero",
+      "nuxt_shared_types_schema_collectionnames_block_posts",
+      "nuxt_shared_types_schema_collectionnames_block_pricing",
+      "nuxt_shared_types_schema_collectionnames_block_pricing_cards",
+      "nuxt_shared_types_schema_collectionnames_block_richtext",
+      "nuxt_shared_types_schema_collectionnames_directus_access",
+      "nuxt_shared_types_schema_collectionnames_directus_activity",
+      "nuxt_shared_types_schema_collectionnames_directus_collections",
+      "nuxt_shared_types_schema_collectionnames_directus_comments",
+      "nuxt_shared_types_schema_collectionnames_directus_dashboards",
+      "nuxt_shared_types_schema_collectionnames_directus_deployment_projects",
+      "nuxt_shared_types_schema_collectionnames_directus_deployment_runs",
+      "nuxt_shared_types_schema_collectionnames_directus_deployments",
+      "nuxt_shared_types_schema_collectionnames_directus_extensions",
+      "nuxt_shared_types_schema_collectionnames_directus_fields",
+      "nuxt_shared_types_schema_collectionnames_directus_files",
+      "nuxt_shared_types_schema_collectionnames_directus_flows",
+      "nuxt_shared_types_schema_collectionnames_directus_folders",
+      "nuxt_shared_types_schema_collectionnames_directus_migrations",
+      "nuxt_shared_types_schema_collectionnames_directus_notifications",
+      "nuxt_shared_types_schema_collectionnames_directus_operations",
+      "nuxt_shared_types_schema_collectionnames_directus_panels",
+      "nuxt_shared_types_schema_collectionnames_directus_permissions",
+      "nuxt_shared_types_schema_collectionnames_directus_policies",
+      "nuxt_shared_types_schema_collectionnames_directus_presets",
+      "nuxt_shared_types_schema_collectionnames_directus_relations",
+      "nuxt_shared_types_schema_collectionnames_directus_revisions",
+      "nuxt_shared_types_schema_collectionnames_directus_roles",
+      "nuxt_shared_types_schema_collectionnames_directus_sessions",
+      "nuxt_shared_types_schema_collectionnames_directus_settings",
+      "nuxt_shared_types_schema_collectionnames_directus_shares",
+      "nuxt_shared_types_schema_collectionnames_directus_translations",
+      "nuxt_shared_types_schema_collectionnames_directus_users",
+      "nuxt_shared_types_schema_collectionnames_directus_versions",
+      "nuxt_shared_types_schema_collectionnames_form_fields",
+      "nuxt_shared_types_schema_collectionnames_form_submission_values",
+      "nuxt_shared_types_schema_collectionnames_form_submissions",
+      "nuxt_shared_types_schema_collectionnames_forms",
+      "nuxt_shared_types_schema_collectionnames_globals",
+      "nuxt_shared_types_schema_collectionnames_navigation",
+      "nuxt_shared_types_schema_collectionnames_navigation_items",
+      "nuxt_shared_types_schema_collectionnames_page_blocks",
+      "nuxt_shared_types_schema_collectionnames_pages",
+      "nuxt_shared_types_schema_collectionnames_posts",
+      "nuxt_shared_types_schema_collectionnames_redirects"
+    ],
+    "1": [
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenu",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenu_emits",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenu_forwarded",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenu_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucheckboxitem",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucheckboxitem_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucheckboxitem_emits",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucheckboxitem_forwarded",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucheckboxitem_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucontent",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucontent_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucontent_emits",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucontent_forwarded",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenucontent_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenugroup",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenugroup_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuitem",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuitem_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuitem_forwardedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuitem_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenulabel",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenulabel_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenulabel_forwardedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenulabel_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradiogroup",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradiogroup_emits",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradiogroup_forwarded",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradiogroup_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradioitem",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradioitem_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradioitem_emits",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradioitem_forwarded",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuradioitem_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusub",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusub_emits",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusub_forwarded",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusub_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubcontent",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubcontent_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubcontent_emits",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubcontent_forwarded",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubcontent_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenutrigger",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenutrigger_forwardedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenutrigger_props",
+      "nuxt_app_components_ui_dropdown_menu_index"
+    ],
+    "2": [
+      "nuxt_shared_types_schema",
+      "nuxt_shared_types_schema_aiprompt",
+      "nuxt_shared_types_schema_blockbutton",
+      "nuxt_shared_types_schema_blockbuttongroup",
+      "nuxt_shared_types_schema_blockform",
+      "nuxt_shared_types_schema_blockgallery",
+      "nuxt_shared_types_schema_blockgalleryitem",
+      "nuxt_shared_types_schema_blockhero",
+      "nuxt_shared_types_schema_blockpricing",
+      "nuxt_shared_types_schema_blockpricingcard",
+      "nuxt_shared_types_schema_blockrichtext",
+      "nuxt_shared_types_schema_directusaccess",
+      "nuxt_shared_types_schema_directusactivity",
+      "nuxt_shared_types_schema_directuscollection",
+      "nuxt_shared_types_schema_directuscomment",
+      "nuxt_shared_types_schema_directusdashboard",
+      "nuxt_shared_types_schema_directusdeployment",
+      "nuxt_shared_types_schema_directusdeploymentproject",
+      "nuxt_shared_types_schema_directusdeploymentrun",
+      "nuxt_shared_types_schema_directusextension",
+      "nuxt_shared_types_schema_directusfield",
+      "nuxt_shared_types_schema_directusfile",
+      "nuxt_shared_types_schema_directusflow",
+      "nuxt_shared_types_schema_directusfolder",
+      "nuxt_shared_types_schema_directusmigration",
+      "nuxt_shared_types_schema_directusnotification",
+      "nuxt_shared_types_schema_directusoperation",
+      "nuxt_shared_types_schema_directuspanel",
+      "nuxt_shared_types_schema_directuspermission",
+      "nuxt_shared_types_schema_directuspolicy",
+      "nuxt_shared_types_schema_directuspreset",
+      "nuxt_shared_types_schema_directusrelation",
+      "nuxt_shared_types_schema_directusrevision",
+      "nuxt_shared_types_schema_directusrole",
+      "nuxt_shared_types_schema_directussession",
+      "nuxt_shared_types_schema_directussettings",
+      "nuxt_shared_types_schema_directusshare",
+      "nuxt_shared_types_schema_directustranslation",
+      "nuxt_shared_types_schema_directusversion",
+      "nuxt_shared_types_schema_extensionseometadata",
+      "nuxt_shared_types_schema_formsubmission",
+      "nuxt_shared_types_schema_formsubmissionvalue",
+      "nuxt_shared_types_schema_globals",
+      "nuxt_shared_types_schema_navigation",
+      "nuxt_shared_types_schema_navigationitem",
+      "nuxt_shared_types_schema_redirect"
+    ],
+    "3": [
+      "nuxt_package",
+      "nuxt_package_engines",
+      "nuxt_package_engines_node",
+      "nuxt_package_engines_pnpm",
+      "nuxt_package_name",
+      "nuxt_package_overrides",
+      "nuxt_package_overrides_ajv",
+      "nuxt_package_overrides_brace_expansion_2",
+      "nuxt_package_overrides_brace_expansion_2_3",
+      "nuxt_package_overrides_flatted",
+      "nuxt_package_overrides_h3",
+      "nuxt_package_overrides_iconify_utils",
+      "nuxt_package_overrides_isaacs_brace_expansion_6",
+      "nuxt_package_overrides_koa",
+      "nuxt_package_overrides_minimatch_10_11",
+      "nuxt_package_overrides_minimatch_3_4",
+      "nuxt_package_overrides_minimatch_5_6",
+      "nuxt_package_overrides_minimatch_9_10",
+      "nuxt_package_overrides_node_forge",
+      "nuxt_package_overrides_picomatch_3",
+      "nuxt_package_overrides_picomatch_4_5",
+      "nuxt_package_overrides_rollup",
+      "nuxt_package_overrides_serialize_javascript",
+      "nuxt_package_overrides_svgo",
+      "nuxt_package_overrides_tar",
+      "nuxt_package_overrides_unhead",
+      "nuxt_package_overrides_yaml",
+      "nuxt_package_packagemanager",
+      "nuxt_package_private",
+      "nuxt_package_repository",
+      "nuxt_package_repository_url",
+      "nuxt_package_scripts",
+      "nuxt_package_scripts_build",
+      "nuxt_package_scripts_dev",
+      "nuxt_package_scripts_format",
+      "nuxt_package_scripts_generate",
+      "nuxt_package_scripts_generate_types",
+      "nuxt_package_scripts_lint",
+      "nuxt_package_scripts_postinstall",
+      "nuxt_package_scripts_preview",
+      "nuxt_package_scripts_start",
+      "nuxt_package_scripts_typecheck",
+      "nuxt_package_type"
+    ],
+    "4": [
+      "defu",
+      "destr",
+      "directus_sdk_typegen",
+      "directus_types",
+      "dotenv",
+      "eslint",
+      "eslint_config_prettier",
+      "eslint_plugin_prettier",
+      "eslint_plugin_vue",
+      "nuxt_devtools",
+      "nuxt_eslint",
+      "nuxt_package_devdependencies",
+      "nuxt_package_devdependencies_defu",
+      "nuxt_package_devdependencies_destr",
+      "nuxt_package_devdependencies_directus_sdk_typegen",
+      "nuxt_package_devdependencies_directus_types",
+      "nuxt_package_devdependencies_dotenv",
+      "nuxt_package_devdependencies_eslint",
+      "nuxt_package_devdependencies_eslint_config_prettier",
+      "nuxt_package_devdependencies_eslint_plugin_prettier",
+      "nuxt_package_devdependencies_eslint_plugin_vue",
+      "nuxt_package_devdependencies_nuxt_devtools",
+      "nuxt_package_devdependencies_nuxt_eslint",
+      "nuxt_package_devdependencies_prettier",
+      "nuxt_package_devdependencies_readline_sync",
+      "nuxt_package_devdependencies_tailwindcss_typography",
+      "nuxt_package_devdependencies_typescript",
+      "nuxt_package_devdependencies_typescript_eslint_eslint_plugin",
+      "nuxt_package_devdependencies_typescript_eslint_parser",
+      "nuxt_package_devdependencies_vue_eslint_parser",
+      "nuxt_package_devdependencies_vue_tsc",
+      "prettier",
+      "readline_sync",
+      "tailwindcss_typography",
+      "typescript",
+      "typescript_eslint_eslint_plugin",
+      "typescript_eslint_parser",
+      "vue_eslint_parser",
+      "vue_tsc"
+    ],
+    "5": [
+      "nuxt_app_components_base_baseblock",
+      "nuxt_app_components_base_baseblock_baseblockprops",
+      "nuxt_app_components_base_baseblock_blockref",
+      "nuxt_app_components_base_baseblock_component",
+      "nuxt_app_components_base_baseblock_componentdata",
+      "nuxt_app_components_base_baseblock_components",
+      "nuxt_app_components_base_baseblock_props",
+      "nuxt_app_components_base_text",
+      "nuxt_app_components_base_text_contentel",
+      "nuxt_app_components_base_text_proseprops",
+      "nuxt_app_components_block_formblock",
+      "nuxt_app_components_block_formblock_customform",
+      "nuxt_app_components_block_formblock_customformdata",
+      "nuxt_app_components_block_formblock_setblockattr",
+      "nuxt_app_components_block_gallery",
+      "nuxt_app_components_block_gallery_currentindex",
+      "nuxt_app_components_block_gallery_currentitem",
+      "nuxt_app_components_block_gallery_galleryitem",
+      "nuxt_app_components_block_gallery_galleryprops",
+      "nuxt_app_components_block_gallery_handlekeydown",
+      "nuxt_app_components_block_gallery_handlenext",
+      "nuxt_app_components_block_gallery_handleopenlightbox",
+      "nuxt_app_components_block_gallery_handleprev",
+      "nuxt_app_components_block_gallery_islightboxopen",
+      "nuxt_app_components_block_gallery_props",
+      "nuxt_app_components_block_gallery_setblockattr",
+      "nuxt_app_components_block_gallery_sorteditems",
+      "nuxt_app_components_block_hero",
+      "nuxt_app_components_block_hero_heroprops",
+      "nuxt_app_components_block_hero_isdraftpreview_setblockattr",
+      "nuxt_app_components_block_pricing",
+      "nuxt_app_components_block_pricing_pricingprops",
+      "nuxt_app_components_block_pricing_setblockattr",
+      "nuxt_app_components_block_richtext",
+      "nuxt_app_components_block_richtext_richtextprops",
+      "nuxt_app_components_block_richtext_setblockattr"
+    ],
+    "6": [
+      "nuxt_app_components_forms_baseformfield",
+      "nuxt_app_components_forms_baseformfield_componentmap",
+      "nuxt_app_components_forms_baseformfield_getcomponentprops",
+      "nuxt_app_components_forms_baseformfield_getfieldcomponent",
+      "nuxt_app_components_forms_baseformfield_props",
+      "nuxt_app_components_forms_baseformfield_value_errormessage",
+      "nuxt_app_components_forms_fields_checkboxfield",
+      "nuxt_app_components_forms_fields_checkboxfield_emits",
+      "nuxt_app_components_forms_fields_checkboxfield_localvalue",
+      "nuxt_app_components_forms_fields_checkboxfield_props",
+      "nuxt_app_components_forms_fields_checkboxgroupfield",
+      "nuxt_app_components_forms_fields_checkboxgroupfield_emits",
+      "nuxt_app_components_forms_fields_checkboxgroupfield_ischecked",
+      "nuxt_app_components_forms_fields_checkboxgroupfield_props",
+      "nuxt_app_components_forms_fields_checkboxgroupfield_togglevalue",
+      "nuxt_app_components_forms_fields_fileuploadfield",
+      "nuxt_app_components_forms_fields_fileuploadfield_emits",
+      "nuxt_app_components_forms_fields_fileuploadfield_onfilechange",
+      "nuxt_app_components_forms_fields_radiogroupfield",
+      "nuxt_app_components_forms_fields_radiogroupfield_emits",
+      "nuxt_app_components_forms_fields_radiogroupfield_localvalue",
+      "nuxt_app_components_forms_fields_radiogroupfield_props",
+      "nuxt_app_components_forms_fields_selectfield",
+      "nuxt_app_components_forms_fields_selectfield_emits",
+      "nuxt_app_components_forms_fields_selectfield_localvalue",
+      "nuxt_app_components_forms_fields_selectfield_props",
+      "nuxt_app_components_ui_input_index",
+      "nuxt_app_components_ui_input_input",
+      "nuxt_app_components_ui_input_input_emits",
+      "nuxt_app_components_ui_input_input_modelvalue",
+      "nuxt_app_components_ui_input_input_props",
+      "nuxt_app_components_ui_textarea_index",
+      "nuxt_app_components_ui_textarea_textarea",
+      "nuxt_app_components_ui_textarea_textarea_emits",
+      "nuxt_app_components_ui_textarea_textarea_modelvalue",
+      "nuxt_app_components_ui_textarea_textarea_props"
+    ],
+    "7": [
+      "nuxt_app_components_ui_command_command",
+      "nuxt_app_components_ui_command_command_delegatedprops",
+      "nuxt_app_components_ui_command_command_emits",
+      "nuxt_app_components_ui_command_command_forwarded",
+      "nuxt_app_components_ui_command_command_props",
+      "nuxt_app_components_ui_command_commanddialog",
+      "nuxt_app_components_ui_command_commanddialog_emits",
+      "nuxt_app_components_ui_command_commanddialog_forwarded",
+      "nuxt_app_components_ui_command_commanddialog_props",
+      "nuxt_app_components_ui_dialog_dialog",
+      "nuxt_app_components_ui_dialog_dialog_emits",
+      "nuxt_app_components_ui_dialog_dialog_forwarded",
+      "nuxt_app_components_ui_dialog_dialog_props",
+      "nuxt_app_components_ui_dialog_dialogclose",
+      "nuxt_app_components_ui_dialog_dialogclose_props",
+      "nuxt_app_components_ui_dialog_dialogcontent",
+      "nuxt_app_components_ui_dialog_dialogcontent_delegatedprops",
+      "nuxt_app_components_ui_dialog_dialogcontent_emits",
+      "nuxt_app_components_ui_dialog_dialogcontent_forwarded",
+      "nuxt_app_components_ui_dialog_dialogcontent_props",
+      "nuxt_app_components_ui_dialog_dialogdescription",
+      "nuxt_app_components_ui_dialog_dialogdescription_delegatedprops",
+      "nuxt_app_components_ui_dialog_dialogdescription_forwardedprops",
+      "nuxt_app_components_ui_dialog_dialogdescription_props",
+      "nuxt_app_components_ui_dialog_dialogscrollcontent",
+      "nuxt_app_components_ui_dialog_dialogscrollcontent_delegatedprops",
+      "nuxt_app_components_ui_dialog_dialogscrollcontent_emits",
+      "nuxt_app_components_ui_dialog_dialogscrollcontent_forwarded",
+      "nuxt_app_components_ui_dialog_dialogscrollcontent_props",
+      "nuxt_app_components_ui_dialog_dialogtitle",
+      "nuxt_app_components_ui_dialog_dialogtitle_delegatedprops",
+      "nuxt_app_components_ui_dialog_dialogtitle_forwardedprops",
+      "nuxt_app_components_ui_dialog_dialogtitle_props",
+      "nuxt_app_components_ui_dialog_dialogtrigger",
+      "nuxt_app_components_ui_dialog_dialogtrigger_props",
+      "nuxt_app_components_ui_dialog_index"
+    ],
+    "8": [
+      "nuxt_app_components_base_basebutton",
+      "nuxt_app_components_base_basebutton_buttonclasses",
+      "nuxt_app_components_base_basebutton_href",
+      "nuxt_app_components_base_basebutton_icon",
+      "nuxt_app_components_base_basebutton_icons",
+      "nuxt_app_components_base_basebutton_linkcomponent",
+      "nuxt_app_components_base_basebutton_props",
+      "nuxt_app_components_block_pricingcard",
+      "nuxt_app_components_block_pricingcard_isdraftpreview_setblockattr",
+      "nuxt_app_components_block_pricingcard_pricingcardfield",
+      "nuxt_app_components_block_pricingcard_pricingcardprops",
+      "nuxt_app_components_block_pricingcard_props",
+      "nuxt_app_components_ui_button_button",
+      "nuxt_app_components_ui_button_button_props",
+      "nuxt_app_components_ui_button_index",
+      "nuxt_app_components_ui_button_index_buttonvariants",
+      "nuxt_app_components_ui_pagination_index",
+      "nuxt_app_components_ui_pagination_paginationellipsis",
+      "nuxt_app_components_ui_pagination_paginationellipsis_delegatedprops",
+      "nuxt_app_components_ui_pagination_paginationellipsis_props",
+      "nuxt_app_components_ui_pagination_paginationfirst",
+      "nuxt_app_components_ui_pagination_paginationfirst_delegatedprops",
+      "nuxt_app_components_ui_pagination_paginationfirst_props",
+      "nuxt_app_components_ui_pagination_paginationlast",
+      "nuxt_app_components_ui_pagination_paginationlast_delegatedprops",
+      "nuxt_app_components_ui_pagination_paginationlast_props",
+      "nuxt_app_components_ui_pagination_paginationnext",
+      "nuxt_app_components_ui_pagination_paginationnext_delegatedprops",
+      "nuxt_app_components_ui_pagination_paginationnext_props",
+      "nuxt_app_components_ui_pagination_paginationprev",
+      "nuxt_app_components_ui_pagination_paginationprev_delegatedprops",
+      "nuxt_app_components_ui_pagination_paginationprev_props"
+    ],
+    "9": [
+      "nuxt_app_components_ui_navigation_menu_index",
+      "nuxt_app_components_ui_navigation_menu_index_navigationmenutriggerstyle",
+      "nuxt_app_components_ui_navigation_menu_navigationmenu",
+      "nuxt_app_components_ui_navigation_menu_navigationmenu_delegatedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenu_emits",
+      "nuxt_app_components_ui_navigation_menu_navigationmenu_forwarded",
+      "nuxt_app_components_ui_navigation_menu_navigationmenu_props",
+      "nuxt_app_components_ui_navigation_menu_navigationmenucontent",
+      "nuxt_app_components_ui_navigation_menu_navigationmenucontent_delegatedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenucontent_emits",
+      "nuxt_app_components_ui_navigation_menu_navigationmenucontent_forwarded",
+      "nuxt_app_components_ui_navigation_menu_navigationmenucontent_props",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuitem",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuitem_props",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulink",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulink_emits",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulink_forwarded",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulink_props",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulist",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulist_delegatedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulist_forwardedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenulist_props",
+      "nuxt_app_components_ui_navigation_menu_navigationmenutrigger",
+      "nuxt_app_components_ui_navigation_menu_navigationmenutrigger_delegatedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenutrigger_forwardedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenutrigger_props",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuviewport",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuviewport_delegatedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuviewport_forwardedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuviewport_props"
+    ],
+    "10": [
+      "nuxt_app_components_forms_dynamicform",
+      "nuxt_app_components_forms_dynamicform_handlesubmit_values",
+      "nuxt_app_components_forms_dynamicform_initialvalues",
+      "nuxt_app_components_forms_dynamicform_isdraftpreview_setblockattr",
+      "nuxt_app_components_forms_dynamicform_issubmitting",
+      "nuxt_app_components_forms_dynamicform_onsubmitform",
+      "nuxt_app_components_forms_dynamicform_props",
+      "nuxt_app_components_forms_dynamicform_schema",
+      "nuxt_app_components_forms_dynamicform_sortedfields",
+      "nuxt_app_components_forms_dynamicform_validfields",
+      "nuxt_app_components_forms_formbuilder",
+      "nuxt_app_components_forms_formbuilder_customformdata",
+      "nuxt_app_components_forms_formbuilder_error",
+      "nuxt_app_components_forms_formbuilder_handlesubmit",
+      "nuxt_app_components_forms_formbuilder_issubmitted",
+      "nuxt_app_components_forms_formbuilder_props",
+      "nuxt_app_lib_directus_validateformsubmission",
+      "nuxt_app_lib_directus_validateformsubmission_max_form_file_bytes",
+      "nuxt_app_lib_directus_validateformsubmission_multiparttoformdata",
+      "nuxt_app_lib_directus_validateformsubmission_parsefieldvalue",
+      "nuxt_app_lib_directus_validateformsubmission_validateformsubmission",
+      "nuxt_app_lib_zodschemabuilder",
+      "nuxt_app_lib_zodschemabuilder_buildzodschema",
+      "nuxt_server_api_forms_submit_post",
+      "nuxt_server_api_forms_submit_post_submissionvalue",
+      "nuxt_shared_types_schema_form",
+      "nuxt_shared_types_schema_formfield"
+    ],
+    "11": [
+      "nuxt_app_composables_usevisualediting",
+      "nuxt_app_composables_usevisualediting_applyoptions",
+      "nuxt_app_composables_usevisualediting_usevisualediting",
+      "nuxt_app_composables_usevisualeditingattrs",
+      "nuxt_app_composables_usevisualeditingattrs_usevisualeditingattrs",
+      "nuxt_app_pages_permalink",
+      "nuxt_app_pages_permalink_applypagevisualediting",
+      "nuxt_app_pages_permalink_applyvisualeditingbutton",
+      "nuxt_app_pages_permalink_contentversion",
+      "nuxt_app_pages_permalink_data_page_error_refresh",
+      "nuxt_app_pages_permalink_editingpageid",
+      "nuxt_app_pages_permalink_enabled",
+      "nuxt_app_pages_permalink_isvisualeditingenabled_apply",
+      "nuxt_app_pages_permalink_pageblocks",
+      "nuxt_app_pages_permalink_pageroot",
+      "nuxt_app_pages_permalink_pageurl",
+      "nuxt_app_pages_permalink_permalink",
+      "nuxt_app_pages_permalink_route",
+      "nuxt_app_utils_visualediting",
+      "nuxt_app_utils_visualediting_applyoptions",
+      "nuxt_app_utils_visualediting_providevisualeditingpagecontext",
+      "nuxt_app_utils_visualediting_setattr",
+      "nuxt_app_utils_visualediting_setblockattroptions",
+      "nuxt_app_utils_visualediting_topageblockfields",
+      "nuxt_app_utils_visualediting_visualeditingpagecontext",
+      "nuxt_app_utils_visualediting_visualeditingpagecontextkey"
+    ],
+    "12": [
+      "nuxt_app_components_base_searchmodel",
+      "nuxt_app_components_base_searchmodel_debouncedfetchresults",
+      "nuxt_app_components_base_searchmodel_fetchresults",
+      "nuxt_app_components_base_searchmodel_loading",
+      "nuxt_app_components_base_searchmodel_open",
+      "nuxt_app_components_base_searchmodel_results",
+      "nuxt_app_components_base_searchmodel_router",
+      "nuxt_app_components_base_searchmodel_searched",
+      "nuxt_app_components_base_searchmodel_searchresult",
+      "nuxt_app_components_navigationbar",
+      "nuxt_app_components_navigationbar_darklogourl",
+      "nuxt_app_components_navigationbar_globals",
+      "nuxt_app_components_navigationbar_handlelinkclick",
+      "nuxt_app_components_navigationbar_lightlogourl",
+      "nuxt_app_components_navigationbar_menuopen",
+      "nuxt_app_components_navigationbar_navigation",
+      "nuxt_app_components_navigationbar_navigationitem",
+      "nuxt_app_components_navigationbar_navigationref",
+      "nuxt_app_components_navigationbar_props",
+      "nuxt_app_components_navigationbar_runtimeconfig",
+      "nuxt_app_components_navigationbar_setattr"
+    ],
+    "13": [
+      "nuxt_app_components_ui_form_formcontrol",
+      "nuxt_app_components_ui_form_formcontrol_error_formitemid_formdescriptionid_formmessageid",
+      "nuxt_app_components_ui_form_formdescription",
+      "nuxt_app_components_ui_form_formdescription_formdescriptionid",
+      "nuxt_app_components_ui_form_formdescription_props",
+      "nuxt_app_components_ui_form_formitem",
+      "nuxt_app_components_ui_form_formitem_id",
+      "nuxt_app_components_ui_form_formitem_props",
+      "nuxt_app_components_ui_form_formlabel",
+      "nuxt_app_components_ui_form_formlabel_error_formitemid",
+      "nuxt_app_components_ui_form_formlabel_props",
+      "nuxt_app_components_ui_form_formmessage",
+      "nuxt_app_components_ui_form_formmessage_name_formmessageid",
+      "nuxt_app_components_ui_form_index",
+      "nuxt_app_components_ui_form_injectionkeys",
+      "nuxt_app_components_ui_form_injectionkeys_form_item_injection_key",
+      "nuxt_app_components_ui_form_useformfield",
+      "nuxt_app_components_ui_form_useformfield_useformfield"
+    ],
+    "14": [
+      "nuxt_app_components_ui_command_commandempty",
+      "nuxt_app_components_ui_command_commandempty_delegatedprops",
+      "nuxt_app_components_ui_command_commandempty_props",
+      "nuxt_app_components_ui_command_commandgroup",
+      "nuxt_app_components_ui_command_commandgroup_delegatedprops",
+      "nuxt_app_components_ui_command_commandgroup_props",
+      "nuxt_app_components_ui_command_commanditem",
+      "nuxt_app_components_ui_command_commanditem_delegatedprops",
+      "nuxt_app_components_ui_command_commanditem_emits",
+      "nuxt_app_components_ui_command_commanditem_forwarded",
+      "nuxt_app_components_ui_command_commanditem_props",
+      "nuxt_app_components_ui_command_commandseparator",
+      "nuxt_app_components_ui_command_commandseparator_delegatedprops",
+      "nuxt_app_components_ui_command_commandseparator_props",
+      "nuxt_app_components_ui_command_commandshortcut",
+      "nuxt_app_components_ui_command_commandshortcut_props",
+      "nuxt_app_components_ui_command_index"
+    ],
+    "15": [
+      "nuxt_app_components_ui_select_index",
+      "nuxt_app_components_ui_select_selectgroup",
+      "nuxt_app_components_ui_select_selectgroup_delegatedprops",
+      "nuxt_app_components_ui_select_selectgroup_props",
+      "nuxt_app_components_ui_select_selectitem",
+      "nuxt_app_components_ui_select_selectitem_delegatedprops",
+      "nuxt_app_components_ui_select_selectitem_forwardedprops",
+      "nuxt_app_components_ui_select_selectitem_props",
+      "nuxt_app_components_ui_select_selectitemtext",
+      "nuxt_app_components_ui_select_selectitemtext_props",
+      "nuxt_app_components_ui_select_selectlabel",
+      "nuxt_app_components_ui_select_selectlabel_props",
+      "nuxt_app_components_ui_select_selectseparator",
+      "nuxt_app_components_ui_select_selectseparator_delegatedprops",
+      "nuxt_app_components_ui_select_selectseparator_props",
+      "nuxt_app_components_ui_select_selectvalue",
+      "nuxt_app_components_ui_select_selectvalue_props"
+    ],
+    "16": [
+      "nuxt_app_components_block_posts",
+      "nuxt_app_components_block_posts_currentpage",
+      "nuxt_app_components_block_posts_data_postsdata_error_error",
+      "nuxt_app_components_block_posts_handlepagechange",
+      "nuxt_app_components_block_posts_paginationlinks",
+      "nuxt_app_components_block_posts_posts",
+      "nuxt_app_components_block_posts_postsprops",
+      "nuxt_app_components_block_posts_props",
+      "nuxt_app_components_block_posts_route",
+      "nuxt_app_components_block_posts_router",
+      "nuxt_app_components_block_posts_setblockattr",
+      "nuxt_app_components_block_posts_totalpages",
+      "nuxt_server_api_posts_slug_get",
+      "nuxt_server_api_posts_slug_get_postfields",
+      "nuxt_shared_types_schema_post"
+    ],
+    "17": [
+      "nuxt_components",
+      "nuxt_components_aliases",
+      "nuxt_components_aliases_components",
+      "nuxt_components_aliases_utils",
+      "nuxt_components_framework",
+      "nuxt_components_schema",
+      "nuxt_components_style",
+      "nuxt_components_tailwind",
+      "nuxt_components_tailwind_basecolor",
+      "nuxt_components_tailwind_config",
+      "nuxt_components_tailwind_css",
+      "nuxt_components_tailwind_cssvariables",
+      "nuxt_components_tailwind_prefix",
+      "nuxt_components_tsconfigpath",
+      "nuxt_components_typescript"
+    ],
+    "18": [
+      "nuxt_app_components_ui_tooltip_index",
+      "nuxt_app_components_ui_tooltip_tooltip",
+      "nuxt_app_components_ui_tooltip_tooltip_emits",
+      "nuxt_app_components_ui_tooltip_tooltip_forwarded",
+      "nuxt_app_components_ui_tooltip_tooltip_props",
+      "nuxt_app_components_ui_tooltip_tooltipcontent",
+      "nuxt_app_components_ui_tooltip_tooltipcontent_delegatedprops",
+      "nuxt_app_components_ui_tooltip_tooltipcontent_emits",
+      "nuxt_app_components_ui_tooltip_tooltipcontent_forwarded",
+      "nuxt_app_components_ui_tooltip_tooltipcontent_props",
+      "nuxt_app_components_ui_tooltip_tooltipprovider",
+      "nuxt_app_components_ui_tooltip_tooltipprovider_props",
+      "nuxt_app_components_ui_tooltip_tooltiptrigger",
+      "nuxt_app_components_ui_tooltip_tooltiptrigger_props"
+    ],
+    "19": [
+      "nuxt_app_components_ui_popover_index",
+      "nuxt_app_components_ui_popover_popover",
+      "nuxt_app_components_ui_popover_popover_emits",
+      "nuxt_app_components_ui_popover_popover_forwarded",
+      "nuxt_app_components_ui_popover_popover_props",
+      "nuxt_app_components_ui_popover_popovercontent",
+      "nuxt_app_components_ui_popover_popovercontent_delegatedprops",
+      "nuxt_app_components_ui_popover_popovercontent_emits",
+      "nuxt_app_components_ui_popover_popovercontent_forwarded",
+      "nuxt_app_components_ui_popover_popovercontent_props",
+      "nuxt_app_components_ui_popover_popovertrigger",
+      "nuxt_app_components_ui_popover_popovertrigger_props"
+    ],
+    "20": [
+      "nuxt_app_components_ui_dialog_dialogfooter",
+      "nuxt_app_components_ui_dialog_dialogfooter_props",
+      "nuxt_app_components_ui_dialog_dialogheader",
+      "nuxt_app_components_ui_dialog_dialogheader_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenushortcut",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenushortcut_props",
+      "nuxt_app_components_ui_label_index",
+      "nuxt_app_components_ui_label_label",
+      "nuxt_app_components_ui_label_label_delegatedprops",
+      "nuxt_app_components_ui_label_label_props",
+      "nuxt_shared_utils"
+    ],
+    "21": [
+      "nuxt_app_pages_blog_slug",
+      "nuxt_app_pages_blog_slug_author",
+      "nuxt_app_pages_blog_slug_data_error_refresh",
+      "nuxt_app_pages_blog_slug_enabled",
+      "nuxt_app_pages_blog_slug_isvisualeditingenabled_apply_setattr",
+      "nuxt_app_pages_blog_slug_post",
+      "nuxt_app_pages_blog_slug_public_siteurl",
+      "nuxt_app_pages_blog_slug_relatedposts",
+      "nuxt_app_pages_blog_slug_route",
+      "nuxt_app_pages_blog_slug_slug",
+      "nuxt_app_pages_blog_slug_wrapperref"
+    ],
+    "22": [
+      "nuxt_app_components_ui_radio_group_index",
+      "nuxt_app_components_ui_radio_group_radiogroup",
+      "nuxt_app_components_ui_radio_group_radiogroup_delegatedprops",
+      "nuxt_app_components_ui_radio_group_radiogroup_emits",
+      "nuxt_app_components_ui_radio_group_radiogroup_forwarded",
+      "nuxt_app_components_ui_radio_group_radiogroup_props",
+      "nuxt_app_components_ui_radio_group_radiogroupitem",
+      "nuxt_app_components_ui_radio_group_radiogroupitem_delegatedprops",
+      "nuxt_app_components_ui_radio_group_radiogroupitem_forwardedprops",
+      "nuxt_app_components_ui_radio_group_radiogroupitem_props"
+    ],
+    "23": [
+      "class_variance_authority",
+      "clsx",
+      "nuxt_icon",
+      "nuxt_package_dependencies",
+      "nuxt_package_dependencies_class_variance_authority",
+      "nuxt_package_dependencies_clsx",
+      "nuxt_package_dependencies_nuxt_icon",
+      "nuxt_package_dependencies_shadcn_nuxt",
+      "shadcn_nuxt"
+    ],
+    "24": [
+      "nuxt_app_components_base_basebutton_buttonprops",
+      "nuxt_app_components_base_buttongroup",
+      "nuxt_app_components_base_buttongroup_buttongroupprops",
+      "nuxt_app_components_base_buttongroup_containerclasses",
+      "nuxt_app_components_base_buttongroup_props",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuseparator",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuseparator_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenuseparator_props",
+      "nuxt_shared_utils_cn"
+    ],
+    "25": [
+      "nuxt_app_components_footer",
+      "nuxt_app_components_footer_darklogourl",
+      "nuxt_app_components_footer_footerprops",
+      "nuxt_app_components_footer_footerref",
+      "nuxt_app_components_footer_lightlogourl",
+      "nuxt_app_components_footer_navigationitem",
+      "nuxt_app_components_footer_props",
+      "nuxt_app_components_footer_runtimeconfig",
+      "nuxt_app_components_footer_sociallink"
+    ],
+    "26": [
+      "nuxt_app_components_ui_collapsible_collapsible",
+      "nuxt_app_components_ui_collapsible_collapsible_emits",
+      "nuxt_app_components_ui_collapsible_collapsible_forwarded",
+      "nuxt_app_components_ui_collapsible_collapsible_props",
+      "nuxt_app_components_ui_collapsible_collapsiblecontent",
+      "nuxt_app_components_ui_collapsible_collapsiblecontent_props",
+      "nuxt_app_components_ui_collapsible_collapsibletrigger",
+      "nuxt_app_components_ui_collapsible_collapsibletrigger_props",
+      "nuxt_app_components_ui_collapsible_index"
+    ],
+    "27": [
+      "nuxt_scripts_generate_types",
+      "nuxt_scripts_generate_types_dirname",
+      "nuxt_scripts_generate_types_filename",
+      "nuxt_scripts_generate_types_generatetypes",
+      "nuxt_scripts_generate_types_postprocesstypes",
+      "nuxt_scripts_generate_types_projectroot",
+      "nuxt_scripts_generate_types_promptfortoken"
+    ],
+    "28": [
+      "nuxt_app_components_base_sharedialog",
+      "nuxt_app_components_base_sharedialog_copied",
+      "nuxt_app_components_base_sharedialog_handlecopy",
+      "nuxt_app_components_base_sharedialog_props",
+      "nuxt_app_components_base_sharedialog_sociallinks",
+      "nuxt_app_components_base_sharedialog_url"
+    ],
+    "29": [
+      "nuxt_app_components_shared_directusimage",
+      "nuxt_app_components_shared_directusimage_directusimageprops",
+      "nuxt_app_components_shared_directusimage_props",
+      "nuxt_app_components_shared_directusimage_src",
+      "nuxt_server_utils_directus_utils",
+      "nuxt_server_utils_directus_utils_getdirectusasseturl"
+    ],
+    "30": [
+      "nuxt_app_components_ui_checkbox_checkbox",
+      "nuxt_app_components_ui_checkbox_checkbox_delegatedprops",
+      "nuxt_app_components_ui_checkbox_checkbox_emits",
+      "nuxt_app_components_ui_checkbox_checkbox_forwarded",
+      "nuxt_app_components_ui_checkbox_checkbox_props",
+      "nuxt_app_components_ui_checkbox_index"
+    ],
+    "31": [
+      "nuxt_modules_redirects",
+      "nuxt_modules_redirects_setup",
+      "nuxt_server_utils_directus_server",
+      "nuxt_server_utils_directus_server_directusserver",
+      "nuxt_server_utils_directus_server_public_directusurl_directusservertoken",
+      "nuxt_shared_types_schema_schema"
+    ],
+    "32": [
+      "nuxt_vercel",
+      "nuxt_vercel_build",
+      "nuxt_vercel_build_env",
+      "nuxt_vercel_env_enable_experimental_corepack",
+      "nuxt_vercel_github",
+      "nuxt_vercel_github_silent"
+    ],
+    "33": [
+      "nuxt_app_components_base_themetoggle",
+      "nuxt_app_components_base_themetoggle_classname",
+      "nuxt_app_components_base_themetoggle_colormode",
+      "nuxt_app_components_base_themetoggle_isdark",
+      "nuxt_app_components_base_themetoggle_toggletheme"
+    ],
+    "34": [
+      "nuxt_app_components_ui_command_commandlist",
+      "nuxt_app_components_ui_command_commandlist_delegatedprops",
+      "nuxt_app_components_ui_command_commandlist_emits",
+      "nuxt_app_components_ui_command_commandlist_forwarded",
+      "nuxt_app_components_ui_command_commandlist_props"
+    ],
+    "35": [
+      "nuxt_app_components_ui_select_selectcontent",
+      "nuxt_app_components_ui_select_selectcontent_delegatedprops",
+      "nuxt_app_components_ui_select_selectcontent_emits",
+      "nuxt_app_components_ui_select_selectcontent_forwarded",
+      "nuxt_app_components_ui_select_selectcontent_props"
+    ],
+    "36": [
+      "nuxt_app_utils_username",
+      "nuxt_app_utils_username_userinitials",
+      "nuxt_app_utils_username_username",
+      "nuxt_app_utils_username_usernameoptions",
+      "nuxt_shared_types_schema_directususer"
+    ],
+    "37": [
+      "nuxt_prettierrc",
+      "nuxt_prettierrc_htmlwhitespacesensitivity",
+      "nuxt_prettierrc_printwidth",
+      "nuxt_prettierrc_prosewrap",
+      "nuxt_prettierrc_singlequote"
+    ],
+    "38": [
+      "nuxt_server_api_pages_one_get",
+      "nuxt_server_api_pages_one_get_pagefields",
+      "nuxt_shared_types_schema_blockpost",
+      "nuxt_shared_types_schema_page",
+      "nuxt_shared_types_schema_pageblock"
+    ],
+    "39": [
+      "nuxt_app_components_pagebuilder",
+      "nuxt_app_components_pagebuilder_pagebuilderprops",
+      "nuxt_app_components_pagebuilder_props",
+      "nuxt_app_components_pagebuilder_validblocks"
+    ],
+    "40": [
+      "nuxt_app_components_ui_badge_badge",
+      "nuxt_app_components_ui_badge_badge_props",
+      "nuxt_app_components_ui_badge_index",
+      "nuxt_app_components_ui_badge_index_badgevariants"
+    ],
+    "41": [
+      "nuxt_app_components_ui_command_commandinput",
+      "nuxt_app_components_ui_command_commandinput_delegatedprops",
+      "nuxt_app_components_ui_command_commandinput_forwardedprops",
+      "nuxt_app_components_ui_command_commandinput_props"
+    ],
+    "42": [
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubtrigger",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubtrigger_delegatedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubtrigger_forwardedprops",
+      "nuxt_app_components_ui_dropdown_menu_dropdownmenusubtrigger_props"
+    ],
+    "43": [
+      "nuxt_app_components_ui_navigation_menu_navigationmenuindicator",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuindicator_delegatedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuindicator_forwardedprops",
+      "nuxt_app_components_ui_navigation_menu_navigationmenuindicator_props"
+    ],
+    "44": [
+      "nuxt_app_components_ui_select_select",
+      "nuxt_app_components_ui_select_select_emits",
+      "nuxt_app_components_ui_select_select_forwarded",
+      "nuxt_app_components_ui_select_select_props"
+    ],
+    "45": [
+      "nuxt_app_components_ui_select_selectscrolldownbutton",
+      "nuxt_app_components_ui_select_selectscrolldownbutton_delegatedprops",
+      "nuxt_app_components_ui_select_selectscrolldownbutton_forwardedprops",
+      "nuxt_app_components_ui_select_selectscrolldownbutton_props"
+    ],
+    "46": [
+      "nuxt_app_components_ui_select_selectscrollupbutton",
+      "nuxt_app_components_ui_select_selectscrollupbutton_delegatedprops",
+      "nuxt_app_components_ui_select_selectscrollupbutton_forwardedprops",
+      "nuxt_app_components_ui_select_selectscrollupbutton_props"
+    ],
+    "47": [
+      "nuxt_app_components_ui_select_selecttrigger",
+      "nuxt_app_components_ui_select_selecttrigger_delegatedprops",
+      "nuxt_app_components_ui_select_selecttrigger_forwardedprops",
+      "nuxt_app_components_ui_select_selecttrigger_props"
+    ],
+    "48": [
+      "nuxt_app_components_ui_separator_index",
+      "nuxt_app_components_ui_separator_separator",
+      "nuxt_app_components_ui_separator_separator_delegatedprops",
+      "nuxt_app_components_ui_separator_separator_props"
+    ],
+    "49": [
+      "nuxt_app_layouts_default",
+      "nuxt_app_layouts_default_footer",
+      "nuxt_app_layouts_default_isvisualeditingenabled_apply",
+      "nuxt_app_layouts_default_navigation"
+    ],
+    "50": [
+      "nuxt_app_components_base_container",
+      "nuxt_app_components_base_container_as_div_classname_role",
+      "nuxt_app_components_base_container_containerprops"
+    ],
+    "51": [
+      "nuxt_tsconfig",
+      "nuxt_tsconfig_extends",
+      "ref_nuxt_tsconfig_json"
+    ],
+    "52": [
+      "directus_sdk",
+      "nuxt_package_dependencies_directus_sdk"
+    ],
+    "53": [
+      "directus_visual_editing",
+      "nuxt_package_dependencies_directus_visual_editing"
+    ],
+    "54": [
+      "formkit_auto_animate",
+      "nuxt_package_dependencies_formkit_auto_animate"
+    ],
+    "55": [
+      "hookform_resolvers",
+      "nuxt_package_dependencies_hookform_resolvers"
+    ],
+    "56": [
+      "iconify_utils",
+      "nuxt_package_dependencies_iconify_utils"
+    ],
+    "57": [
+      "lucide_vue_next",
+      "nuxt_package_dependencies_lucide_vue_next"
+    ],
+    "58": [
+      "nuxt",
+      "nuxt_package_dependencies_nuxt"
+    ],
+    "59": [
+      "nuxt_app_components_base_headline",
+      "nuxt_app_components_base_headline_headlineprops"
+    ],
+    "60": [
+      "nuxt_app_components_base_tagline",
+      "nuxt_app_components_base_tagline_taglineprops"
+    ],
+    "61": [
+      "nuxt_app_composables_uselivepreview",
+      "nuxt_app_composables_uselivepreview_uselivepreview"
+    ],
+    "62": [
+      "nuxt_app_utils_singularize",
+      "nuxt_app_utils_singularize_singularize"
+    ],
+    "63": [
+      "nuxt_app_utils_title_case",
+      "nuxt_app_utils_title_case_totitlecase"
+    ],
+    "64": [
+      "nuxt_fonts",
+      "nuxt_package_dependencies_nuxt_fonts"
+    ],
+    "65": [
+      "nuxt_image",
+      "nuxt_package_dependencies_nuxt_image"
+    ],
+    "66": [
+      "nuxt_package_dependencies_nuxt_scripts",
+      "nuxt_scripts"
+    ],
+    "67": [
+      "nuxt_package_dependencies_nuxt_security",
+      "nuxt_security"
+    ],
+    "68": [
+      "nuxt_package_dependencies_nuxtjs_color_mode",
+      "nuxtjs_color_mode"
+    ],
+    "69": [
+      "nuxt_package_dependencies_nuxtjs_seo",
+      "nuxtjs_seo"
+    ],
+    "70": [
+      "nuxt_package_dependencies_nuxtjs_sitemap",
+      "nuxtjs_sitemap"
+    ],
+    "71": [
+      "nuxt_package_dependencies_nuxtjs_tailwindcss",
+      "nuxtjs_tailwindcss"
+    ],
+    "72": [
+      "nuxt_package_dependencies_radix_vue",
+      "radix_vue"
+    ],
+    "73": [
+      "nuxt_package_dependencies_sharp",
+      "sharp"
+    ],
+    "74": [
+      "nuxt_package_dependencies_tailwind_merge",
+      "tailwind_merge"
+    ],
+    "75": [
+      "nuxt_package_dependencies_tailwindcss_animate",
+      "tailwindcss_animate"
+    ],
+    "76": [
+      "nuxt_package_dependencies_unhead_schema_org",
+      "unhead_schema_org"
+    ],
+    "77": [
+      "nuxt_package_dependencies_unhead_vue",
+      "unhead_vue"
+    ],
+    "78": [
+      "nuxt_package_dependencies_vee_validate",
+      "vee_validate"
+    ],
+    "79": [
+      "nuxt_package_dependencies_vee_validate_zod",
+      "vee_validate_zod"
+    ],
+    "80": [
+      "nuxt_package_dependencies_vue_hook_form",
+      "vue_hook_form"
+    ],
+    "81": [
+      "nuxt_package_dependencies_vueuse_core",
+      "vueuse_core"
+    ],
+    "82": [
+      "nuxt_package_dependencies_vueuse_nuxt",
+      "vueuse_nuxt"
+    ],
+    "83": [
+      "nuxt_package_dependencies_zod",
+      "zod"
+    ],
+    "84": [
+      "nuxt_server_api_posts_index_get",
+      "nuxt_server_api_posts_index_get_queryschema"
+    ],
+    "85": [
+      "nuxt_tailwind_config",
+      "nuxt_tailwind_config_config"
+    ],
+    "86": [
+      "nuxt_app_app"
+    ],
+    "87": [
+      "nuxt_app_app_config"
+    ],
+    "88": [
+      "nuxt_app_error"
+    ],
+    "89": [
+      "nuxt_eslint_config"
+    ],
+    "90": [
+      "nuxt_nuxt_config"
+    ],
+    "91": [
+      "nuxt_server_api_search_get"
+    ],
+    "92": [
+      "nuxt_server_api_site_data_get"
+    ],
+    "93": [
+      "nuxt_server_api_sitemap_get"
+    ]
+  },
+  "cohesion": {
+    "0": 0.038461538461538464,
+    "1": 0.043478260869565216,
+    "2": 0.043478260869565216,
+    "3": 0.046511627906976744,
+    "4": 0.05128205128205128,
+    "5": 0.05873015873015873,
+    "6": 0.06349206349206349,
+    "7": 0.05555555555555555,
+    "8": 0.07862903225806452,
+    "9": 0.07126436781609195,
+    "10": 0.10826210826210826,
+    "11": 0.11076923076923077,
+    "12": 0.09523809523809523,
+    "13": 0.1895424836601307,
+    "14": 0.11764705882352941,
+    "15": 0.11764705882352941,
+    "16": 0.14285714285714285,
+    "17": 0.13333333333333333,
+    "18": 0.14285714285714285,
+    "19": 0.16666666666666666,
+    "20": 0.18181818181818182,
+    "21": 0.18181818181818182,
+    "22": 0.2,
+    "23": 0.2222222222222222,
+    "24": 0.2777777777777778,
+    "25": 0.2222222222222222,
+    "26": 0.2222222222222222,
+    "27": 0.38095238095238093,
+    "28": 0.3333333333333333,
+    "29": 0.4,
+    "30": 0.3333333333333333,
+    "31": 0.3333333333333333,
+    "32": 0.3333333333333333,
+    "33": 0.4,
+    "34": 0.4,
+    "35": 0.4,
+    "36": 0.4,
+    "37": 0.4,
+    "38": 0.4,
+    "39": 0.5,
+    "40": 0.6666666666666666,
+    "41": 0.5,
+    "42": 0.5,
+    "43": 0.5,
+    "44": 0.5,
+    "45": 0.5,
+    "46": 0.5,
+    "47": 0.5,
+    "48": 0.5,
+    "49": 0.5,
+    "50": 0.6666666666666666,
+    "51": 0.6666666666666666,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0
+  },
+  "gods": [
+    {
+      "id": "nuxt_shared_utils_cn",
+      "label": "cn()",
+      "degree": 61
+    },
+    {
+      "id": "nuxt_shared_types_schema_collectionnames",
+      "label": "CollectionNames",
+      "degree": 52
+    },
+    {
+      "id": "nuxt_package_overrides",
+      "label": "overrides",
+      "degree": 22
+    },
+    {
+      "id": "nuxt_package_scripts",
+      "label": "scripts",
+      "degree": 11
+    },
+    {
+      "id": "nuxt_shared_types_schema_formfield",
+      "label": "FormField",
+      "degree": 8
+    },
+    {
+      "id": "nuxt_shared_types_schema_post",
+      "label": "Post",
+      "degree": 6
+    },
+    {
+      "id": "nuxt_app_utils_visualediting_setattr",
+      "label": "setAttr()",
+      "degree": 6
+    },
+    {
+      "id": "nuxt_components_tailwind",
+      "label": "tailwind",
+      "degree": 6
+    },
+    {
+      "id": "nuxt_app_components_ui_button_index_buttonvariants",
+      "label": "ButtonVariants",
+      "degree": 5
+    },
+    {
+      "id": "nuxt_app_lib_zodschemabuilder_buildzodschema",
+      "label": "buildZodSchema()",
+      "degree": 5
+    }
+  ],
+  "surprises": [
+    {
+      "source": "useVisualEditing()",
+      "target": "setAttr()",
+      "source_files": [
+        "nuxt/app/composables/useVisualEditing.ts",
+        "nuxt/app/utils/visualEditing.ts"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `useVisualEditing()` unexpectedly reaches hub `setAttr()`"
+    },
+    {
+      "source": "CustomFormData",
+      "target": "FormField",
+      "source_files": [
+        "nuxt/app/components/forms/FormBuilder.vue",
+        "nuxt/shared/types/schema.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "peripheral node `CustomFormData` unexpectedly reaches hub `FormField`"
+    },
+    {
+      "source": "PostsProps",
+      "target": "Post",
+      "source_files": [
+        "nuxt/app/components/block/Posts.vue",
+        "nuxt/shared/types/schema.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "peripheral node `PostsProps` unexpectedly reaches hub `Post`"
+    },
+    {
+      "source": "Props",
+      "target": "ButtonVariants",
+      "source_files": [
+        "nuxt/app/components/ui/button/Button.vue",
+        "nuxt/app/components/ui/button/index.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "peripheral node `Props` unexpectedly reaches hub `ButtonVariants`"
+    },
+    {
+      "source": "schema",
+      "target": "buildZodSchema()",
+      "source_files": [
+        "nuxt/app/components/forms/DynamicForm.vue",
+        "nuxt/app/lib/zodSchemaBuilder.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `schema` unexpectedly reaches hub `buildZodSchema()`"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `cn()` connect `cn` to `dropdown-menu/index.ts`, `BaseFormField.vue`, `dialog/index.ts`, `BaseButton.vue`, `navigation-menu/index.ts`, `FormDescription.vue`, `command/index.ts`, `select/index.ts`, `TooltipContent.vue`, `PopoverContent.vue`, `utils.ts`, `RadioGroup.vue`, `Checkbox.vue`, `CommandList.vue`, `SelectContent.vue`, `Badge.vue`, `CommandInput.vue`, `DropdownMenuSubTrigger.vue`, `NavigationMenuIndicator.vue`, `SelectScrollDownButton.vue`, `SelectScrollUpButton.vue`, `SelectTrigger.vue`, `Separator.vue`?",
+      "why": "High betweenness centrality (0.167) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `CollectionNames` connect `CollectionNames` to `schema.ts`?",
+      "why": "High betweenness centrality (0.079) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `dependencies` connect `dependencies` to `overrides`, `@directus/sdk`, `@directus/visual-editing`, `@formkit/auto-animate`, `@hookform/resolvers`, `@iconify/utils`, `lucide-vue-next`, `nuxt`, `@nuxt/fonts`, `@nuxt/image`, `@nuxt/scripts`, `nuxt-security`, `@nuxtjs/color-mode`, `@nuxtjs/seo`, `@nuxtjs/sitemap`, `@nuxtjs/tailwindcss`, `radix-vue`, `sharp`, `tailwind-merge`, `tailwindcss-animate`, `@unhead/schema-org`, `@unhead/vue`, `vee-validate`, `@vee-validate/zod`, `vue-hook-form`, `@vueuse/core`, `@vueuse/nuxt`, `zod`?",
+      "why": "High betweenness centrality (0.020) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `SubmissionValue`, `ApplyOptions`, `ApplyOptions` to the rest of the system?",
+      "why": "543 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `CollectionNames` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.038461538461538464 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `dropdown-menu/index.ts` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.043478260869565216 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `schema.ts` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.043478260869565216 - nodes in this community are weakly interconnected."
+    }
+  ]
+}
