@@ -22,6 +22,8 @@ const isSplit = computed(() => props.hero.template === 'hero_split_screen');
 interface Slide {
 	model: string;
 	image: string;
+	/** Literal Tailwind object-position class (kept whole so the JIT scanner picks it up). */
+	focal?: string;
 	alt: string;
 	eyebrow: string;
 	/** Headline lead-in; `highlight` is painted Mitsubishi Red after it. */
@@ -43,6 +45,7 @@ const SLIDES: Slide[] = [
 	{
 		model: 'triton',
 		image: '/images/main-hero/24MY_TRITON_ALL-NEW_LHD_MV_Intro_P_proxy.png',
+		focal: 'object-[center_60%]',
 		alt: 'All-new Mitsubishi Triton pickup',
 		eyebrow: 'The Workhorse',
 		headline: 'Engineered beyond ',
@@ -51,8 +54,8 @@ const SLIDES: Slide[] = [
 	},
 	{
 		model: 'xpander-cross',
-		image: '/images/main-hero/2023-xpander-glamour1.jpg',
-		alt: 'Mitsubishi Xpander parked on a sunlit brick driveway',
+		image: '/images/main-hero/2023-xpander-cross-glamour3-1536x1025.jpg',
+		alt: 'Mitsubishi Xpander Cross on a wet coastal hairpin road',
 		eyebrow: '7-Seater Adventure',
 		headline: 'Expand your ',
 		highlight: 'horizons.',
@@ -128,7 +131,7 @@ const headlineParts = computed(() => {
 				:fetchpriority="index === 0 ? 'high' : 'low'"
 				decoding="async"
 				class="absolute inset-0 -z-10 h-full w-full object-cover transition-opacity duration-1000 ease-in-out motion-reduce:transition-none"
-				:class="index === active ? 'opacity-100' : 'opacity-0'"
+				:class="[index === active ? 'opacity-100' : 'opacity-0', slide.focal]"
 			/>
 			<div class="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 via-black/45 to-transparent" aria-hidden="true" />
 			<!-- Floor fade keeps the indicators legible over bright pavement -->

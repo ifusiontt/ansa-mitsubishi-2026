@@ -480,7 +480,7 @@ for (const headline of RETIRED_HEADLINES) {
 const HERO_SLIDE_IMAGES = [
 	'/images/main-hero/2025-outlander-sport-glamour-1-2048x1447.webp',
 	'/images/main-hero/24MY_TRITON_ALL-NEW_LHD_MV_Intro_P_proxy.png',
-	'/images/main-hero/2023-xpander-glamour1.jpg',
+	'/images/main-hero/2023-xpander-cross-glamour3-1536x1025.jpg',
 ];
 // Only the active slide's CTA is server-rendered; the rest swap in client-side.
 const HERO_SLIDE_LINKS = ['/showroom/outlander-sport'];
