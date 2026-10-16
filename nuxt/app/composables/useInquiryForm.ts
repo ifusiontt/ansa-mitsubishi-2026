@@ -115,7 +115,7 @@ export function useInquiryForm<S extends ZodTypeAny>(type: InquiryType, schema: 
 }
 
 /**
- * Maps `?vehicle=` (a slug like `2025-outlander-sport`, `xpander-cross`, or a model name)
+ * Maps `?vehicle=` (a slug like `outlander-sport`, `xpander-cross`, or a model name)
  * to a VEHICLE_MODEL_OPTIONS label, for pre-selecting the inquiry form's vehicle.
  */
 export function useInquiryVehicleQuery() {

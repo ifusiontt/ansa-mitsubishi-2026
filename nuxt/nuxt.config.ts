@@ -74,6 +74,16 @@ export default defineNuxtConfig({
 
 	devtools: { enabled: true },
 
+	// Legacy-site SEO redirects (permanent) plus the old Outlander Sport slug.
+	routeRules: {
+		'/models/all-new-triton': { redirect: { to: '/showroom/triton', statusCode: 301 } },
+		'/models/xpander-cross': { redirect: { to: '/showroom/xpander-cross', statusCode: 301 } },
+		'/models/eclipse-cross': { redirect: { to: '/showroom/outlander-sport', statusCode: 301 } },
+		'/models': { redirect: { to: '/#models', statusCode: 301 } },
+		'/models/**': { redirect: { to: '/#models', statusCode: 301 } },
+		'/showroom/2025-outlander-sport': { redirect: { to: '/showroom/outlander-sport', statusCode: 301 } },
+	},
+
 	// Image Configuration - https://image.nuxt.com/providers/directus
 	image: {
 		directus: {

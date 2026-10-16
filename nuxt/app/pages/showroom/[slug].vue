@@ -51,7 +51,12 @@ const heroVideoUrl = computed(() => vehicle.hero_video_url || '');
 const heroKicker = computed(() => [vehicle.model_year, vehicle.category].filter(Boolean).join(' '));
 
 const colors = computed<VehiclePageColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
-const trims = computed<VehiclePageTrim[]>(() => [...(vehicle.trims ?? [])].sort((a, b) => a.trim_name.localeCompare(b.trim_name)));
+// Cheapest first so index 0 (the default selection) is the entry trim; unpriced trims go last.
+const trims = computed<VehiclePageTrim[]>(() =>
+	[...(vehicle.trims ?? [])].sort(
+		(a, b) => (a.price ?? Infinity) - (b.price ?? Infinity) || a.trim_name.localeCompare(b.trim_name),
+	),
+);
 
 const selectedColorIdx = ref(0);
 const selectedColor = computed<VehiclePageColor | null>(() => colors.value[selectedColorIdx.value] ?? null);

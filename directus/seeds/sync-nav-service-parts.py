@@ -45,7 +45,7 @@ def req(method, path, body=None, expect=(200, 201, 204)):
 # Desired nav: (url, title, sort) — all local Nuxt routes
 DESIRED = [
     ('/', 'Home', 1),
-    ('/showroom/2025-outlander-sport', 'Showroom', 2),
+    ('/showroom/outlander-sport', 'Showroom', 2),
     ('/about', 'About', 3),
     ('/service', 'Service', 4),
     ('/parts', 'Parts', 5),

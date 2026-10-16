@@ -2,9 +2,9 @@ import type { VehicleSummary } from '#shared/types/vehicle';
 
 /**
  * Active 2026 fleet, in display order. Slugs must match `vehicles.slug` in
- * Directus (Outlander Sport is seeded as `2025-outlander-sport`).
+ * Directus (Outlander Sport is seeded as `outlander-sport`).
  */
-const FLEET_SLUGS = ['2025-outlander-sport', 'triton', 'xpander-cross', 'xpander'];
+const FLEET_SLUGS = ['outlander-sport', 'triton', 'xpander-cross', 'xpander'];
 
 /**
  * Vehicle list handler — published fleet index for the header mega menu.

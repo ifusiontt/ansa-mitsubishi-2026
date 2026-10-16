@@ -2,7 +2,7 @@
 /**
  * seed-outlander-vehicle.mjs
  *
- * Populates the "Mitsubishi Outlander Sport" vehicle entry (slug: 2025-outlander-sport)
+ * Populates the "Mitsubishi Outlander Sport" vehicle entry (slug: outlander-sport)
  * in Directus with media, colors, highlights, and trim corrections.
  *
  * Source assets:
@@ -55,7 +55,7 @@ const TOKEN = loadToken();
 const BASE = process.env.DIRECTUS_URL || 'http://localhost:8055';
 const H = { Authorization: `Bearer ${TOKEN}` };
 
-const VEHICLE_SLUG = '2025-outlander-sport';
+const VEHICLE_SLUG = 'outlander-sport';
 const FOLDER_NAME = 'Outlander Sport';
 const ASSET_ROOT = path.join(
 	ROOT,

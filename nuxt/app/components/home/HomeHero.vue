@@ -24,6 +24,8 @@ interface Slide {
 	image: string;
 	/** Literal Tailwind object-position class (kept whole so the JIT scanner picks it up). */
 	focal?: string;
+	/** Copy side; 'right' mirrors the scrim and anchors copy right so a left-placed car stays clear. */
+	align?: 'left' | 'right';
 	alt: string;
 	eyebrow: string;
 	/** Headline lead-in; `highlight` is painted Mitsubishi Red after it. */
@@ -55,6 +57,7 @@ const SLIDES: Slide[] = [
 	{
 		model: 'xpander-cross',
 		image: '/images/main-hero/2023-xpander-cross-glamour3-1536x1025.jpg',
+		align: 'right',
 		alt: 'Mitsubishi Xpander Cross on a wet coastal hairpin road',
 		eyebrow: '7-Seater Adventure',
 		headline: 'Expand your ',
@@ -75,6 +78,7 @@ const visibility = useDocumentVisibility();
 const reducedMotion = usePreferredReducedMotion();
 
 const activeSlide = computed(() => SLIDES[active.value] ?? SLIDES[0]!);
+const alignRight = computed(() => activeSlide.value.align === 'right');
 
 const autoplay = computed(
 	() => !isSplit.value && !hovered.value && !focused.value && visibility.value === 'visible' && reducedMotion.value !== 'reduce',
@@ -133,7 +137,17 @@ const headlineParts = computed(() => {
 				class="absolute inset-0 -z-10 h-full w-full object-cover transition-opacity duration-1000 ease-in-out motion-reduce:transition-none"
 				:class="[index === active ? 'opacity-100' : 'opacity-0', slide.focal]"
 			/>
-			<div class="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 via-black/45 to-transparent" aria-hidden="true" />
+			<!-- Scrim follows the copy side; both layers crossfade with the slide -->
+			<div
+				class="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 via-black/45 to-transparent transition-opacity duration-1000 motion-reduce:transition-none"
+				:class="alignRight ? 'opacity-0' : 'opacity-100'"
+				aria-hidden="true"
+			/>
+			<div
+				class="absolute inset-0 -z-10 bg-gradient-to-l from-black/90 via-black/45 to-transparent transition-opacity duration-1000 motion-reduce:transition-none"
+				:class="alignRight ? 'opacity-100' : 'opacity-0'"
+				aria-hidden="true"
+			/>
 			<!-- Floor fade keeps the indicators legible over bright pavement -->
 			<div class="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-black/70 to-transparent" aria-hidden="true" />
 
@@ -145,8 +159,11 @@ const headlineParts = computed(() => {
 					leave-active-class="transition duration-300 ease-in motion-reduce:transition-none"
 					leave-to-class="opacity-0"
 				>
-					<div :key="activeSlide.model" class="max-w-2xl">
-						<p class="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em] text-neutral-300">
+					<div :key="activeSlide.model" class="flex max-w-2xl flex-col" :class="alignRight ? 'ml-auto items-end text-right' : 'items-start'">
+						<p
+							class="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em] text-neutral-300"
+							:class="{ 'flex-row-reverse': alignRight }"
+						>
 							<span class="h-px w-10 bg-brand-red" aria-hidden="true" />
 							{{ activeSlide.eyebrow }}
 						</p>
@@ -154,7 +171,7 @@ const headlineParts = computed(() => {
 							{{ activeSlide.headline }}<span class="text-brand-red">{{ activeSlide.highlight }}</span>
 						</h1>
 
-						<div class="mt-10 flex flex-wrap gap-4">
+						<div class="mt-10 flex flex-wrap gap-4" :class="{ 'justify-end': alignRight }">
 							<NuxtLink
 								:to="activeSlide.cta.to"
 								class="inline-block rounded-md bg-brand-red px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"

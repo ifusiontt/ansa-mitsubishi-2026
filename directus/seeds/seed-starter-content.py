@@ -84,7 +84,7 @@ print('3. navigation items')
 # All nav links point to local Nuxt routes (see sync-nav-service-parts.py for the live-DB sync)
 nav_links = [
     (1, 'Home', '/'),
-    (2, 'Showroom', '/showroom/2025-outlander-sport'),
+    (2, 'Showroom', '/showroom/outlander-sport'),
     (3, 'About', '/about'),
     (4, 'Service', '/service'),
     (5, 'Parts', '/parts'),

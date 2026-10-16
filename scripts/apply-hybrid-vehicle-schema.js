@@ -194,7 +194,7 @@ const m2oRelationMeta = (manyCollection, manyField, oneCollection, oneField, sor
 
 const VEHICLE = {
   title: 'Mitsubishi Outlander Sport',
-  slug: '2025-outlander-sport',
+  slug: 'outlander-sport',
   tagline: 'Compact Crossover Ambition For The Urban Explorer',
   hero_headline: 'Outdrive The Limits In Compact Crossover Form',
   starting_price: 255000, // TTD

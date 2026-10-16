@@ -118,7 +118,7 @@ if (fields.includes('*') || fields.includes('menu_image')) {
 const CONTENT_DIR =
 	process.env.CONTENT_DIR || path.join(os.homedir(), 'Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026');
 const CUTOUTS = {
-	'2025-outlander-sport': 'Outlander_Sport_HEV/outlander_menu_cutout.png',
+	'outlander-sport': 'Outlander_Sport_HEV/outlander_menu_cutout.png',
 	triton: 'Triton/triton_menu_cutout.png',
 	'xpander-cross': 'Xpander_Cross/xpander_menu_cutout.png',
 };

@@ -8,7 +8,7 @@ import type { VehiclePage } from '#shared/types/vehicle';
  *
  * Uses the public read policy (field whitelist on vehicles + vehicle_colors),
  * so no static token is required. Nested relations are deep-sorted for stable
- * render order (colors/highlights by `sort`, trims by `trim_name`).
+ * render order (colors/highlights by `sort`, trims by `price` ascending, then `trim_name`, so the entry trim leads).
  *
  * NOTE: `highlights` is the M2O to block_content_items, whose `images` field is
  * an M2M whose items expand to JUNCTION rows in this Directus build. A bare
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
 			deep: {
 				colors: { _sort: ['sort'] },
 				highlights: { _sort: ['sort'] },
-				trims: { _sort: ['trim_name'] },
+				trims: { _sort: ['price', 'trim_name'] },
 			} as any,
 		}),
 	)) as VehiclePage[];

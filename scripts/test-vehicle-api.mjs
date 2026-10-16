@@ -32,7 +32,7 @@
  */
 
 const BASE = process.env.DIRECTUS_URL || 'http://localhost:8055';
-const VEHICLE_SLUG = '2025-outlander-sport';
+const VEHICLE_SLUG = 'outlander-sport';
 
 // ---------------------------------------------------------------------------
 // expected content (must match scripts/seed-outlander-vehicle.mjs)
@@ -367,7 +367,7 @@ try {
 
 console.log('\n── 7. fleet menu cutouts ─────────────────────────────────────────');
 const EXPECTED_CUTOUTS = {
-	'2025-outlander-sport': 'outlander_menu_cutout.png',
+	'outlander-sport': 'outlander_menu_cutout.png',
 	triton: 'triton_menu_cutout.png',
 	'xpander-cross': 'xpander_menu_cutout.png',
 };

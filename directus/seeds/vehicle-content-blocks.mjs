@@ -74,7 +74,7 @@ const getAll = async (urlPath) => (await api('GET', `${urlPath}&limit=-1&cache=f
 // file name (first term wins); `match` lists former headlines of an existing row.
 const VEHICLES = [
 	{
-		slug: '2025-outlander-sport',
+		slug: 'outlander-sport',
 		label: 'Outlander Sport',
 		keywords: ['outlander', 'xfh'],
 		items: [
