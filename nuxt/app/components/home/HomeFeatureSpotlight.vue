@@ -35,12 +35,13 @@ const headline = computed(() => item.value?.headline || DEFAULT_COPY.headline);
 const description = computed(() => item.value?.description || DEFAULT_COPY.description);</script>
 
 <template>
-	<section class="relative isolate w-full overflow-hidden bg-black text-white" aria-labelledby="home-spotlight-heading">
-		<img :src="IMAGE" alt="" loading="lazy" class="absolute inset-0 -z-10 h-full w-full object-cover" />
-		<!-- Shade sits under the card: bottom-up on mobile, left-to-right on desktop -->
+	<section class="relative isolate h-[640px] w-full overflow-hidden bg-black text-white md:h-[720px] xl:h-[820px] 2xl:h-[900px]" aria-labelledby="home-spotlight-heading">
+		<img :src="IMAGE" alt="" loading="lazy" class="absolute inset-0 -z-10 h-full w-full object-cover object-[center_70%] xl:object-[center_65%]" />
+		<!-- Shade sits under the card: bottom-up on mobile, left-to-right on desktop. The card row is
+		     viewport-anchored (no max-w container) so it never drifts onto the car on wide screens. -->
 		<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-transparent lg:bg-gradient-to-r" aria-hidden="true" />
 
-		<div class="mx-auto flex min-h-[560px] max-w-7xl items-center justify-start py-12 pl-8 pr-4 sm:pr-6 md:py-24 md:pl-16 lg:py-32 lg:pl-24">
+		<div class="flex h-full w-full items-center justify-start py-12 pl-8 pr-4 sm:pr-6 md:py-24 md:pl-16 lg:py-32 lg:pl-24">
 			<article
 				class="max-w-md rounded-xl border border-white/10 bg-neutral-900/60 p-8 shadow-2xl shadow-black/50 backdrop-blur-md"
 				:data-directus="item ? setAttr({ collection: 'block_content_items', item: item.id, fields: ['headline', 'description'], mode: 'drawer' }) : undefined"

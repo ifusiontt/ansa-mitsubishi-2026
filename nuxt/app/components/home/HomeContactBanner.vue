@@ -95,8 +95,8 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 			<div class="relative isolate p-8 text-white md:p-10 lg:col-span-5">
 				<img v-if="imageUrl" :src="imageUrl" alt="" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover brightness-125" />
 				<div v-else class="absolute inset-0 -z-20 bg-gradient-to-br from-neutral-800 to-neutral-950" aria-hidden="true" />
-				<!-- Directional scrim: solid behind the headline and the form buttons, open through the middle so the car shows -->
-				<div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/85 via-black/35 to-black/90" aria-hidden="true" />
+				<!-- Deep scrim: the photo reads as texture only, so car lines never cross the form fields -->
+				<div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/90 via-black/80 to-black/95" aria-hidden="true" />
 
 				<p class="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em]">
 					<span class="h-1.5 w-1.5 rounded-full bg-brand-red" aria-hidden="true" />
@@ -106,34 +106,37 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 				<p class="mt-3 text-neutral-300">Schedule a personalized test drive or visit our showroom.</p>
 
 				<form class="mt-8 space-y-4" data-inquiry-form novalidate @submit.prevent="submit">
-					<InquiryField v-slot="attrs" name="full_name" label="Name" required :label-class="labelClass" :error="errors.full_name">
-						<input v-bind="attrs" v-model="values.full_name" type="text" autocomplete="name" :class="inputClass" @blur="touch('full_name')" />
-					</InquiryField>
-					<InquiryField v-slot="attrs" name="phone" label="Phone Number" required :label-class="labelClass" :error="errors.phone">
-						<input
-							v-bind="attrs"
-							v-model="values.phone"
-							type="tel"
-							autocomplete="tel"
-							placeholder="+1 (868) 000-0000"
-							:class="inputClass"
-							@blur="touch('phone')"
-						/>
-					</InquiryField>
-					<InquiryField v-slot="attrs" name="vehicle_model" label="Model" required :label-class="labelClass" :error="errors.vehicle_model">
-						<select v-bind="attrs" v-model="values.vehicle_model" :class="inputClass" @blur="touch('vehicle_model')">
-							<option value="" disabled>Select a model</option>
-							<option v-for="model in VEHICLE_MODEL_OPTIONS" :key="model" :value="model">{{ model }}</option>
-						</select>
-					</InquiryField>
+					<!-- Frosted panel keeps fields and submit on one clean surface -->
+					<div class="space-y-4 rounded-xl border border-white/10 bg-black/55 p-5 backdrop-blur-md">
+						<InquiryField v-slot="attrs" name="full_name" label="Name" required :label-class="labelClass" :error="errors.full_name">
+							<input v-bind="attrs" v-model="values.full_name" type="text" autocomplete="name" :class="inputClass" @blur="touch('full_name')" />
+						</InquiryField>
+						<InquiryField v-slot="attrs" name="phone" label="Phone Number" required :label-class="labelClass" :error="errors.phone">
+							<input
+								v-bind="attrs"
+								v-model="values.phone"
+								type="tel"
+								autocomplete="tel"
+								placeholder="+1 (868) 000-0000"
+								:class="inputClass"
+								@blur="touch('phone')"
+							/>
+						</InquiryField>
+						<InquiryField v-slot="attrs" name="vehicle_model" label="Model" required :label-class="labelClass" :error="errors.vehicle_model">
+							<select v-bind="attrs" v-model="values.vehicle_model" :class="inputClass" @blur="touch('vehicle_model')">
+								<option value="" disabled>Select a model</option>
+								<option v-for="model in VEHICLE_MODEL_OPTIONS" :key="model" :value="model">{{ model }}</option>
+							</select>
+						</InquiryField>
 
-					<button
-						type="submit"
-						:disabled="loading"
-						class="w-full rounded-md bg-brand-red px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:cursor-wait disabled:opacity-70"
-					>
-						{{ loading ? 'Sending…' : 'Request Test Drive' }}
-					</button>
+						<button
+							type="submit"
+							:disabled="loading"
+							class="w-full rounded-md bg-brand-red px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:cursor-wait disabled:opacity-70"
+						>
+							{{ loading ? 'Sending…' : 'Request Test Drive' }}
+						</button>
+					</div>
 
 					<p v-if="status === 'success'" role="status" class="rounded-md border border-emerald-400/40 bg-emerald-500/15 px-4 py-3 text-sm text-emerald-100">
 						Thank you! A sales consultant will call you to arrange your test drive.

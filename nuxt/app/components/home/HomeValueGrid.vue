@@ -50,7 +50,7 @@ const cards = computed(() => {
 			<li
 				v-for="card in cards"
 				:key="card.key"
-				class="group relative isolate flex min-h-[580px] flex-col justify-end overflow-hidden bg-neutral-900 text-white lg:min-h-[620px]"
+				class="group relative isolate flex min-h-[640px] flex-col justify-end overflow-hidden bg-neutral-900 text-white lg:min-h-[720px] xl:min-h-[840px] 2xl:min-h-[940px]"
 				:data-directus="card.id ? setAttr({ collection: 'block_content_items', item: card.id, fields: ['tagline', 'headline', 'description', 'images'], mode: 'drawer' }) : undefined"
 			>
 				<img
@@ -63,7 +63,7 @@ const cards = computed(() => {
 				<!-- Fallback until photography is attached in Directus -->
 				<div v-else class="absolute inset-0 -z-20 bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-950" aria-hidden="true" />
 				<!-- Scrim covers only the lower 60% (densest in the bottom third, under the text); the top of each photo stays untouched -->
-				<div class="absolute inset-x-0 bottom-0 -z-10 h-[60%] bg-gradient-to-t from-black/95 via-black/45 to-transparent" aria-hidden="true" />
+				<div class="absolute inset-x-0 bottom-0 -z-10 h-[60%] bg-gradient-to-t from-black/95 via-black/50 to-transparent" aria-hidden="true" />
 
 				<div class="p-8 lg:p-12">
 					<p v-if="card.tagline" class="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-white">
