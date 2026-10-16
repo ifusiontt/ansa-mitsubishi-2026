@@ -53,6 +53,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ensureHeroMedia } from './lib/hero-media.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -565,11 +566,16 @@ async function ensureVehicle(vehicle) {
 // step 3 — hero block
 // ---------------------------------------------------------------------------
 
+/** Lifestyle still from scripts/lib/hero-media.mjs when mapped, else the configured studio exterior. */
+async function heroMediaId(vehicle) {
+	return (await ensureHeroMedia({ base: BASE, headers: H, root: ROOT, slug: vehicle.slug })) ?? fileByRel(vehicle, vehicle.hero.media);
+}
+
 async function ensureHero(vehicle, row) {
 	let heroId = row.hero_block;
 	if (heroId) {
 		// update hero copy + media
-		const mediaId = fileByRel(vehicle, vehicle.hero.media);
+		const mediaId = await heroMediaId(vehicle);
 		const patch = {
 			title: vehicle.hero.title,
 			highlight_keyword: vehicle.hero.highlight_keyword,
@@ -581,7 +587,7 @@ async function ensureHero(vehicle, row) {
 		console.log(`  hero: updated ${heroId.slice(0, 8)}.. → media ${mediaId.slice(0, 8)}..`);
 		return heroId;
 	}
-	const mediaId = fileByRel(vehicle, vehicle.hero.media);
+	const mediaId = await heroMediaId(vehicle);
 	const created = await api('POST', '/items/block_hero_custom', {
 		title: vehicle.hero.title,
 		highlight_keyword: vehicle.hero.highlight_keyword,

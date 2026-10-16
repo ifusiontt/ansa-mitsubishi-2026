@@ -31,6 +31,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ensureHeroMedia } from './lib/hero-media.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -477,13 +478,14 @@ for (const [id, newName] of Object.entries(TRIM_RENAMES)) {
 }
 
 // ---------------------------------------------------------------------------
-// step 6 — hero media (replace placeholder with real exterior photography)
+// step 6 — hero media: the lifestyle still from scripts/lib/hero-media.mjs (shared with
+// sync-vehicle-hero-media.mjs); the studio exterior is only a fallback for unmapped slugs
 // ---------------------------------------------------------------------------
 
 if (vehicle.hero_block) {
-	const heroImgId = fileByRel(PICKS.hero);
+	const heroImgId = (await ensureHeroMedia({ base: BASE, headers: H, root: ROOT, slug: VEHICLE_SLUG })) ?? fileByRel(PICKS.hero);
 	await api('PATCH', `/items/block_hero_custom/${vehicle.hero_block}`, { media: heroImgId });
-	console.log(`hero: media → ${heroImgId.slice(0, 8)}.. (${PICKS.hero})`);
+	console.log(`hero: media → ${heroImgId.slice(0, 8)}..`);
 }
 
 // ---------------------------------------------------------------------------

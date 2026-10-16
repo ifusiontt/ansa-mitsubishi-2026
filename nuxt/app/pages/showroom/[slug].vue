@@ -3,6 +3,7 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 import type { VehiclePageColor, VehiclePage, VehiclePageTrim } from '#shared/types/vehicle';
 import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
 import VehicleHighlights from '~/components/showroom/VehicleHighlights.vue';
+import VehicleHeroStage from '~/components/showroom/VehicleHeroStage.vue';
 
 /**
  * /showroom/[slug] — 8-part vehicle page.
@@ -45,10 +46,6 @@ const heroMedia = computed(() => {
 	if (!media) return '';
 	return typeof media === 'string' ? media : media.id ?? '';
 });
-
-// Optional background video (vehicles.hero_video_url); falls back to heroMedia.
-const heroVideoUrl = computed(() => vehicle.hero_video_url || '');
-const heroKicker = computed(() => [vehicle.model_year, vehicle.category].filter(Boolean).join(' '));
 
 const colors = computed<VehiclePageColor[]>(() => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort));
 // Cheapest first so index 0 (the default selection) is the entry trim; unpriced trims go last.
@@ -154,70 +151,8 @@ useSeoMeta({
 
 <template>
 	<div class="vehicle-page">
-		<!-- ════════════════════════════════════════════════════════════
-		     PART 1 · HERO — immersive dark hero (hero_block)
-	     ════════════════════════════════════════════════════════════ -->
-		<section
-			id="hero"
-			class="relative flex items-end md:items-center min-h-[min(92svh,860px)] overflow-hidden bg-slate-950"
-			aria-labelledby="hero-heading"
-		>
-			<!-- Background: looping video when provided, else the hero image -->
-			<video
-				v-if="heroVideoUrl"
-				:src="heroVideoUrl"
-				:poster="heroMedia ? getDirectusAssetURL(heroMedia) : undefined"
-				autoplay
-				loop
-				muted
-				playsinline
-				class="absolute inset-0 w-full h-full object-cover"
-				aria-hidden="true"
-			/>
-			<DirectusImage
-				v-else-if="heroMedia"
-				:uuid="heroMedia"
-				alt=""
-				loading="eager"
-				class="absolute inset-0 w-full h-full object-cover"
-				aria-hidden="true"
-			/>
-
-			<!-- Legibility scrims: left-to-right for the copy, bottom-up for the fold -->
-			<div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/50 to-transparent" aria-hidden="true" />
-			<div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/30" aria-hidden="true" />
-
-			<div class="vp-container relative z-10 py-24 md:py-32">
-				<div class="max-w-2xl text-left z-10 relative">
-					<p v-if="heroKicker" class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">{{ heroKicker }}</p>
-					<h1 id="hero-heading" class="text-4xl md:text-6xl font-extrabold uppercase tracking-tight text-white mb-3">
-						{{ displayTitle }}
-					</h1>
-					<p v-if="heroBlock?.headline" class="text-lg md:text-xl font-bold uppercase tracking-wider text-slate-200 mb-4">
-						{{ heroBlock.headline }}
-					</p>
-					<p v-if="heroBlock?.body" class="text-sm text-slate-300 max-w-lg mb-8 leading-relaxed">{{ heroBlock.body }}</p>
-					<div class="flex flex-wrap gap-4 justify-start">
-						<a
-							href="#trims"
-							class="inline-block bg-brand-red hover:bg-brand-red-dark text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-							@click.prevent="scrollToSection('trims')"
-						>
-							View Trims &amp; Pricing
-						</a>
-						<a
-							v-if="vehicle.brochure_url"
-							:href="vehicle.brochure_url"
-							target="_blank"
-							rel="noopener"
-							class="inline-block border border-white/40 hover:border-white text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-						>
-							Download Brochure
-						</a>
-					</div>
-				</div>
-			</div>
-		</section>
+		<!-- PART 1 · HERO — full-bleed stage (video or hero_block.media) -->
+		<VehicleHeroStage :vehicle="vehicle" :hero-image="vehicle.hero_block?.media" />
 
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 2 · OVERVIEW — tagline, headline, copy + facts strip
