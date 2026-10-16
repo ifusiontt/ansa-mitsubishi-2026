@@ -43,7 +43,7 @@ const cards = computed(() => {
 </script>
 
 <template>
-	<section class="bg-white py-24 text-neutral-950 dark:bg-black dark:text-white md:py-32" aria-labelledby="home-value-heading">
+	<section class="bg-white py-12 text-neutral-950 dark:bg-black dark:text-white md:py-24 lg:py-32" aria-labelledby="home-value-heading">
 		<h2 id="home-value-heading" class="sr-only">{{ block?.tagline || 'The ANSA Difference' }}</h2>
 		<!-- Full-bleed, edge-to-edge panels -->
 		<ul class="grid w-full max-w-none grid-cols-1 gap-0 px-0 md:grid-cols-3">

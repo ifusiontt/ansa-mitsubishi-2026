@@ -59,7 +59,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 		/>
 
 		<div class="mx-auto grid max-w-7xl items-center px-4 sm:px-6 lg:grid-cols-12 lg:px-16">
-			<div class="py-24 md:py-32 lg:col-span-4">
+			<div class="py-12 md:py-24 lg:col-span-4 lg:py-32">
 				<p class="text-xs font-bold uppercase tracking-[0.3em] text-brand-red">Colour Studio</p>
 				<h2 id="home-colors-heading" class="mt-3 text-3xl font-black uppercase tracking-tight md:text-5xl">Explore colour options</h2>
 				<p class="mt-4 text-neutral-600 dark:text-neutral-400">Preview factory paint options across the 2026 lineup.</p>
@@ -129,7 +129,7 @@ const renderUrls = computed(() => colors.value.map((_, index) => colorRenderUrl(
 
 			<!-- Mobile: full-bleed dark panel; desktop: transparent over the wedge. -->
 			<div
-				class="relative isolate -mx-4 overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-950 to-[#0b1630] px-4 py-16 text-white sm:-mx-6 sm:px-6 md:py-24 lg:col-span-8 lg:mx-0 lg:overflow-visible lg:bg-none lg:py-32 lg:pl-20 lg:pr-0"
+				class="relative isolate -mx-4 overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-950 to-[#0b1630] px-4 py-12 text-white sm:-mx-6 sm:px-6 md:py-24 lg:col-span-8 lg:mx-0 lg:overflow-visible lg:bg-none lg:py-32 lg:pl-20 lg:pr-0"
 			>
 				<!-- Glow tinted toward the active paint; `currentColor` lets the colour change animate. -->
 				<div

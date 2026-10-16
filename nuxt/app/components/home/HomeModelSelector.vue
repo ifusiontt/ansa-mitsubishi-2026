@@ -45,7 +45,7 @@ const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 <template>
 	<section
 		id="models"
-		class="scroll-mt-20 bg-[#F6F7F9] py-24 text-neutral-950 dark:bg-black dark:text-white md:py-32"
+		class="scroll-mt-20 bg-[#F6F7F9] py-12 text-neutral-950 dark:bg-black dark:text-white md:py-24 lg:py-32"
 		aria-labelledby="home-models-heading"
 	>
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
@@ -55,13 +55,13 @@ const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 				Engineered for performance, capability, and reliability across Trinidad &amp; Tobago.
 			</p>
 
-			<ul class="mt-14 flex flex-wrap justify-center gap-6">
+			<ul class="mt-10 flex flex-wrap justify-center gap-6 md:mt-14">
 				<li v-for="vehicle in vehicles" :key="vehicle.id" class="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc((100%-3rem)/3)]">
 					<article
-						class="group relative flex h-full min-h-[480px] flex-col justify-between overflow-hidden rounded-xl border border-t-2 border-neutral-200/80 border-t-brand-red bg-white shadow-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-brand-red hover:-translate-y-1.5 hover:shadow-xl dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900"
+						class="group relative flex h-full min-h-[420px] md:min-h-[480px] flex-col justify-between overflow-hidden rounded-xl border border-t-2 border-neutral-200/80 border-t-brand-red bg-white shadow-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-brand-red hover:-translate-y-1.5 hover:shadow-xl dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900"
 					>
 						<!-- Studio stage -->
-						<div class="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-b from-neutral-100/70 to-transparent p-6 dark:from-neutral-800/50">
+						<div class="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-b from-neutral-100/70 to-transparent p-4 md:h-52 md:p-6 dark:from-neutral-800/50">
 							<div class="relative h-full w-full">
 								<div
 									class="absolute inset-x-0 bottom-[-2%] mx-auto h-5 w-[85%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.1)_45%,transparent_72%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.8)_0%,transparent_72%)]"
@@ -90,7 +90,7 @@ const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 							</dl>
 						</div>
 
-						<div class="flex flex-1 flex-col p-6">
+						<div class="flex flex-1 flex-col p-4 md:p-6">
 							<span
 								v-if="vehicle.category"
 								class="mb-3 w-fit rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"

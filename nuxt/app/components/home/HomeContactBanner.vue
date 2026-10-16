@@ -87,7 +87,7 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 </script>
 
 <template>
-	<section class="bg-white px-4 py-24 text-neutral-950 dark:bg-black dark:text-white sm:px-6 md:py-32" aria-labelledby="home-contact-heading">
+	<section class="bg-white px-4 py-12 text-neutral-950 dark:bg-black dark:text-white sm:px-6 md:py-24 lg:py-32" aria-labelledby="home-contact-heading">
 		<div
 			class="mx-auto grid max-w-6xl grid-cols-1 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900 lg:grid-cols-12"
 		>
@@ -151,11 +151,11 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 					Sales and servicing at every branch. Call ahead or drop in during opening hours.
 				</p>
 
-				<ul class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+				<ul class="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-2">
 					<li
 						v-for="branch in branches"
 						:key="branch.slug"
-						class="group flex flex-col rounded-lg border border-neutral-200 bg-neutral-50 p-4 transition-all hover:border-brand-red dark:border-neutral-700 dark:bg-neutral-800"
+						class="group flex flex-col rounded-lg border border-neutral-200 bg-neutral-50 p-3.5 transition-all sm:p-4 hover:border-brand-red dark:border-neutral-700 dark:bg-neutral-800"
 					>
 						<p class="flex items-center gap-2 font-bold text-neutral-950 dark:text-white">
 							<Icon name="lucide:map-pin" class="h-4 w-4 shrink-0 text-brand-red" aria-hidden="true" />
@@ -163,7 +163,7 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 						</p>
 						<p class="mt-0.5 pl-6 text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{{ branch.role }}</p>
 
-						<div class="mt-3 space-y-1 pl-6 text-sm">
+						<div class="mt-2 space-y-0.5 pl-6 text-sm leading-snug sm:mt-3 sm:space-y-1 sm:leading-normal">
 							<p v-if="branch.address" class="text-neutral-700 dark:text-neutral-300">{{ branch.address }}</p>
 							<a
 								v-if="branch.phone"
@@ -180,7 +180,7 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 							:external="!!branch.mapsUrl"
 							:target="branch.mapsUrl ? '_blank' : undefined"
 							:rel="branch.mapsUrl ? 'noopener' : undefined"
-							class="mt-auto inline-flex items-center gap-1.5 pl-6 pt-4 text-xs font-bold uppercase tracking-widest text-neutral-950 transition-colors hover:text-brand-red dark:text-white"
+							class="mt-auto inline-flex items-center gap-1.5 pl-6 pt-3 text-xs sm:pt-4 font-bold uppercase tracking-widest text-neutral-950 transition-colors hover:text-brand-red dark:text-white"
 						>
 							{{ branch.mapsUrl ? 'View Map' : 'Contact branch' }}
 							<Icon

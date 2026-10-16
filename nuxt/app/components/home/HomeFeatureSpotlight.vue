@@ -49,7 +49,7 @@ const imageUrl = computed(() => {
 		<!-- Shade sits under the card: bottom-up on mobile, right-to-left on desktop -->
 		<div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/30 to-transparent lg:bg-gradient-to-l" aria-hidden="true" />
 
-		<div class="mx-auto flex min-h-[560px] max-w-7xl items-center px-4 py-24 sm:px-6 md:py-32 lg:justify-end lg:px-16">
+		<div class="mx-auto flex min-h-[560px] max-w-7xl items-center px-4 py-12 sm:px-6 md:py-24 lg:py-32 lg:justify-end lg:px-16">
 			<article
 				class="max-w-md rounded-xl border border-white/10 bg-neutral-900/60 p-8 shadow-2xl shadow-black/50 backdrop-blur-md"
 				:data-directus="item ? setAttr({ collection: 'block_content_items', item: item.id, fields: ['headline', 'description', 'images'], mode: 'drawer' }) : undefined"
