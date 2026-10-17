@@ -4,10 +4,12 @@ import type { VehiclePageColor, VehiclePage, VehiclePageTrim } from '#shared/typ
 import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
 import VehicleHighlights from '~/components/showroom/VehicleHighlights.vue';
 import VehicleHeroStage from '~/components/showroom/VehicleHeroStage.vue';
+import VehicleHorizonBar from '~/components/showroom/VehicleHorizonBar.vue';
 
 /**
- * /showroom/[slug] — vehicle page in buyer-journey order: hero → overview → highlights →
- * colours → trims → key specs → brochure → CTA.
+ * /showroom/[slug] — vehicle page in buyer-journey order: hero → sticky horizon bar → overview →
+ * highlights → colours → trims → key specs → brochure → CTA. Every section except the full-bleed
+ * highlight splits and the centred colour stage shares one 1440px container so their left edges line up.
  *
  * Design tokens and spacing metrics are extracted live from the reference site
  * (https://mitsubishi-motors.com.jm/vehicle/2025-outlander-sport/) via
@@ -155,11 +157,14 @@ useSeoMeta({
 		<!-- PART 1 · HERO — full-bleed stage (video or hero_block.media) -->
 		<VehicleHeroStage :vehicle="vehicle" :hero-image="vehicle.hero_block?.media" />
 
+		<!-- Sticky sub-nav: model + price, section jump links, test-drive CTA -->
+		<VehicleHorizonBar :title="vehicle.title" :price="formatPrice(vehicle.starting_price)" />
+
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 2 · OVERVIEW — tagline, headline, copy + facts strip
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="overview" class="vp-section vp-section--white" aria-labelledby="overview-heading">
-			<div class="vp-container">
+		<section id="overview" class="scroll-mt-[13.5rem] vp-section vp-section--white" aria-labelledby="overview-heading">
+			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 				<div class="grid gap-6 md:grid-cols-2 md:gap-12 md:items-end">
 					<div>
 						<p v-if="vehicle.tagline" class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">{{ vehicle.tagline }}</p>
@@ -187,7 +192,7 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 4 · COLORS — centred showroom stage + swatches
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="colors" class="bg-white py-16 lg:py-20 dark:bg-zinc-950" aria-labelledby="colors-heading">
+		<section id="colors" class="scroll-mt-[13.5rem] bg-white py-16 lg:py-20 dark:bg-zinc-950" aria-labelledby="colors-heading">
 			<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<header class="text-center">
 					<p>
@@ -289,8 +294,8 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 5 · TRIMS — selectable trim cards with key features
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="trims" class="vp-section vp-section--mist" aria-label="Trims and pricing">
-			<div class="vp-container">
+		<section id="trims" class="scroll-mt-[13.5rem] vp-section vp-section--mist" aria-label="Trims and pricing">
+			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 				<header class="vp-section-head">
 					<p class="vp-tagline tracking-wider uppercase">Find Your Fit</p>
 					<h2 class="vp-h2 tracking-wider uppercase">Trims &amp; Pricing</h2>
@@ -367,8 +372,8 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 6 · KEY SPECS — dark industrial spec grid
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="specs" class="vp-section vp-section--dark" aria-labelledby="specs-heading">
-			<div class="vp-container">
+		<section id="specs" class="scroll-mt-[13.5rem] vp-section vp-section--dark" aria-labelledby="specs-heading">
+			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 				<header>
 					<p class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">Under the Hood</p>
 					<h2 id="specs-heading" class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-white mb-8">Key Specifications</h2>
@@ -390,8 +395,8 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 7 · BROCHURE — download CTA + at-a-glance card
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="brochure" class="vp-section vp-section--white" aria-labelledby="brochure-heading">
-			<div class="vp-container vp-brochure">
+		<section id="brochure" class="scroll-mt-[13.5rem] vp-section vp-section--white" aria-labelledby="brochure-heading">
+			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 vp-brochure">
 				<div>
 					<p class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">Learn More</p>
 					<h2 id="brochure-heading" class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-slate-900 mb-4">Brochure</h2>
@@ -428,27 +433,29 @@ useSeoMeta({
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 8 · CTA — dealer / contact call to action
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="cta" class="bg-slate-950 text-white py-20 md:py-24 px-4 text-center border-t border-slate-900" aria-labelledby="cta-heading">
-			<p class="text-xs font-bold tracking-widest text-brand-red uppercase mb-3">Next Step</p>
-			<h2 id="cta-heading" class="text-3xl md:text-5xl font-bold uppercase tracking-wider text-white mb-4">
-				Ready to <span class="text-brand-red">{{ displayTitle }}</span>?
-			</h2>
-			<p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-8 leading-relaxed">
-				Visit a dealer to take a test drive, or talk to our sales team about the {{ vehicle.model_year }} {{ vehicle.title }}.
-			</p>
-			<div class="flex flex-wrap justify-center gap-4">
-				<NuxtLink
-					:to="contactHref('dealer')"
-					class="inline-block bg-brand-red hover:bg-brand-red-dark text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-				>
-					Visit a Dealer
-				</NuxtLink>
-				<NuxtLink
-					:to="contactHref('sales')"
-					class="inline-block border border-white/40 hover:border-white text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-				>
-					Contact Sales
-				</NuxtLink>
+		<section id="cta" class="scroll-mt-[13.5rem] bg-slate-950 text-white py-20 md:py-24 text-center border-t border-slate-900" aria-labelledby="cta-heading">
+			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+				<p class="text-xs font-bold tracking-widest text-brand-red uppercase mb-3">Next Step</p>
+				<h2 id="cta-heading" class="text-3xl md:text-5xl font-bold uppercase tracking-wider text-white mb-4">
+					Ready to <span class="text-brand-red">{{ displayTitle }}</span>?
+				</h2>
+				<p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-8 leading-relaxed">
+					Visit a dealer to take a test drive, or talk to our sales team about the {{ vehicle.model_year }} {{ vehicle.title }}.
+				</p>
+				<div class="flex flex-wrap justify-center gap-4">
+					<NuxtLink
+						:to="contactHref('dealer')"
+						class="inline-block bg-brand-red hover:bg-brand-red-dark text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+					>
+						Visit a Dealer
+					</NuxtLink>
+					<NuxtLink
+						:to="contactHref('sales')"
+						class="inline-block border border-white/40 hover:border-white text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+					>
+						Contact Sales
+					</NuxtLink>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -503,9 +510,7 @@ useSeoMeta({
 	--vp-sp-7: 5.06rem;
 
 	/* — Layout (expanded section vertical padding: py-16 / py-20 luxury feel) — */
-	--vp-container: 1536px; /* theme .container @2xl (640/768/1024/1280/1536) */
 	--vp-section-py: 5.5rem; /* ~88px padding-block (py-20/22 feel) */
-	--vp-gutter: 2rem; /* theme #top-nav horizontal padding */
 	--vp-gap-xs: 0.25rem; /* theme gap-1 */
 	--vp-gap-md: 1rem; /* theme .vehicle-colour-selector__colours gap */
 	--vp-gap-lg: 1.75rem; /* theme gap-7 */
@@ -535,38 +540,6 @@ useSeoMeta({
 	font-size: var(--vp-fs-base);
 	font-weight: var(--vp-fw-regular);
 	line-height: var(--vp-lh);
-}
-
-/* — Container: extracted theme .container scale (width 100% → 1536px) — */
-.vp-container {
-	width: 100%;
-	margin-inline: auto;
-	padding-inline: var(--vp-gutter);
-}
-@media (min-width: 640px) {
-	.vp-container {
-		max-width: 640px;
-	}
-}
-@media (min-width: 768px) {
-	.vp-container {
-		max-width: 768px;
-	}
-}
-@media (min-width: 1024px) {
-	.vp-container {
-		max-width: 1024px;
-	}
-}
-@media (min-width: 1280px) {
-	.vp-container {
-		max-width: 1280px;
-	}
-}
-@media (min-width: 1536px) {
-	.vp-container {
-		max-width: var(--vp-container);
-	}
 }
 
 /* — Shared type utilities — */

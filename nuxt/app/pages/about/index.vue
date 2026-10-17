@@ -141,6 +141,30 @@ useHead(() => ({
 		<AboutHeroNav :links="links" :active="activeTab" />
 
 		<section v-show="activeTab === 'about'" id="about" class="scroll-mt-[13rem] py-12 md:py-20">
+			<!-- Editorial brand banner: photo under a left-weighted dark scrim carrying the headline -->
+			<div class="mx-auto mb-16 w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
+				<div class="relative h-[360px] w-full overflow-hidden rounded-3xl bg-zinc-900 shadow-xl md:h-[440px]">
+					<img
+						src="/images/main-hero/2025-outlander-sport-glamour-1-2048x1447.webp"
+						alt="Mitsubishi SUV driving through a tree-lined city street"
+						class="absolute inset-0 h-full w-full object-cover object-[60%_65%]"
+						width="2048"
+						height="1447"
+					/>
+					<div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/10" aria-hidden="true" />
+					<div class="relative flex h-full max-w-2xl flex-col justify-end p-8 md:p-14">
+						<p>
+							<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-200">
+								ANSA Motors · Mitsubishi
+							</span>
+						</p>
+						<p class="mt-4 text-3xl font-black uppercase leading-tight tracking-tight text-white md:text-5xl">
+							Engineered for the roads of <span class="text-brand-red">Trinidad &amp; Tobago</span>
+						</p>
+					</div>
+				</div>
+			</div>
+
 			<Container>
 				<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
 					<article

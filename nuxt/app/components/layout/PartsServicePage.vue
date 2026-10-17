@@ -8,6 +8,7 @@ import { provideVisualEditingPageContext } from '~/utils/visualEditing';
  * Shared shell for /service and /parts: hero + tab bar, then a 60/40 grid —
  * CMS rich-text blocks from the Directus page at `permalink` on the left, the
  * inquiry form (default slot) in a sticky sidebar on the right. Stacks on mobile.
+ * An optional `lead` slot renders full-width above the grid (e.g. /service trust badges).
  * Light showroom canvas with `dark:` variants; rich-text blocks use the editorial
  * type scale (EditorialRichText), other block types fall back to BaseBlock.
  * Content blocks are seeded by directus/seeds/parts-service-forms.mjs.
@@ -54,6 +55,10 @@ useSeoMeta({
 <template>
 	<div class="bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
 		<PartsServiceHeroNav :active="tab" :title="title" :description="description" />
+
+		<div v-if="$slots.lead" class="mx-auto max-w-7xl px-4 pt-12 md:px-8 md:pt-16">
+			<slot name="lead" />
+		</div>
 
 		<div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 md:px-8 md:py-16 lg:grid-cols-[3fr_2fr] lg:gap-12">
 			<div class="ps-content min-w-0 space-y-6">
