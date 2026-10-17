@@ -11,7 +11,7 @@ import RadioGroupField from './fields/RadioGroupField.vue';
 import SelectField from './fields/SelectField.vue';
 import FileUploadField from './fields/FileUploadField.vue';
 
-const props = defineProps<{ field: FormField; theme?: 'light' | 'dark' }>();
+const props = defineProps<{ field: FormField; theme?: 'light' | 'dark' | 'console' }>();
 const { value, errorMessage } = useField(props.field.name ?? '');
 
 const componentMap: Record<string, Component> = {
@@ -26,9 +26,15 @@ const componentMap: Record<string, Component> = {
 const getFieldComponent = () => componentMap[props.field.type ?? ''] || Input;
 
 const isDark = computed(() => props.theme === 'dark');
+const isConsole = computed(() => props.theme === 'console');
 
 const darkControlClass =
 	'bg-black text-white border-neutral-800 placeholder:text-neutral-500 focus-visible:ring-brand-red focus-visible:ring-offset-black';
+
+/** Matches inquiryInputClass (service/parts forms). */
+const consoleControlClass =
+	'h-auto rounded-lg border-zinc-300 bg-zinc-100/80 px-4 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-0 ' +
+	'dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-white dark:placeholder:text-zinc-500';
 
 /**
  * Directus stores email/phone inputs as `text` fields, so the HTML input type is
@@ -63,7 +69,8 @@ const getComponentProps = (field: FormField) => {
 		return { ...baseProps, label: field.label ?? '' };
 	}
 
-	const themedProps = isDark.value ? { ...baseProps, class: darkControlClass } : baseProps;
+	const themeClass = isDark.value ? darkControlClass : isConsole.value ? consoleControlClass : undefined;
+	const themedProps = themeClass ? { ...baseProps, class: themeClass } : baseProps;
 
 	if (field.type === 'textarea') {
 		return themedProps;
@@ -83,12 +90,21 @@ const getComponentProps = (field: FormField) => {
 <template>
 	<div
 		v-if="props.field.type !== 'hidden'"
-		:class="[`field-width-${field.width ?? '100'}`, { 'form-field--dark': isDark }]"
+		:class="[`field-width-${field.width ?? '100'}`, { 'form-field--dark': isDark, 'form-field--console': isConsole }]"
 	>
 		<FormItem class="pt-2">
-			<FormLabel :for="field.name ?? ''" class="flex items-center justify-between">
+			<FormLabel
+				:for="field.name ?? ''"
+				:class="[
+					'flex items-center justify-between',
+					isConsole && 'text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300',
+				]"
+			>
 				<div class="flex items-center space-x-1 h-[20px]">
-					<span v-if="field.type !== 'checkbox'">{{ field.label ?? '' }}</span>
+					<span v-if="field.type !== 'checkbox'">
+						{{ field.label ?? '' }}
+						<span v-if="field.required && isConsole" class="text-brand-red" aria-hidden="true">*</span>
+					</span>
 					<TooltipProvider v-if="field.help">
 						<Tooltip>
 							<TooltipTrigger>
@@ -98,12 +114,15 @@ const getComponentProps = (field: FormField) => {
 						</Tooltip>
 					</TooltipProvider>
 				</div>
-				<span v-if="field.required" :class="['text-sm', isDark ? 'text-neutral-500' : 'text-gray-400']">*Required</span>
+				<span v-if="field.required && !isConsole" :class="['text-sm', isDark ? 'text-neutral-500' : 'text-gray-400']">*Required</span>
 			</FormLabel>
 			<FormControl class="h-10">
 				<component :is="getFieldComponent()" v-bind="getComponentProps(field)" />
 			</FormControl>
-			<FormMessage v-if="errorMessage" :class="['italic text-sm', isDark ? 'text-[#ff4d6d]' : 'text-red-500']">{{ errorMessage }}</FormMessage>
+			<FormMessage
+				v-if="errorMessage"
+				:class="['italic text-sm', isDark ? 'text-[#ff4d6d]' : isConsole ? 'text-xs not-italic text-red-600 dark:text-[#ff4d6d]' : 'text-red-500']"
+			>{{ errorMessage }}</FormMessage>
 		</FormItem>
 	</div>
 </template>
@@ -116,6 +135,23 @@ const getComponentProps = (field: FormField) => {
 	border-color: rgb(38 38 38);
 }
 .form-field--dark :deep(label) {
+	color: #fff;
+}
+.form-field--console :deep(button[role='combobox']) {
+	height: auto;
+	border-radius: 0.5rem;
+	border-color: rgb(212 212 216);
+	background-color: rgb(244 244 245 / 0.8);
+	padding: 0.625rem 1rem;
+	color: rgb(24 24 27);
+}
+.form-field--console :deep(button[role='combobox']:focus-visible) {
+	--tw-ring-color: #ed0008;
+	--tw-ring-offset-width: 0px;
+}
+.dark .form-field--console :deep(button[role='combobox']) {
+	border-color: rgb(63 63 70);
+	background-color: rgb(39 39 42 / 0.8);
 	color: #fff;
 }
 

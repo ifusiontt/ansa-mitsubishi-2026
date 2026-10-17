@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { Map as LeafletMap, Marker } from 'leaflet';
+import type { Map as LeafletMap, Marker, TileLayer } from 'leaflet';
 import type { Dealer } from '#shared/types/schema';
 import { Clock, Mail, MapPin, Navigation, Phone } from 'lucide-vue-next';
 import 'leaflet/dist/leaflet.css';
 
 /**
- * Pitch-black branch locator: filterable location cards (left) synced with a
- * dark Esri World Dark Gray Leaflet map (right). Selecting a card flies the
+ * Branch locator on a light card (zinc in dark mode): filterable location cards (left)
+ * synced with an Esri Light Gray / Dark Gray Leaflet map (right) that follows the colour
+ * mode. Selecting a card flies the
  * map to that branch; clicking a marker selects (and scrolls to) its card.
  * Leaflet touches `window`, so it is imported lazily on mount (client only).
  */
@@ -16,7 +17,11 @@ type Island = 'trinidad' | 'tobago';
 type IslandFilter = 'all' | Island;
 
 const BRAND_RED = '#ED0008';
-const BRANCH_ZOOM = 15; // Esri Dark Gray Base tiles stop at zoom 16
+const BRANCH_ZOOM = 15; // Esri Gray Base tiles stop at zoom 16
+const TILE_URL = {
+	light: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+	dark: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+} as const;
 const TIMEZONE = 'America/Port_of_Spain';
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
 
@@ -99,6 +104,10 @@ const mapEl = ref<HTMLElement | null>(null);
 const listEl = ref<HTMLElement | null>(null);
 let map: LeafletMap | null = null;
 let L: typeof import('leaflet') | null = null;
+let tiles: TileLayer | null = null;
+
+const colorMode = useColorMode();
+const tileTheme = computed<keyof typeof TILE_URL>(() => (colorMode.value === 'dark' ? 'dark' : 'light'));
 const markers = new Map<number, Marker>();
 
 function pinIcon(active: boolean) {
@@ -158,8 +167,8 @@ onMounted(async () => {
 	L = await import('leaflet');
 	map = L.map(mapEl.value, { zoomControl: true, scrollWheelZoom: false, attributionControl: true });
 
-	// Esri World Dark Gray Base (charcoal canvas, major place names baked in). Esri requires this attribution.
-	L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+	// Esri World Light/Dark Gray Base (major place names baked in), swapped with the colour mode. Esri requires this attribution.
+	tiles = L.tileLayer(TILE_URL[tileTheme.value], {
 		maxZoom: 16,
 		attribution: '&copy; Esri, HERE, Garmin, USGS, NGA, EPA',
 	}).addTo(map);
@@ -176,8 +185,11 @@ onMounted(async () => {
 	map.fitBounds(bounds, { padding: [48, 48], maxZoom: 12 });
 });
 
+watch(tileTheme, (theme) => tiles?.setUrl(TILE_URL[theme]));
+
 onBeforeUnmount(() => {
 	map?.remove();
+	tiles = null;
 	map = null;
 	markers.clear();
 });
@@ -186,18 +198,22 @@ onBeforeUnmount(() => {
 <template>
 	<section
 		v-if="branches.length"
-		class="bg-black text-white border border-neutral-900 rounded-2xl p-6"
+		class="dealer-map rounded-2xl border border-zinc-200/80 bg-zinc-50/80 p-6 text-zinc-900 shadow-sm md:p-8 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-100"
 		aria-labelledby="dealership-map-heading"
 	>
 		<div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 			<div>
-				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-red">Find a branch</p>
-				<h2 id="dealership-map-heading" class="mt-2 text-2xl md:text-3xl font-bold tracking-tight">
+				<p class="mb-4">
+					<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400">
+						Find a branch
+					</span>
+				</p>
+				<h2 id="dealership-map-heading" class="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl dark:text-white">
 					ANSA Motors Locations
 				</h2>
 			</div>
 
-			<div role="tablist" aria-label="Filter branches by island" class="inline-flex rounded-full border border-neutral-800 p-1">
+			<div role="tablist" aria-label="Filter branches by island" class="inline-flex rounded-full border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-950">
 				<button
 					v-for="filter in FILTERS"
 					:key="filter.value"
@@ -206,7 +222,9 @@ onBeforeUnmount(() => {
 					:aria-selected="activeFilter === filter.value"
 					:class="[
 						'px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors',
-						activeFilter === filter.value ? 'bg-brand-red text-white' : 'text-neutral-400 hover:text-white',
+						activeFilter === filter.value
+							? 'bg-brand-red text-white'
+							: 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white',
 					]"
 					@click="activeFilter = filter.value"
 				>
@@ -225,8 +243,8 @@ onBeforeUnmount(() => {
 					:class="[
 						'rounded-xl border p-5 transition-colors cursor-pointer',
 						selectedId === branch.id
-							? 'border-brand-red bg-neutral-950'
-							: 'border-neutral-800 hover:border-neutral-600',
+							? 'border-brand-red bg-white shadow-md dark:bg-zinc-950'
+							: 'border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600',
 					]"
 					@click="selectBranch(branch)"
 				>
@@ -241,13 +259,13 @@ onBeforeUnmount(() => {
 						</button>
 						<span
 							v-if="branch.isHeadquarters"
-							class="shrink-0 rounded-full bg-brand-red px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
+							class="shrink-0 rounded-full bg-brand-red px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white"
 						>
 							HQ
 						</span>
 					</div>
 
-					<p class="mt-2 flex items-start gap-2 text-sm text-neutral-400">
+					<p class="mt-2 flex items-start gap-2 text-sm text-zinc-600 dark:text-zinc-400">
 						<MapPin class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
 						{{ branch.address }}
 					</p>
@@ -257,8 +275,8 @@ onBeforeUnmount(() => {
 							<dt class="sr-only">Today's hours</dt>
 							<Clock class="size-4 shrink-0 text-neutral-500" aria-hidden="true" />
 							<dd>
-								<span class="text-neutral-500">Today:</span>
-								<span :class="isClosed(todaysHours(branch)) ? 'text-[#ff4d6d]' : 'text-white'">
+								<span class="text-zinc-500">Today:</span>
+								<span :class="isClosed(todaysHours(branch)) ? 'text-red-600 dark:text-[#ff4d6d]' : 'text-zinc-900 dark:text-white'">
 									{{ todaysHours(branch) }}
 								</span>
 							</dd>
@@ -283,7 +301,7 @@ onBeforeUnmount(() => {
 						<li
 							v-for="service in branch.services"
 							:key="service"
-							class="rounded-full border border-neutral-800 px-2.5 py-1 text-[11px] text-neutral-300"
+							class="rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] text-zinc-600 dark:border-zinc-800 dark:text-zinc-300"
 						>
 							{{ service }}
 						</li>
@@ -294,7 +312,7 @@ onBeforeUnmount(() => {
 							:href="branch.directionsUrl"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="inline-flex items-center gap-2 rounded-full bg-brand-red px-4 py-2 text-xs font-semibold uppercase tracking-wider hover:bg-brand-red-dark"
+							class="inline-flex items-center gap-2 rounded-full bg-brand-red px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow-md transition-all hover:bg-red-700"
 							@click.stop
 						>
 							<Navigation class="size-3.5" aria-hidden="true" />
@@ -303,7 +321,7 @@ onBeforeUnmount(() => {
 						<a
 							v-if="branch.phone"
 							:href="telHref(branch.phone)"
-							class="inline-flex items-center gap-2 rounded-full border border-neutral-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider hover:border-white"
+							class="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-900 hover:border-zinc-900 dark:border-zinc-700 dark:text-white dark:hover:border-white"
 							@click.stop
 						>
 							<Phone class="size-3.5" aria-hidden="true" />
@@ -314,22 +332,26 @@ onBeforeUnmount(() => {
 			</div>
 
 			<!-- Map: `isolate` keeps Leaflet's high z-index panes beneath the sticky navigation. -->
-			<div class="relative isolate min-h-[360px] lg:min-h-[560px] overflow-hidden rounded-xl border border-neutral-900">
-				<div ref="mapEl" class="absolute inset-0 bg-neutral-950" role="region" aria-label="Map of ANSA Motors branches" />
+			<div class="relative isolate min-h-[360px] lg:min-h-[560px] overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+				<div ref="mapEl" class="absolute inset-0 bg-zinc-100 dark:bg-zinc-950" role="region" aria-label="Map of ANSA Motors branches" />
 			</div>
 		</div>
 	</section>
 </template>
 
 <style scoped>
+/* Light defaults; `.dark .dealer-map` (html class from @nuxtjs/color-mode) restores the charcoal map chrome. */
 .dealer-list {
 	scrollbar-width: thin;
-	scrollbar-color: #262626 transparent;
+	scrollbar-color: #d4d4d8 transparent;
+}
+.dark .dealer-list {
+	scrollbar-color: #3f3f46 transparent;
 }
 
-/* Pull Esri's charcoal canvas down to the page's #000 while keeping land outlines legible.
+/* Pull Esri's charcoal canvas down toward zinc-950 while keeping land outlines legible.
    Only the tile pane is filtered, so the red markers keep their full brightness. */
-:deep(.leaflet-tile-pane) {
+.dark .dealer-map :deep(.leaflet-tile-pane) {
 	filter: brightness(0.6) contrast(1.25) grayscale(0.2);
 }
 
@@ -337,33 +359,38 @@ onBeforeUnmount(() => {
 	background: transparent;
 	border: 0;
 	cursor: pointer;
-	filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.6));
+	filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.45));
 }
 
 :deep(.dealer-tooltip) {
-	background: #0a0a0a;
-	color: #fff;
-	border: 1px solid #262626;
-	box-shadow: none;
+	background: #fff;
+	color: #18181b;
+	border: 1px solid #e4e4e7;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
 	font-weight: 600;
 }
-
 :deep(.dealer-tooltip::before) {
-	border-top-color: #262626;
+	border-top-color: #e4e4e7;
 }
-
-:deep(.leaflet-control-attribution) {
-	background: rgb(0 0 0 / 0.7);
-	color: #a3a3a3;
-}
-
-:deep(.leaflet-control-attribution a) {
-	color: #d4d4d4;
-}
-
-:deep(.leaflet-bar a) {
-	background: #0a0a0a;
+.dark .dealer-map :deep(.dealer-tooltip) {
+	background: #09090b;
 	color: #fff;
-	border-color: #262626;
+	border-color: #27272a;
+}
+.dark .dealer-map :deep(.dealer-tooltip::before) {
+	border-top-color: #27272a;
+}
+
+.dark .dealer-map :deep(.leaflet-control-attribution) {
+	background: rgb(0 0 0 / 0.7);
+	color: #a1a1aa;
+}
+.dark .dealer-map :deep(.leaflet-control-attribution a) {
+	color: #d4d4d8;
+}
+.dark .dealer-map :deep(.leaflet-bar a) {
+	background: #09090b;
+	color: #fff;
+	border-color: #27272a;
 }
 </style>

@@ -6,7 +6,8 @@ import VehicleHighlights from '~/components/showroom/VehicleHighlights.vue';
 import VehicleHeroStage from '~/components/showroom/VehicleHeroStage.vue';
 
 /**
- * /showroom/[slug] — 8-part vehicle page.
+ * /showroom/[slug] — vehicle page in buyer-journey order: hero → overview → highlights →
+ * colours → trims → key specs → brochure → CTA.
  *
  * Design tokens and spacing metrics are extracted live from the reference site
  * (https://mitsubishi-motors.com.jm/vehicle/2025-outlander-sport/) via
@@ -179,6 +180,11 @@ useSeoMeta({
 		</section>
 
 		<!-- ════════════════════════════════════════════════════════════
+		     PART 3 · HIGHLIGHTS — wide editorial splits + pillar strip
+	     ════════════════════════════════════════════════════════════ -->
+		<VehicleHighlights :items="vehicle.highlights ?? []" :vehicle-title="displayTitle" :fallback-image="heroMedia" />
+
+		<!-- ════════════════════════════════════════════════════════════
 		     PART 4 · COLORS — 2-column slanted mini-configurator
 	     ════════════════════════════════════════════════════════════ -->
 		<section id="colors" class="relative isolate overflow-hidden bg-white pt-8 md:pt-12" aria-label="Exterior colours">
@@ -279,11 +285,6 @@ useSeoMeta({
 				</div>
 			</div>
 		</section>
-
-		<!-- ════════════════════════════════════════════════════════════
-		     HIGHLIGHTS — every published highlight, alternating image / text rows
-	     ════════════════════════════════════════════════════════════ -->
-		<VehicleHighlights :items="vehicle.highlights ?? []" :vehicle-title="displayTitle" :fallback-image="heroMedia" />
 
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 5 · TRIMS — selectable trim cards with key features

@@ -11,6 +11,8 @@ const props = defineProps<{
 	hint?: string;
 	/** Replaces the default label styling (e.g. white labels over a photo). */
 	labelClass?: string;
+	/** Replaces the default error-text colour (e.g. a brighter red over a photo). */
+	errorClass?: string;
 }>();
 
 const id = computed(() => `inquiry-${props.name}`);
@@ -31,14 +33,14 @@ const controlAttrs = computed(() => ({
 
 <template>
 	<div>
-		<label :for="id" :class="labelClass ?? 'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-300'">
+		<label :for="id" :class="labelClass ?? 'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300'">
 			{{ label }}
 			<span v-if="required" class="text-brand-red" aria-hidden="true">*</span>
-			<span v-else class="font-normal normal-case tracking-normal text-neutral-500">(optional)</span>
+			<span v-else class="font-normal normal-case tracking-normal text-zinc-500">(optional)</span>
 		</label>
 		<!-- One v-bind object: a static `name` on <slot> would select the slot by name instead of passing a prop. -->
 		<slot v-bind="controlAttrs" />
-		<p v-if="error" :id="`${id}-error`" class="mt-1.5 text-xs text-[#ff4d6d]">{{ error }}</p>
-		<p v-else-if="hint" :id="`${id}-hint`" class="mt-1.5 text-xs text-neutral-500">{{ hint }}</p>
+		<p v-if="error" :id="`${id}-error`" :class="['mt-1.5 text-xs', errorClass ?? 'text-red-600 dark:text-[#ff4d6d]']">{{ error }}</p>
+		<p v-else-if="hint" :id="`${id}-hint`" class="mt-1.5 text-xs text-zinc-500">{{ hint }}</p>
 	</div>
 </template>

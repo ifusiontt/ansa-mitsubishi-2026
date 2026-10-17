@@ -7,10 +7,11 @@ import { VEHICLE_MODEL_OPTIONS, type InquiryType } from '#shared/types/contact';
  * in the page background colour) and theme tokens can't wash them out.
  */
 export const inquiryInputClass =
-	'relative z-10 pointer-events-auto block w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3.5 py-2.5 ' +
-	'text-sm text-white caret-brand-red placeholder-neutral-500 transition-colors ' +
-	'hover:border-neutral-700 focus:border-brand-red focus:outline-none focus:ring-2 focus:ring-brand-red/60 focus:ring-offset-0 ' +
-	'aria-[invalid=true]:border-brand-red/80 disabled:cursor-not-allowed disabled:opacity-60 [color-scheme:dark]';
+	'relative z-10 pointer-events-auto block w-full rounded-lg border border-zinc-300 bg-zinc-100/80 px-4 py-2.5 ' +
+	'text-sm text-zinc-900 caret-brand-red placeholder-zinc-400 transition-colors ' +
+	'hover:border-zinc-400 focus:border-brand-red focus:outline-none focus:ring-2 focus:ring-brand-red focus:ring-offset-0 ' +
+	'dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-white dark:placeholder-zinc-500 dark:hover:border-zinc-600 ' +
+	'aria-[invalid=true]:border-brand-red/80 disabled:cursor-not-allowed disabled:opacity-60 [color-scheme:light] dark:[color-scheme:dark]';
 
 /**
  * Reactive state for an inquiry form posting to /api/forms/parts-service.

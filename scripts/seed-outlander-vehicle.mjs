@@ -57,6 +57,8 @@ const BASE = process.env.DIRECTUS_URL || 'http://localhost:8055';
 const H = { Authorization: `Bearer ${TOKEN}` };
 
 const VEHICLE_SLUG = 'outlander-sport';
+/** Marketed as part of the 2026 lineup (the homepage hero reads "All-New 2026"). */
+const MODEL_YEAR = 2026;
 const FOLDER_NAME = 'Outlander Sport';
 const ASSET_ROOT = path.join(
 	ROOT,
@@ -200,7 +202,7 @@ async function uploadFile(absPath, folderId) {
 
 const vehicles = await search('vehicles', {
 	filter: { slug: { _eq: VEHICLE_SLUG } },
-	fields: ['id', 'title', 'hero_block', 'primary_color'],
+	fields: ['id', 'title', 'hero_block', 'primary_color', 'model_year'],
 	limit: 1,
 });
 const vehicle = vehicles.data?.[0];
@@ -209,6 +211,11 @@ if (!vehicle) {
 	process.exit(1);
 }
 console.log(`vehicle: #${vehicle.id} ${vehicle.title} (hero_block: ${vehicle.hero_block})`);
+
+if (Number(vehicle.model_year) !== MODEL_YEAR) {
+	await api('PATCH', `/items/vehicles/${vehicle.id}`, { model_year: MODEL_YEAR });
+	console.log(`model_year: ${vehicle.model_year} → ${MODEL_YEAR}`);
+}
 
 // ---------------------------------------------------------------------------
 // step 1 — folder "Outlander Sport"

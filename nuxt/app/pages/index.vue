@@ -55,10 +55,6 @@ const otherBlocks = computed(() => {
 // Lead vehicle (Outlander Sport) — its hero render backs the hero / spotlight when the CMS has no media.
 const leadVehicle = computed(() => vehicles.value?.[0]);
 const leadMedia = computed(() => directusFileId(leadVehicle.value?.hero_block?.media));
-// Stand-in for the dealership hub photo until a showroom/dealership exterior shot is in Directus.
-const contactMedia = computed(
-	() => directusFileId(vehicles.value?.find((v) => v.slug === 'xpander-cross')?.hero_block?.media) || leadMedia.value,
-);
 
 const hero = computed<BlockHeroCustom>(
 	() =>
@@ -99,6 +95,6 @@ useSeoMeta({
 		<HomeValueGrid :block="valueGrid" />
 		<HomeColorPreview v-if="vehicles?.length" :vehicles="vehicles" />
 		<PageBuilder v-if="otherBlocks.length" :sections="otherBlocks" />
-		<HomeContactBanner :image="contactMedia" />
+		<HomeContactBanner />
 	</div>
 </template>

@@ -94,12 +94,16 @@ useSeoMeta({
 </script>
 
 <template>
-	<section class="bg-black text-white min-h-[70vh] py-16 md:py-24">
+	<section class="min-h-[70vh] bg-white py-16 text-zinc-900 md:py-24 dark:bg-zinc-950 dark:text-zinc-100">
 		<Container>
-			<div class="max-w-3xl mx-auto">
-				<p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-red">ANSA Mitsubishi</p>
-				<h1 class="mt-3 text-4xl md:text-5xl font-bold tracking-tight">Contact Us</h1>
-				<p class="mt-4 text-neutral-400 max-w-xl">
+			<div class="mx-auto max-w-3xl">
+				<p class="mb-4">
+					<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400">
+						ANSA Mitsubishi
+					</span>
+				</p>
+				<h1 class="text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl lg:text-5xl dark:text-white">Contact Us</h1>
+				<p class="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-600 md:text-base dark:text-zinc-300">
 					Questions about a vehicle, a test drive, or service? Send us a message and our team will get back to you.
 				</p>
 
@@ -110,9 +114,13 @@ useSeoMeta({
 						:key="JSON.stringify(prefill)"
 						:form="contactForm"
 						:prefill="prefill"
-						theme="dark"
+						theme="console"
 					/>
-					<div v-else role="status" class="border border-neutral-800 rounded-lg p-8 text-neutral-400">
+					<div
+						v-else
+						role="status"
+						class="rounded-2xl border border-zinc-200/80 bg-zinc-50/80 p-8 text-sm text-zinc-600 shadow-sm md:text-base dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
+					>
 						The contact form is currently unavailable. Please call or visit your nearest ANSA Mitsubishi dealership.
 					</div>
 				</div>

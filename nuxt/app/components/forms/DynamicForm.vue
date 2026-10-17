@@ -14,7 +14,8 @@ const props = defineProps<{
 	blockFormId?: string;
 	/** Values keyed by field name that override the empty defaults (e.g. from the query string). */
 	prefill?: Record<string, string>;
-	theme?: 'light' | 'dark';
+	/** `console`: light zinc controls with dark-mode variants (secondary pages such as /contact). */
+	theme?: 'light' | 'dark' | 'console';
 }>();
 
 const isSubmitting = ref(false);
@@ -87,6 +88,12 @@ const onSubmitForm = handleSubmit(async (formValues) => {
 		isSubmitting.value = false;
 	}
 });
+
+const SUBMIT_CLASSES = {
+	dark: 'bg-brand-red text-white hover:bg-brand-red-dark',
+	console: 'w-full justify-center rounded-lg bg-brand-red py-3 font-semibold text-white shadow-md transition-all hover:bg-red-700',
+} as const;
+const submitClass = computed(() => (props.theme && props.theme !== 'light' ? SUBMIT_CLASSES[props.theme] : undefined));
 </script>
 
 <template>
@@ -146,7 +153,7 @@ const onSubmitForm = handleSubmit(async (formValues) => {
 						type="submit"
 						:label="submitLabel"
 						:disabled="isSubmitting"
-						:class-name="theme === 'dark' ? 'bg-brand-red text-white hover:bg-brand-red-dark' : undefined"
+						:class-name="submitClass"
 						icon="arrow"
 						icon-position="right"
 					/>

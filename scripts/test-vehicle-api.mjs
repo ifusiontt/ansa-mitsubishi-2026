@@ -212,7 +212,7 @@ if (!vehicle) {
 const scalars = [
 	['title', 'Mitsubishi Outlander Sport'],
 	['slug', VEHICLE_SLUG],
-	['model_year', '2025'],
+	['model_year', '2026'],
 	['status', 'published'],
 	['category', null],
 	['body_type', null],

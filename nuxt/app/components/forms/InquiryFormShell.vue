@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Pitch-black card shared by ServiceBookingForm and PartsRequestForm: heading,
+ * Light console card (zinc in dark mode) shared by ServiceBookingForm and PartsRequestForm: heading,
  * success/error banner, field grid (default slot) and the full-width red submit button.
  */
 defineProps<{
@@ -17,28 +17,28 @@ const emit = defineEmits<{ submit: []; dismiss: [] }>();
 </script>
 
 <template>
-	<div class="rounded-xl border border-neutral-800 bg-neutral-950 p-6 text-neutral-100 shadow-2xl">
-		<h2 class="text-xl font-bold tracking-tight">{{ title }}</h2>
-		<p v-if="description" class="mt-1.5 text-sm text-neutral-400">{{ description }}</p>
+	<div class="rounded-2xl border border-zinc-200 bg-white p-6 text-zinc-900 shadow-xl md:p-8 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-100">
+		<h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">{{ title }}</h2>
+		<p v-if="description" class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{{ description }}</p>
 
 		<div aria-live="polite">
 			<div
 				v-if="status === 'success'"
 				role="status"
-				class="mt-5 flex items-start gap-3 rounded-lg border border-emerald-700/60 bg-emerald-950/50 p-4 text-sm text-emerald-100"
+				class="mt-5 flex items-start gap-3 rounded-lg border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-700/60 dark:bg-emerald-950/50 dark:text-emerald-100"
 			>
-				<Icon name="lucide:circle-check" class="mt-0.5 size-5 shrink-0 text-emerald-400" />
+				<Icon name="lucide:circle-check" class="mt-0.5 size-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
 				<p class="flex-1">{{ successMessage }}</p>
-				<button type="button" class="text-emerald-300 hover:text-white" aria-label="Dismiss" @click="emit('dismiss')">
+				<button type="button" class="text-emerald-700 hover:text-emerald-950 dark:text-emerald-300 dark:hover:text-white" aria-label="Dismiss" @click="emit('dismiss')">
 					<Icon name="lucide:x" class="size-4" />
 				</button>
 			</div>
 			<div
 				v-else-if="status === 'error'"
 				role="alert"
-				class="mt-5 flex items-start gap-3 rounded-lg border border-brand-red/60 bg-brand-red/10 p-4 text-sm text-red-100"
+				class="mt-5 flex items-start gap-3 rounded-lg border border-brand-red/40 bg-brand-red/5 p-4 text-sm text-red-900 dark:border-brand-red/60 dark:bg-brand-red/10 dark:text-red-100"
 			>
-				<Icon name="lucide:circle-alert" class="mt-0.5 size-5 shrink-0 text-[#ff4d6d]" />
+				<Icon name="lucide:circle-alert" class="mt-0.5 size-5 shrink-0 text-brand-red dark:text-[#ff4d6d]" />
 				<p>{{ serverError }}</p>
 			</div>
 		</div>
@@ -52,7 +52,7 @@ const emit = defineEmits<{ submit: []; dismiss: [] }>();
 				type="submit"
 				:disabled="loading"
 				:aria-busy="loading"
-				class="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand-red px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-red/20 transition-transform duration-200 hover:scale-[1.02] hover:bg-[#d4063a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 active:scale-[0.99] disabled:cursor-wait disabled:opacity-70 disabled:hover:scale-100"
+				class="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand-red px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.99] disabled:cursor-wait disabled:opacity-70 dark:focus-visible:ring-offset-zinc-900"
 			>
 				<Icon v-if="loading" name="lucide:loader-circle" class="size-4 animate-spin" />
 				{{ loading ? 'Sending…' : submitLabel }}

@@ -72,11 +72,13 @@ function scrollTo(id: string) {
 		<!-- Same steps as the page's scoped .vp-container (not reachable from a child component) -->
 		<div class="relative mx-auto w-full px-8 py-24 sm:max-w-[640px] md:max-w-[768px] md:py-32 lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1536px]">
 			<div class="max-w-2xl">
-				<p v-if="eyebrow" class="mb-4 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em] text-brand-red">
-					<span class="h-px w-10 bg-brand-red" aria-hidden="true" />
-					{{ eyebrow }}
+				<!-- Off-white eyebrow with a brand-red rule: red text alone was illegible over darkened photos -->
+				<p v-if="eyebrow" class="mb-4">
+					<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-200">
+						{{ eyebrow }}
+					</span>
 				</p>
-				<h1 id="hero-heading" class="text-5xl font-black uppercase leading-[0.95] tracking-tight md:text-7xl">{{ displayTitle }}</h1>
+				<h1 id="hero-heading" class="text-5xl font-black uppercase leading-[0.95] tracking-tight text-white md:text-7xl">{{ displayTitle }}</h1>
 				<p v-if="subhead" class="mt-5 text-lg font-bold uppercase tracking-wider text-neutral-200 md:text-xl">{{ subhead }}</p>
 				<p v-if="startingPrice" class="mt-3 text-sm text-neutral-300">
 					Starting from <span class="font-bold text-white">{{ startingPrice }}</span>

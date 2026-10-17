@@ -20,10 +20,11 @@ const props = defineProps<{
 	className?: string;
 	blockFormId?: string;
 	prefill?: Record<string, string>;
-	theme?: 'light' | 'dark';
+	theme?: 'light' | 'dark' | 'console';
 }>();
 
 const isDark = computed(() => props.theme === 'dark');
+const isConsole = computed(() => props.theme === 'console');
 
 const isSubmitted = ref(false);
 const error = ref<string | null>(null);
@@ -69,7 +70,11 @@ const handleSubmit = async (data: Record<string, any>) => {
 		v-if="form.is_active"
 		:class="[
 			'space-y-6 border p-8 rounded-lg',
-			isDark ? 'bg-black text-white border-neutral-800' : 'border-input',
+			isDark
+				? 'bg-black text-white border-neutral-800'
+				: isConsole
+					? 'rounded-2xl border-zinc-200 bg-white p-6 text-zinc-900 shadow-xl md:p-8 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-100'
+					: 'border-input',
 			className,
 		]"
 	>
@@ -79,8 +84,8 @@ const handleSubmit = async (data: Record<string, any>) => {
 			aria-live="polite"
 			class="flex flex-col items-center justify-center space-y-4 p-6 text-center"
 		>
-			<CheckCircle :class="['size-12', isDark ? 'text-brand-red' : 'text-green-500']" />
-			<p :class="isDark ? 'text-neutral-300' : 'text-gray-600'">
+			<CheckCircle :class="['size-12', isDark || isConsole ? 'text-brand-red' : 'text-green-500']" />
+			<p :class="isDark ? 'text-neutral-300' : isConsole ? 'text-zinc-600 dark:text-zinc-300' : 'text-gray-600'">
 				{{ form.success_message || 'Your form has been submitted successfully.' }}
 			</p>
 		</div>
@@ -90,7 +95,11 @@ const handleSubmit = async (data: Record<string, any>) => {
 				role="alert"
 				:class="[
 					'p-4 rounded-md',
-					isDark ? 'text-white bg-brand-red/15 border border-brand-red/50' : 'text-red-500 bg-red-100',
+					isDark
+						? 'text-white bg-brand-red/15 border border-brand-red/50'
+						: isConsole
+							? 'border border-brand-red/40 bg-brand-red/5 text-red-900 dark:bg-brand-red/10 dark:text-red-100'
+							: 'text-red-500 bg-red-100',
 				]"
 			>
 				<strong>Error:</strong>

@@ -10,9 +10,14 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  *   `form_submissions` under the "Test Drive Request" form (directus/seeds/parts-service-forms.mjs).
  * - Branch phone, hours and map links come from the published `dealers` collection (matched by
  *   slug); a branch without a dealer record still renders and links to /contact.
- * - `image` is a Directus file id for the left panel's photo; the panel falls back to a dark gradient.
+ * - The left panel's photo is its own static asset (CONSOLE_IMAGE) — deliberately not tied to any
+ *   vehicle's hero block, so re-pointing a hero never repaints this panel. `image` (a Directus file
+ *   id) overrides it once a dedicated dealership/showroom shot is in the library.
  */
 const props = withDefaults(defineProps<{ image?: string | null }>(), { image: null });
+
+/** Xpander Cross studio render, pre-cropped 1000x1400 for the portrait panel. */
+const CONSOLE_IMAGE = '/images/contact/dealership-console-xpander-cross.webp';
 
 const BRANCHES = [
 	{ slug: 'port-of-spain', label: 'Port of Spain', role: 'Head Office & Showroom' },
@@ -62,7 +67,7 @@ function addressLine(dealer?: Dealer): string | null {
 const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 
 const imageUrl = computed(() =>
-	props.image ? `${getDirectusAssetURL(props.image)}?width=1000&height=1400&fit=cover&quality=78&format=webp` : '',
+	props.image ? `${getDirectusAssetURL(props.image)}?width=1000&height=1400&fit=cover&quality=78&format=webp` : CONSOLE_IMAGE,
 );
 
 /**
@@ -93,8 +98,9 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 		>
 			<!-- Left: quick test-drive request over the showroom photo -->
 			<div class="relative isolate p-8 text-white md:p-10 lg:col-span-5">
-				<img v-if="imageUrl" :src="imageUrl" alt="" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover brightness-125" />
-				<div v-else class="absolute inset-0 -z-20 bg-gradient-to-br from-neutral-800 to-neutral-950" aria-hidden="true" />
+				<!-- Gradient sits under the photo, so a failed image load still leaves a dark panel -->
+				<div class="absolute inset-0 -z-30 bg-gradient-to-br from-neutral-800 to-neutral-950" aria-hidden="true" />
+				<img :src="imageUrl" alt="" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover brightness-125" />
 				<!-- Deep scrim: the photo reads as texture only, so car lines never cross the form fields -->
 				<div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/90 via-black/80 to-black/95" aria-hidden="true" />
 
@@ -108,10 +114,10 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 				<form class="mt-8 space-y-4" data-inquiry-form novalidate @submit.prevent="submit">
 					<!-- Frosted panel keeps fields and submit on one clean surface -->
 					<div class="space-y-4 rounded-xl border border-white/10 bg-black/55 p-5 backdrop-blur-md">
-						<InquiryField v-slot="attrs" name="full_name" label="Name" required :label-class="labelClass" :error="errors.full_name">
+						<InquiryField v-slot="attrs" name="full_name" label="Name" required :label-class="labelClass" error-class="text-[#ff4d6d]" :error="errors.full_name">
 							<input v-bind="attrs" v-model="values.full_name" type="text" autocomplete="name" :class="inputClass" @blur="touch('full_name')" />
 						</InquiryField>
-						<InquiryField v-slot="attrs" name="phone" label="Phone Number" required :label-class="labelClass" :error="errors.phone">
+						<InquiryField v-slot="attrs" name="phone" label="Phone Number" required :label-class="labelClass" error-class="text-[#ff4d6d]" :error="errors.phone">
 							<input
 								v-bind="attrs"
 								v-model="values.phone"
@@ -122,7 +128,7 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 								@blur="touch('phone')"
 							/>
 						</InquiryField>
-						<InquiryField v-slot="attrs" name="vehicle_model" label="Model" required :label-class="labelClass" :error="errors.vehicle_model">
+						<InquiryField v-slot="attrs" name="vehicle_model" label="Model" required :label-class="labelClass" error-class="text-[#ff4d6d]" :error="errors.vehicle_model">
 							<select v-bind="attrs" v-model="values.vehicle_model" :class="inputClass" @blur="touch('vehicle_model')">
 								<option value="" disabled>Select a model</option>
 								<option v-for="model in VEHICLE_MODEL_OPTIONS" :key="model" :value="model">{{ model }}</option>

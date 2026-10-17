@@ -201,7 +201,7 @@ const VEHICLE = {
   primary_color: '#C9A332', // X4Y Energetic Yellow
   brochure_url: 'https://ansamitsubishi.com/brochures/2025-mitsubishi-outlander-sport.pdf',
   status: 'published',
-  model_year: 2025,
+  model_year: 2026,
   category: 'Compact Crossover SUV',
   body_type: 'SUV',
   seating_capacity: 5,
