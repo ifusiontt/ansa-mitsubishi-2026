@@ -2,10 +2,11 @@
 /**
  * Layout-stable vehicle render stage with crossfading colour switches.
  *
- * - The stage is height-bounded (320px, 380px on desktop) and full width; renders are absolutely
- *   positioned inside it and contained, so its height never depends on an image's dimensions or
- *   load state, and no body shape (long pickup or tall MPV) can outgrow it. Renders are bottom-aligned so
- *   every car rests on the floor shadow beneath the stage.
+ * - The stage is a fixed 2:1 box at full width, so its height never depends on an image's
+ *   dimensions or load state. Mitsubishi's colour renders share one 10:7 framing with the car
+ *   centred and spanning ~70% of the width, so each layer is centred and zoomed 1.12× to make the
+ *   car fill ~78% of the stage width; the car's height (~58% of the stage) leaves headroom for
+ *   tall MPVs. A soft radial floor shadow sits on the wheel line (~10% above the stage bottom).
  * - Two stacked <img> layers: a new render is preloaded + decoded off-screen and
  *   only then faded in over the current one (300ms), so the previous colour stays
  *   visible until the next is ready. Rapid swatch clicks only ever show the latest
@@ -104,7 +105,16 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="relative h-[320px] w-full lg:h-[380px]">
+	<div class="relative aspect-[2/1] w-full">
+		<!-- Floor shadow: a wide soft pool plus a tight contact shadow under the tyres -->
+		<div
+			class="absolute inset-x-[6%] bottom-[2%] h-[18%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.2)_45%,transparent_70%)] blur-md"
+			aria-hidden="true"
+		/>
+		<div
+			class="absolute inset-x-[16%] bottom-[7%] h-[6%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.35)_50%,transparent_75%)] blur-[3px]"
+			aria-hidden="true"
+		/>
 		<template v-for="(layer, index) in layers" :key="index">
 			<img
 				v-if="layer.src"
@@ -114,7 +124,7 @@ onMounted(() => {
 				decoding="async"
 				draggable="false"
 				:class="[
-					'absolute inset-0 h-full w-full object-contain object-bottom transition-opacity duration-300 ease-in-out motion-reduce:transition-none',
+					'pointer-events-none absolute left-1/2 top-1/2 h-auto w-full max-w-none -translate-x-1/2 -translate-y-1/2 scale-[1.12] transition-opacity duration-300 ease-in-out motion-reduce:transition-none',
 					index === active ? 'opacity-100' : 'opacity-0',
 					imgClass,
 				]"

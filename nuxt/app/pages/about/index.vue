@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { BlockRichtext, Faq, Page, PageBlock } from '#shared/types/schema';
+import type { Faq, Page, PageBlock } from '#shared/types/schema';
 import AboutHeroNav, { type AboutHeroLink } from '~/components/about/AboutHeroNav.vue';
 import FaqAccordion from '~/components/about/FaqAccordion.vue';
-import EditorialRichText from '~/components/shared/EditorialRichText.vue';
 import { provideVisualEditingPageContext } from '~/utils/visualEditing';
 
 /**
@@ -14,9 +13,10 @@ import { provideVisualEditingPageContext } from '~/utils/visualEditing';
  * Both panels are server-rendered and toggled with v-show, so all content is indexable.
  * Deep links (`/about#faq`) render "About" on the server and switch on mount.
  *
- * Content: About rich-text blocks come from the Directus `/about` page and render as a
- * responsive card grid (Who We Are / What We Do / Our Network); any other block types
- * fall through to PageBuilder below it. FAQs come from the `faqs` collection. Seeded by
+ * Content: the About tab leads with three stat-anchored value cards (VALUE_CARDS, static:
+ * the stats are brand facts, not CMS copy). The Directus `/about` page's rich-text blocks
+ * carried the same story and are superseded by the cards; any other block types still render
+ * through PageBuilder below them. FAQs come from the `faqs` collection. Seeded by
  * directus/seeds/about-and-faqs.mjs.
  */
 type AboutTab = 'about' | 'faq';
@@ -56,12 +56,46 @@ const [{ data: page }, { data: faqs }] = await Promise.all([
 
 const aboutBlocks = computed(() => ((page.value?.blocks as PageBlock[] | undefined) ?? []).filter((block) => !block.hide_block));
 
-type RichTextBlock = PageBlock & { collection: 'block_richtext'; item: BlockRichtext };
-const isRichText = (block: PageBlock): block is RichTextBlock =>
-	block.collection === 'block_richtext' && !!block.item && typeof block.item === 'object';
+const otherBlocks = computed(() => aboutBlocks.value.filter((block) => block.collection !== 'block_richtext'));
 
-const aboutCards = computed(() => aboutBlocks.value.filter(isRichText));
-const otherBlocks = computed(() => aboutBlocks.value.filter((block) => !isRichText(block)));
+interface ValueCard {
+	eyebrow: string;
+	stat: string;
+	label: string;
+	body: string;
+	points?: { name: string; detail: string }[];
+	link: { label: string; to: string };
+}
+
+const VALUE_CARDS: ValueCard[] = [
+	{
+		eyebrow: 'ANSA McAL Group',
+		stat: '100+',
+		label: 'Years of Commercial Excellence',
+		body: 'ANSA Motors is the authorised distributor of Mitsubishi Motors in Trinidad and Tobago and a member of the ANSA McAL Group, bringing Japanese engineering to local roads with a team that sells, services and supports every Mitsubishi we put on them.',
+		link: { label: 'Explore the 2026 lineup', to: '/#models' },
+	},
+	{
+		eyebrow: 'Manufacturer Backed',
+		stat: '5-Year',
+		label: '100,000 km Warranty',
+		body: 'Every new Mitsubishi is covered for 5 years or 100,000 km. Factory-trained technicians use Mitsubishi diagnostic tooling for scheduled maintenance, repairs and warranty work, fitted with genuine OEM parts so your coverage stays intact.',
+		link: { label: 'Book a service', to: '/service' },
+	},
+	{
+		eyebrow: 'Nationwide Coverage',
+		stat: '4',
+		label: 'Authorised Locations Across T&T',
+		body: 'Sales, service and parts within reach on both islands.',
+		points: [
+			{ name: 'Port of Spain', detail: 'HQ, Richmond & Duke Streets' },
+			{ name: 'San Fernando', detail: 'Royal Road' },
+			{ name: 'Chaguanas', detail: 'Brentwood Commercial Center' },
+			{ name: 'Tobago', detail: 'Milford Road, Scarborough' },
+		],
+		link: { label: 'Find a branch', to: '/contact' },
+	},
+];
 
 // Block components read this for their visual-editing attributes (as on the catch-all route).
 provideVisualEditingPageContext({
@@ -106,30 +140,48 @@ useHead(() => ({
 	<div class="bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
 		<AboutHeroNav :links="links" :active="activeTab" />
 
-		<section v-show="activeTab === 'about'" id="about" class="scroll-mt-24 py-12 md:py-20">
-			<Container v-if="aboutCards.length">
+		<section v-show="activeTab === 'about'" id="about" class="scroll-mt-[13rem] py-12 md:py-20">
+			<Container>
 				<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
 					<article
-						v-for="block in aboutCards"
-						:key="block.id"
-						class="rounded-2xl border border-zinc-200/80 bg-zinc-50/80 p-6 shadow-sm md:p-8 dark:border-zinc-800 dark:bg-zinc-900/70"
+						v-for="card in VALUE_CARDS"
+						:key="card.eyebrow"
+						class="flex flex-col rounded-2xl border border-zinc-200/80 bg-white p-8 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/80"
 					>
-						<EditorialRichText :data="block.item" variant="card" />
+						<p>
+							<span
+								class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400"
+							>
+								{{ card.eyebrow }}
+							</span>
+						</p>
+						<p class="mt-6 text-5xl font-black tracking-tight text-zinc-900 md:text-6xl dark:text-white">{{ card.stat }}</p>
+						<h2 class="mt-2 text-sm font-semibold uppercase tracking-wider text-brand-red">{{ card.label }}</h2>
+						<div class="my-6 h-px bg-zinc-200 dark:bg-zinc-800" aria-hidden="true" />
+						<p class="text-sm leading-relaxed text-zinc-600 md:text-base dark:text-zinc-300">{{ card.body }}</p>
+						<ul v-if="card.points" class="mt-4 space-y-2.5">
+							<li v-for="point in card.points" :key="point.name" class="flex gap-3 text-sm">
+								<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-red" aria-hidden="true" />
+								<span>
+									<span class="font-semibold text-zinc-900 dark:text-white">{{ point.name }}</span>
+									<span class="text-zinc-500 dark:text-zinc-400"> · {{ point.detail }}</span>
+								</span>
+							</li>
+						</ul>
+						<NuxtLink
+							:to="card.link.to"
+							class="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-zinc-900 transition-colors hover:text-brand-red dark:text-white"
+						>
+							{{ card.link.label }}
+							<Icon name="lucide:arrow-right" class="size-4" />
+						</NuxtLink>
 					</article>
 				</div>
 			</Container>
-			<PageBuilder v-if="otherBlocks.length" :sections="otherBlocks" />
-			<Container v-if="!aboutBlocks.length">
-				<p
-					role="status"
-					class="mx-auto max-w-2xl rounded-2xl border border-zinc-200/80 bg-zinc-50/80 p-8 text-sm text-zinc-600 shadow-sm md:text-base dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
-				>
-					Our story is on its way. In the meantime, visit or call your nearest ANSA Motors branch.
-				</p>
-			</Container>
+			<PageBuilder v-if="otherBlocks.length" :sections="otherBlocks" class="mt-12 md:mt-20" />
 		</section>
 
-		<section v-show="activeTab === 'faq'" id="faq" class="scroll-mt-24 py-12 md:py-20">
+		<section v-show="activeTab === 'faq'" id="faq" class="scroll-mt-[13rem] py-12 md:py-20">
 			<Container>
 				<div class="mx-auto max-w-3xl">
 					<p class="mb-4">

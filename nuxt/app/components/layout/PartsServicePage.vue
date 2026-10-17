@@ -81,9 +81,9 @@ useSeoMeta({
 					Capped to the viewport and scrollable: the parts form is taller than most
 					screens, and an uncapped sticky box would leave its lower fields and submit
 					button stuck below the fold until the left column finished scrolling.
-					The negative-margin gutter keeps the form card's shadow-xl from being clipped by the scroller.
+					Offset clears the 148px header plus the sticky PillTabs. The negative-margin gutter keeps the form card's shadow-xl from being clipped by the scroller.
 				-->
-				<div class="lg:sticky lg:top-24 lg:-mx-6 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-6 lg:pb-8">
+				<div class="lg:sticky lg:top-[14rem] lg:-mx-6 lg:max-h-[calc(100vh-15rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-6 lg:pb-8">
 					<slot />
 				</div>
 			</aside>

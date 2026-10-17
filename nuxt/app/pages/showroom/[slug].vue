@@ -185,102 +185,102 @@ useSeoMeta({
 		<VehicleHighlights :items="vehicle.highlights ?? []" :vehicle-title="displayTitle" :fallback-image="heroMedia" />
 
 		<!-- ════════════════════════════════════════════════════════════
-		     PART 4 · COLORS — 2-column slanted mini-configurator
+		     PART 4 · COLORS — centred showroom stage + swatches
 	     ════════════════════════════════════════════════════════════ -->
-		<section id="colors" class="relative isolate overflow-hidden bg-white pt-8 md:pt-12" aria-label="Exterior colours">
-			<div class="grid lg:grid-cols-12 lg:min-h-[600px]">
-				<!-- Left · copy, vehicle picker, CTA -->
-				<div class="flex flex-col justify-center px-6 py-16 sm:px-10 lg:col-span-5 lg:py-24 lg:pl-[max(2.5rem,calc((100vw-1280px)/2+2.5rem))] lg:pr-10">
-					<h2 class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-slate-900">Explore colour options</h2>
-					<p class="text-slate-600 mt-2">Choose the perfect colour for your personality.</p>
+		<section id="colors" class="bg-white py-16 lg:py-20 dark:bg-zinc-950" aria-labelledby="colors-heading">
+			<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+				<header class="text-center">
+					<p>
+						<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400">
+							Exterior Colours
+						</span>
+					</p>
+					<h2 id="colors-heading" class="mt-3 text-3xl font-bold tracking-tight text-zinc-900 lg:text-4xl dark:text-white">Explore colour options</h2>
+					<p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-300">Choose the perfect colour for your personality.</p>
+				</header>
 
-					<NuxtLink
-						:to="{ path: '/contact', query: { vehicle: vehicle.slug } }"
-						class="mt-10 inline-block w-fit px-8 py-3.5 border-2 border-slate-900 text-slate-900 font-bold tracking-widest text-xs uppercase hover:bg-slate-900 hover:text-white transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
-					>
-						Book a test drive
-					</NuxtLink>
-				</div>
-
-				<!-- Right · dark slanted visualizer canvas -->
-				<div class="relative flex flex-col items-center justify-center px-6 pb-12 pt-10 lg:col-span-7 lg:py-16 lg:pl-[12%] lg:pr-10">
-					<!-- Slanted backdrop, tinted toward the active colour. The tint layer
-					     paints its gradient from `currentColor` so the 500ms colour transition
-					     actually animates (gradients themselves aren't transitionable). -->
+				<!-- Dark showroom panel, tinted toward the active colour. The tint layer paints its
+				     gradient from `currentColor` so the 500ms colour transition actually animates
+				     (gradients themselves aren't transitionable). -->
+				<div class="relative isolate mt-10 overflow-hidden rounded-3xl bg-[#121316] shadow-2xl">
 					<div
-						class="absolute inset-0 bg-[#121316] lg:[clip-path:polygon(20%_0,100%_0,100%_100%,0%_100%)]"
+						class="absolute inset-0 -z-10 bg-[linear-gradient(135deg,currentColor_0%,transparent_75%)] opacity-[0.16] transition-colors duration-500"
+						:style="{ color: selectedColor?.hex_code || '#121316' }"
 						aria-hidden="true"
-					>
-						<div
-							class="absolute inset-0 bg-[linear-gradient(135deg,currentColor_0%,transparent_75%)] opacity-[0.16] transition-colors duration-500"
-							:style="{ color: selectedColor?.hex_code || '#121316' }"
-						/>
-					</div>
+					/>
+					<!-- Showroom floor: a lighter elliptical pool the car stands in -->
+					<div
+						class="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-[radial-gradient(ellipse_60%_55%_at_50%_70%,rgba(255,255,255,0.09),transparent_70%)]"
+						aria-hidden="true"
+					/>
 
-					<!-- Vehicle render + ground shadow -->
-					<div class="relative z-10 w-full max-w-3xl">
-						<!-- Fixed 16:9 stage: switching colours crossfades without any reflow. -->
+					<div class="mx-auto max-w-4xl px-4 py-12 sm:px-8">
+						<!-- Fixed 2:1 stage: switching colours crossfades without any reflow. -->
 						<VehicleColorStage
-							class="relative z-10"
 							:src="colorRenderUrl(activeColorImageUuid)"
 							:alt="`${vehicle.title} in ${selectedColor?.color_name ?? ''}`"
 							:preload="colorRenderUrls"
-							img-class="drop-shadow-[0_24px_30px_rgba(0,0,0,0.55)]"
 						/>
-						<div
-							class="mx-auto -mt-6 h-8 w-4/5 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.75)_0%,rgba(0,0,0,0.3)_45%,transparent_72%)] blur-sm"
-							aria-hidden="true"
-						/>
-					</div>
 
-					<!-- Controls -->
-					<div v-if="colors.length" class="relative z-10 mt-8 flex flex-col items-center text-center text-white">
-						<div class="flex items-center gap-4 text-sm font-bold tracking-widest">
-							<button
-								type="button"
-								class="grid h-8 w-8 place-items-center rounded-full text-white/70 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-								aria-label="Previous colour"
-								@click="stepColor(-1)"
+						<!-- Controls -->
+						<div v-if="colors.length" class="relative z-10 mt-6 flex flex-col items-center text-center text-white">
+							<p v-if="selectedColor" class="text-lg font-bold uppercase tracking-widest md:text-xl" aria-live="polite">
+								{{ selectedColor.color_name }}
+							</p>
+
+							<div class="mt-6 flex items-center gap-5">
+								<button
+									type="button"
+									class="grid h-9 w-9 place-items-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+									aria-label="Previous colour"
+									@click="stepColor(-1)"
+								>
+									<svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+										<path d="M12.5 5l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round" />
+									</svg>
+								</button>
+
+								<div class="flex flex-wrap items-center justify-center gap-4" role="radiogroup" aria-label="Exterior colours">
+									<button
+										v-for="(color, index) in colors"
+										:key="color.id"
+										type="button"
+										role="radio"
+										:aria-checked="index === selectedColorIdx"
+										:aria-label="color.color_name"
+										:title="color.color_name"
+										class="h-9 w-9 rounded-full border border-white/25 shadow-md transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-4 focus-visible:ring-offset-[#121316]"
+										:class="index === selectedColorIdx ? 'scale-110 ring-2 ring-white ring-offset-4 ring-offset-[#121316]' : 'hover:scale-110 hover:ring-1 hover:ring-white/40 hover:ring-offset-2 hover:ring-offset-[#121316]'"
+										:style="{ background: color.hex_code }"
+										@click="selectedColorIdx = index"
+									>
+										<span class="sr-only">{{ color.color_name }}</span>
+									</button>
+								</div>
+
+								<button
+									type="button"
+									class="grid h-9 w-9 place-items-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+									aria-label="Next colour"
+									@click="stepColor(1)"
+								>
+									<svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+										<path d="M7.5 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
+									</svg>
+								</button>
+							</div>
+
+							<p class="mt-4 text-xs font-bold tracking-widest text-white/50">
+								{{ pad2(selectedColorIdx + 1) }} / {{ pad2(colors.length) }}
+							</p>
+
+							<NuxtLink
+								:to="{ path: '/contact', query: { vehicle: vehicle.slug } }"
+								class="mt-8 inline-block rounded-md border border-white/40 bg-white/10 px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-md transition-colors hover:border-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#121316]"
 							>
-								<svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-									<path d="M12.5 5l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round" />
-								</svg>
-							</button>
-							<span aria-live="polite">
-								{{ pad2(selectedColorIdx + 1) }}<span class="text-white/50">/{{ pad2(colors.length) }}</span>
-							</span>
-							<button
-								type="button"
-								class="grid h-8 w-8 place-items-center rounded-full text-white/70 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-								aria-label="Next colour"
-								@click="stepColor(1)"
-							>
-								<svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-									<path d="M7.5 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
-								</svg>
-							</button>
+								Book a test drive
+							</NuxtLink>
 						</div>
-
-						<div class="mt-5 flex flex-wrap items-center justify-center gap-4" role="radiogroup" aria-label="Exterior colours">
-							<button
-								v-for="(color, index) in colors"
-								:key="color.id"
-								type="button"
-								role="radio"
-								:aria-checked="index === selectedColorIdx"
-								:aria-label="color.color_name"
-								class="h-7 w-7 rounded-full shadow-md transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-								:class="index === selectedColorIdx ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-slate-950' : 'hover:scale-110'"
-								:style="{ background: color.hex_code }"
-								@click="selectedColorIdx = index"
-							>
-								<span class="sr-only">{{ color.color_name }}</span>
-							</button>
-						</div>
-
-						<p v-if="selectedColor" class="mt-6 text-lg font-bold uppercase tracking-widest md:text-xl">
-							{{ selectedColor.color_name }}
-						</p>
 					</div>
 				</div>
 			</div>
