@@ -1,3 +1,4 @@
+import type { MaybeRefOrGetter } from 'vue';
 import type { z, ZodTypeAny } from 'zod';
 import { VEHICLE_MODEL_OPTIONS, type InquiryType, type VehicleModel } from '#shared/types/contact';
 
@@ -20,8 +21,14 @@ export const inquiryInputClass =
  * message is only shown once it has been touched (blurred) or a submit was
  * attempted, so a fresh form renders without red errors. Also tracks loading,
  * the success/error banner, and resets to `initial()` after a successful send.
+ * `type` and `schema` may be refs/getters, so one form can switch flows (the showroom modal
+ * toggles between test_drive and financing_inquiry).
  */
-export function useInquiryForm<S extends ZodTypeAny>(type: InquiryType, schema: S, initial: () => z.input<S>) {
+export function useInquiryForm<S extends ZodTypeAny>(
+	type: MaybeRefOrGetter<InquiryType>,
+	schema: MaybeRefOrGetter<S>,
+	initial: () => z.input<S>,
+) {
 	type Values = z.input<S>;
 	type Key = keyof Values & string;
 	type ErrorMap = Partial<Record<Key, string>>;
@@ -35,7 +42,7 @@ export function useInquiryForm<S extends ZodTypeAny>(type: InquiryType, schema: 
 	const serverError = ref('');
 
 	const clientErrors = computed<ErrorMap>(() => {
-		const result = schema.safeParse({ ...values });
+		const result = toValue(schema).safeParse({ ...values });
 		if (result.success) return {};
 		const out: ErrorMap = {};
 		for (const issue of result.error.issues) {
@@ -95,7 +102,7 @@ export function useInquiryForm<S extends ZodTypeAny>(type: InquiryType, schema: 
 		loading.value = true;
 		serverError.value = '';
 		try {
-			await $fetch('/api/forms/parts-service', { method: 'POST', body: { type, data: { ...values } } });
+			await $fetch('/api/forms/parts-service', { method: 'POST', body: { type: toValue(type), data: { ...values } } });
 			reset();
 			// The reset above mutates `values`; set the status after the watcher has flushed.
 			await nextTick();

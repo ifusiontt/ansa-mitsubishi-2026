@@ -2,22 +2,24 @@
 /**
  * parts-service-forms.mjs
  *
- * Schema + content for the /service, /parts and homepage test-drive inquiry flows
+ * Schema + content for the /service, /parts, homepage test-drive and showroom financing inquiry flows
  * (nuxt/app/components/forms/ServiceBookingForm.vue, PartsRequestForm.vue,
- * nuxt/app/components/home/HomeContactBanner.vue):
+ * nuxt/app/components/home/HomeContactBanner.vue, nuxt/app/components/shared/BookTestDriveModal.vue):
  *
  *   1. form_submissions gains two fields:
- *        - submission_type  (string dropdown: contact | service | parts | test_drive)
+ *        - submission_type  (string dropdown: contact | service | parts | test_drive | financing_inquiry)
  *        - metadata         (json) — the structured request: contact details plus
  *          service_type, vehicle_model, registration_number, vehicle_mileage,
  *          vehicle_year, chassis_number, part_number, part_description,
- *          request_date, dealer_id (see nuxt/shared/types/contact.ts)
- *   2. forms rows "Service Booking", "Parts Request" and "Test Drive Request" (no
+ *          request_date, dealer_id, trim and the financing estimate fields
+ *          (see nuxt/shared/types/contact.ts)
+ *   2. forms rows "Service Booking", "Parts Request", "Test Drive Request" and
+ *      "Financing Pre-Approval" (no
  *      form_fields — the Vue components own their fields) so submissions are grouped
  *      per form. Service/parts carry a `{# field #}` confirmation email template; the
- *      test-drive request collects no email address, so it has none.
+ *      test-drive request collects no email address, so it has none; financing confirms the estimate.
  *   3. Public policy: create-only on form_submissions, limited to
- *      form / submission_type / metadata and validated to service | parts | test_drive.
+ *      form / submission_type / metadata and validated to the inquiry types above.
  *      No public read — seed-permissions.py still keeps submissions private.
  *   4. Left-column rich-text blocks appended to the /service and /parts pages
  *      (created by sync-nav-service-parts.py); matched by headline, never overwritten.
@@ -81,6 +83,7 @@ const FIELDS = [
 					{ text: 'Service Booking', value: 'service' },
 					{ text: 'Parts Request', value: 'parts' },
 					{ text: 'Test Drive Request', value: 'test_drive' },
+					{ text: 'Financing Pre-Approval', value: 'financing_inquiry' },
 				],
 			},
 		},
@@ -154,6 +157,19 @@ const FORMS = [
 		success_message: 'Thank you! A sales consultant will call you to arrange your test drive.',
 		emails: [],
 	},
+	{
+		title: 'Financing Pre-Approval',
+		submit_label: 'REQUEST FINANCING PRE-APPROVAL',
+		success_message: 'Thank you! A finance specialist will contact you about pre-approval.',
+		emails: [
+			{
+				to: ['{# email #}'],
+				subject: 'Your ANSA Motors financing request - {# vehicle_model #}',
+				message:
+					'<p>Hi {# first_name #},</p><p>We received your pre-approval request for the <strong>{# vehicle_model #} {# trim #}</strong>: an estimated <strong>TTD ${# monthly_payment #}/month</strong> over {# term_months #} months with a {# deposit_percent #}% deposit at {# interest_rate #}% APR. A finance specialist from our {# dealer #} branch will contact you to review your application.</p><p><em>This is an estimate only; final terms are subject to the lender\'s credit assessment.</em></p>',
+			},
+		],
+	},
 ];
 
 console.log('2. forms');
@@ -178,7 +194,7 @@ if (!publicPolicy) throw new Error('public policy not found');
 const permission = {
 	fields: ['form', 'submission_type', 'metadata'],
 	permissions: {},
-	validation: { _and: [{ submission_type: { _in: ['service', 'parts', 'test_drive'] } }] },
+	validation: { _and: [{ submission_type: { _in: ['service', 'parts', 'test_drive', 'financing_inquiry'] } }] },
 	presets: {},
 };
 const existingPerm = await api(

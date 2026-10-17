@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { FINANCE_APR, FINANCE_TERMS } from '#shared/types/contact';
+
 /**
  * Financing estimator for /showroom/[slug]: deposit and term sliders against a fixed illustrative
  * APR, with the standard amortisation formula M = P·r(1+r)^n / ((1+r)^n − 1), r = APR / 12.
  * `basePrice` follows the trim selected on the page (falling back to the starting price), so the
- * estimate updates as the customer picks a trim. "Apply for Pre-Approval" opens the global
- * test-drive modal until a dedicated finance form exists.
+ * estimate updates as the customer picks a trim. "Apply for Pre-Approval" opens the global lead
+ * modal in financing mode, carrying the current estimate into the `financing_inquiry` submission.
  */
 const props = defineProps<{
 	basePrice: number;
@@ -14,8 +16,8 @@ const props = defineProps<{
 	trimName?: string;
 }>();
 
-const INTEREST_RATE = 6.5; // % APR, ANSA Merchant Bank (illustrative)
-const TERMS = [36, 48, 60, 72, 84];
+const INTEREST_RATE = FINANCE_APR; // % APR, ANSA Merchant Bank (illustrative)
+const TERMS = FINANCE_TERMS;
 
 const depositPercent = ref(10);
 const termMonths = ref(60);
@@ -35,7 +37,22 @@ const totalInterest = computed(() => monthlyPayment.value * termMonths.value - p
 
 const ttd = (value: number) => `TTD $${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(value))}`;
 
-const { open: openTestDrive } = useTestDriveModal();
+const { open: openLeadModal } = useTestDriveModal();
+
+function applyForPreApproval() {
+	openLeadModal({
+		mode: 'financing',
+		slug: props.vehicleSlug,
+		title: props.vehicleTitle,
+		trim: props.trimName,
+		financing: {
+			price: props.basePrice,
+			depositPercent: depositPercent.value,
+			termMonths: termMonths.value,
+			monthlyPayment: monthlyPayment.value,
+		},
+	});
+}
 </script>
 
 <template>
@@ -122,7 +139,7 @@ const { open: openTestDrive } = useTestDriveModal();
 				<button
 					type="button"
 					class="mt-6 w-full rounded-md bg-brand-red px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
-					@click="openTestDrive({ slug: vehicleSlug, title: vehicleTitle, trim: trimName })"
+					@click="applyForPreApproval"
 				>
 					Apply for Pre-Approval
 				</button>

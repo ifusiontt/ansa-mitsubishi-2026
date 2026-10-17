@@ -1,6 +1,7 @@
 import {
 	INQUIRY_FORM_TITLES,
 	dealerLabel,
+	financingInquirySchema,
 	partsRequestSchema,
 	serviceBookingSchema,
 	testDriveSchema,
@@ -10,11 +11,12 @@ import {
 import type { Form } from '#shared/types/schema';
 
 /**
- * Service booking / parts request / quick test-drive handler for /service, /parts and the homepage.
+ * Service booking / parts request / test-drive / financing pre-approval handler for /service,
+ * /parts, the homepage and the showroom modals.
  *
- * Body: `{ type: 'service' | 'parts' | 'test_drive', data: {...} }` (InquiryPayload). The data is
+ * Body: `{ type: 'service' | 'parts' | 'test_drive' | 'financing_inquiry', data: {...} }` (InquiryPayload). The data is
  * re-validated with the same zod schema the form uses, then stored as one
- * `form_submissions` row: `form` → the "Service Booking" / "Parts Request" / "Test Drive Request" form,
+ * `form_submissions` row: `form` → the matching INQUIRY_FORM_TITLES form,
  * `submission_type`, and the structured `metadata` JSON. The form's email
  * templates are rendered with the metadata as `{# field #}` merge values.
  */
@@ -28,7 +30,12 @@ export default defineEventHandler(async (event) => {
 	const body = await readBody<{ type?: unknown; data?: unknown }>(event);
 	const type = body?.type as InquiryType;
 
-	const schemas = { service: serviceBookingSchema, parts: partsRequestSchema, test_drive: testDriveSchema };
+	const schemas = {
+		service: serviceBookingSchema,
+		parts: partsRequestSchema,
+		test_drive: testDriveSchema,
+		financing_inquiry: financingInquirySchema,
+	};
 	// Own-key check so prototype keys ("constructor", "__proto__") are rejected rather than looked up.
 	const schema = typeof type === 'string' && Object.hasOwn(schemas, type) ? schemas[type] : undefined;
 
@@ -51,7 +58,9 @@ export default defineEventHandler(async (event) => {
 			? toInquiryMetadata({ type, data: parsed.data as typeof serviceBookingSchema._output })
 			: type === 'parts'
 				? toInquiryMetadata({ type, data: parsed.data as typeof partsRequestSchema._output })
-				: toInquiryMetadata({ type, data: parsed.data as typeof testDriveSchema._output });
+				: type === 'test_drive'
+					? toInquiryMetadata({ type, data: parsed.data as typeof testDriveSchema._output })
+					: toInquiryMetadata({ type, data: parsed.data as typeof financingInquirySchema._output });
 
 	let form: Pick<Form, 'id' | 'title' | 'emails'> | undefined;
 

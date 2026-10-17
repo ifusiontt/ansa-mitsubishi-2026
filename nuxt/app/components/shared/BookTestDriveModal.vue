@@ -1,25 +1,55 @@
 <script setup lang="ts">
 import { DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'radix-vue';
+import type { z } from 'zod';
 import {
 	DEALER_OPTIONS,
+	FINANCE_APR,
 	VEHICLE_MODEL_OPTIONS,
+	financingInquirySchema,
 	testDriveBookingSchema,
 	todayInTT,
+	type FinancingInquiryInput,
 	type TestDriveBookingInput,
 } from '#shared/types/contact';
 import { inquiryInputClass as inputClass, vehicleModelFrom } from '~/composables/useInquiryForm';
 
 /**
- * Global Book a Test Drive modal, mounted once in layouts/default.vue and opened from any CTA via
- * useTestDriveModal().open({ slug, title, trim }). radix-vue's Dialog portals it to <body> and
- * handles the focus trap, Esc and scroll lock.
+ * Global showroom lead modal, mounted once in layouts/default.vue and opened from any CTA via
+ * useTestDriveModal().open({ mode, slug, title, trim, financing }). radix-vue's Dialog portals it
+ * to <body> and handles the focus trap, Esc and scroll lock. Two modes, one form:
  *
- * Posts a `test_drive` inquiry to /api/forms/parts-service (the same lead pipeline as the homepage
- * quick form), with email, branch, date and the trim being viewed. When the CTA names a fleet model
- * the vehicle is fixed and shown as a context pill; otherwise the customer picks one.
+ *  - test_drive: posts a `test_drive` inquiry to /api/forms/parts-service (the same lead pipeline
+ *    as the homepage quick form) with email, branch, date and the trim being viewed.
+ *  - financing: opened by the financing estimator; shows the estimate as a summary card, drops
+ *    the date field, and posts a `financing_inquiry` carrying the estimate figures.
+ *
+ * When the CTA names a fleet model the vehicle is fixed and shown in the context pill/card;
+ * otherwise the customer picks one.
  * Overlay sits at z-[70] so it covers the z-[60] sticky site header.
  */
-const { isOpen, vehicleSlug, vehicleTitle, selectedTrim, close } = useTestDriveModal();
+const { isOpen, mode, vehicleSlug, vehicleTitle, selectedTrim, financing, close } = useTestDriveModal();
+
+const isFinancing = computed(() => mode.value === 'financing' && !!financing.value);
+
+const COPY = {
+	test_drive: {
+		eyebrow: 'Schedule an Experience',
+		title: 'Book a Test Drive',
+		description: 'Pick a branch and date — our sales team will call to confirm your drive.',
+		submit: 'Confirm Test Drive Request',
+		success: 'Thank you! Your test-drive request has been received. Our sales team will contact you shortly to confirm.',
+	},
+	financing: {
+		eyebrow: 'Financing & Pre-Approval',
+		title: 'Apply for Pre-Approval',
+		description: 'Share your details and a finance specialist will review your estimate and contact you about pre-approval.',
+		submit: 'Request Financing Pre-Approval',
+		success: 'Thank you! Your pre-approval request has been received. A finance specialist will contact you shortly.',
+	},
+} as const;
+const copy = computed(() => COPY[isFinancing.value ? 'financing' : 'test_drive']);
+
+const ttd = (value: number) => `TTD $${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(value))}`;
 
 const presetModel = computed(() => vehicleModelFrom(vehicleSlug.value) ?? vehicleModelFrom(vehicleTitle.value));
 
@@ -29,17 +59,33 @@ const contextLabel = computed(() => {
 	return [`2026 ${presetModel.value}`, selectedTrim.value].filter(Boolean).join(' · ');
 });
 
-const initial = (): TestDriveBookingInput => ({
+/**
+ * One value bag for both modes: each mode's schema validates (and the server keeps) only its own
+ * keys — test drives ignore the estimate figures, financing ignores the date.
+ */
+type LeadValues = TestDriveBookingInput & Omit<FinancingInquiryInput, keyof TestDriveBookingInput>;
+
+const initial = (): LeadValues => ({
 	full_name: '',
 	phone: '',
 	email: '',
-	dealer_id: '' as TestDriveBookingInput['dealer_id'],
+	dealer_id: '' as LeadValues['dealer_id'],
 	request_date: '',
-	vehicle_model: (presetModel.value ?? '') as TestDriveBookingInput['vehicle_model'],
+	vehicle_model: (presetModel.value ?? '') as LeadValues['vehicle_model'],
 	trim: selectedTrim.value,
+	vehicle_price: financing.value?.price ?? 0,
+	deposit_percent: financing.value?.depositPercent ?? 0,
+	term_months: financing.value?.termMonths ?? 0,
+	monthly_payment: financing.value?.monthlyPayment ?? 0,
 });
 
-const { values, errors, loading, status, serverError, touch, submit, reset } = useInquiryForm('test_drive', testDriveBookingSchema, initial);
+const schema = computed(() => (isFinancing.value ? financingInquirySchema : testDriveBookingSchema) as unknown as z.ZodType<unknown, z.ZodTypeDef, LeadValues>);
+
+const { values, errors, loading, status, serverError, touch, submit, reset } = useInquiryForm(
+	() => (isFinancing.value ? 'financing_inquiry' : 'test_drive'),
+	schema,
+	initial,
+);
 
 // Each open starts clean, pre-populated with the vehicle + trim the CTA passed.
 watch(isOpen, (open) => {
@@ -80,14 +126,29 @@ function focusFirstField(event: Event) {
 						<Icon name="lucide:x" class="size-5" />
 					</DialogClose>
 
-					<p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-red">Schedule an Experience</p>
-					<DialogTitle class="mt-2 text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl dark:text-white">Book a Test Drive</DialogTitle>
-					<DialogDescription class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-						Pick a branch and date — our sales team will call to confirm your drive.
-					</DialogDescription>
+					<p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-red">{{ copy.eyebrow }}</p>
+					<DialogTitle class="mt-2 text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl dark:text-white">{{ copy.title }}</DialogTitle>
+					<DialogDescription class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{{ copy.description }}</DialogDescription>
+
+					<!-- Financing: the estimate the customer is applying with -->
+					<div
+						v-if="isFinancing && financing"
+						class="mt-5 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/60"
+					>
+						<p v-if="contextLabel" class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
+							<Icon name="lucide:car-front" class="size-4 text-brand-red" aria-hidden="true" />
+							{{ contextLabel }}
+						</p>
+						<p class="mt-2 text-lg font-bold text-zinc-900 dark:text-white">
+							Estimated {{ ttd(financing.monthlyPayment) }}<span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">/mo</span>
+						</p>
+						<p class="mt-0.5 text-sm text-zinc-600 dark:text-zinc-300">
+							{{ financing.depositPercent }}% Deposit · {{ financing.termMonths }} Months · {{ FINANCE_APR }}% APR on {{ ttd(financing.price) }}
+						</p>
+					</div>
 
 					<p
-						v-if="contextLabel"
+						v-else-if="contextLabel"
 						class="mt-4 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
 					>
 						<Icon name="lucide:car-front" class="size-4 text-brand-red" aria-hidden="true" />
@@ -101,7 +162,7 @@ function focusFirstField(event: Event) {
 							class="mt-6 flex items-start gap-3 rounded-lg border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-700/60 dark:bg-emerald-950/50 dark:text-emerald-100"
 						>
 							<Icon name="lucide:circle-check" class="mt-0.5 size-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-							<p>Thank you! Your test-drive request has been received. Our sales team will contact you shortly to confirm.</p>
+							<p>{{ copy.success }}</p>
 						</div>
 						<div
 							v-else-if="status === 'error'"
@@ -155,13 +216,21 @@ function focusFirstField(event: Event) {
 									<option v-for="option in VEHICLE_MODEL_OPTIONS" :key="option" :value="option">{{ option }}</option>
 								</select>
 							</InquiryField>
-							<InquiryField v-slot="attrs" id-prefix="test-drive" name="dealer_id" label="Preferred ANSA Location" required :error="errors.dealer_id">
+							<InquiryField
+								v-slot="attrs"
+								id-prefix="test-drive"
+								name="dealer_id"
+								label="Preferred ANSA Location"
+								required
+								:error="errors.dealer_id"
+								:class="{ 'sm:col-span-2': isFinancing }"
+							>
 								<select v-bind="attrs" v-model="values.dealer_id" :class="inputClass" @blur="touch('dealer_id')">
 									<option value="" disabled>Select a branch</option>
 									<option v-for="option in DEALER_OPTIONS" :key="option.value" :value="option.value">{{ option.label }}</option>
 								</select>
 							</InquiryField>
-							<InquiryField v-slot="attrs" id-prefix="test-drive" name="request_date" label="Preferred Date" required :error="errors.request_date">
+							<InquiryField v-if="!isFinancing" v-slot="attrs" id-prefix="test-drive" name="request_date" label="Preferred Date" required :error="errors.request_date">
 								<input v-bind="attrs" v-model="values.request_date" type="date" :min="minDate" :class="inputClass" @blur="touch('request_date')" />
 							</InquiryField>
 						</fieldset>
@@ -173,7 +242,7 @@ function focusFirstField(event: Event) {
 							class="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand-red px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-md transition-all hover:bg-brand-red-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.99] disabled:cursor-wait disabled:opacity-70 dark:focus-visible:ring-offset-zinc-900"
 						>
 							<Icon v-if="loading" name="lucide:loader-circle" class="size-4 animate-spin" />
-							{{ loading ? 'Sending…' : 'Confirm Test Drive Request' }}
+							{{ loading ? 'Sending…' : copy.submit }}
 						</button>
 					</form>
 				</DialogContent>
