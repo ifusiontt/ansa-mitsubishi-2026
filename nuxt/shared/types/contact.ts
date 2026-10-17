@@ -22,6 +22,23 @@ export const INQUIRY_FORM_TITLES: Record<InquiryType, string> = {
 /** Showroom financing estimator terms (months) and its fixed illustrative APR (%). */
 export const FINANCE_TERMS = [36, 48, 60, 72, 84] as const;
 export const FINANCE_APR = 6.5;
+/** Standard terms the estimator opens on and the fleet cards quote: 10% down over 60 months. */
+export const FINANCE_DEFAULT_DEPOSIT_PERCENT = 10;
+export const FINANCE_DEFAULT_TERM_MONTHS = 60;
+
+/** Amortised monthly payment M = P·r(1+r)^n / ((1+r)^n − 1), r = APR / 12, on the price less the deposit. */
+export function estimateMonthlyPayment(
+	price: number,
+	depositPercent = FINANCE_DEFAULT_DEPOSIT_PERCENT,
+	termMonths = FINANCE_DEFAULT_TERM_MONTHS,
+	apr = FINANCE_APR,
+): number {
+	const principal = price - Math.round((price * depositPercent) / 100);
+	if (principal <= 0) return 0;
+	const r = apr / 100 / 12;
+	const growth = (1 + r) ** termMonths;
+	return (principal * r * growth) / (growth - 1);
+}
 
 /** Branch choices; `value` is stored as `metadata.dealer_id` (matches `dealers.slug` where a row exists). */
 export const DEALER_OPTIONS = [

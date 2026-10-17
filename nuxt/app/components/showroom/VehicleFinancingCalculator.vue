@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { FINANCE_APR, FINANCE_TERMS } from '#shared/types/contact';
+import {
+	FINANCE_APR,
+	FINANCE_DEFAULT_DEPOSIT_PERCENT,
+	FINANCE_DEFAULT_TERM_MONTHS,
+	FINANCE_TERMS,
+	estimateMonthlyPayment,
+} from '#shared/types/contact';
 
 /**
  * Financing estimator for /showroom/[slug]: deposit and term sliders against a fixed illustrative
@@ -19,19 +25,13 @@ const props = defineProps<{
 const INTEREST_RATE = FINANCE_APR; // % APR, ANSA Merchant Bank (illustrative)
 const TERMS = FINANCE_TERMS;
 
-const depositPercent = ref(10);
-const termMonths = ref(60);
+const depositPercent = ref(FINANCE_DEFAULT_DEPOSIT_PERCENT);
+const termMonths = ref<number>(FINANCE_DEFAULT_TERM_MONTHS);
 
 const deposit = computed(() => Math.round((props.basePrice * depositPercent.value) / 100));
 const principal = computed(() => props.basePrice - deposit.value);
 
-const monthlyPayment = computed(() => {
-	const r = INTEREST_RATE / 100 / 12;
-	const n = termMonths.value;
-	if (principal.value <= 0) return 0;
-	const growth = (1 + r) ** n;
-	return (principal.value * r * growth) / (growth - 1);
-});
+const monthlyPayment = computed(() => estimateMonthlyPayment(props.basePrice, depositPercent.value, termMonths.value, INTEREST_RATE));
 
 const totalInterest = computed(() => monthlyPayment.value * termMonths.value - principal.value);
 

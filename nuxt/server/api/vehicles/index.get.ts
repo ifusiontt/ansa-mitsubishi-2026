@@ -7,13 +7,15 @@ import type { VehicleSummary } from '#shared/types/vehicle';
 const FLEET_SLUGS = ['outlander-sport', 'triton', 'xpander-cross', 'xpander'];
 
 /**
- * Vehicle list handler — published fleet index for the header mega menu.
+ * Vehicle list handler — published fleet index for the header mega menu and the homepage fleet
+ * cards (colour swatches, quick specs modal).
  * Archived fleet models (currently the Xpander) are excluded.
  *
  * Server-side equivalent of:
  *   GET /items/vehicles?filter[slug][_in]=<FLEET_SLUGS>&filter[status][_eq]=published
  *     &fields=id,slug,title,model_year,starting_price,menu_image,category,seating_capacity,fuel_type,
- *       hero_block.media,trims.status,trims.price,trims.engine,trims.drivetrain
+ *       body_type,warranty,brochure_url,hero_block.media,colors.sort,colors.color_name,colors.hex_code,colors.image,
+ *       trims.status,trims.price,trims.engine,trims.transmission,trims.drivetrain
  */
 export default defineEventHandler(async () => {
 	const vehicles = (await directusServer.request(
@@ -29,8 +31,12 @@ export default defineEventHandler(async () => {
 				'category',
 				'seating_capacity',
 				'fuel_type',
+				'body_type',
+				'warranty',
+				'brochure_url',
 				{ hero_block: ['media'] },
-				{ trims: ['status', 'price', 'engine', 'drivetrain'] },
+				{ colors: ['sort', 'color_name', 'hex_code', 'image'] },
+				{ trims: ['status', 'price', 'engine', 'transmission', 'drivetrain'] },
 			] as any,
 			limit: -1,
 		}),

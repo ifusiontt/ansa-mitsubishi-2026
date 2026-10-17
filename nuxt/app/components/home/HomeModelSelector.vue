@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VehicleSummary } from '#shared/types/vehicle';
+import { FINANCE_DEFAULT_DEPOSIT_PERCENT, FINANCE_DEFAULT_TERM_MONTHS, estimateMonthlyPayment } from '#shared/types/contact';
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 
 /**
@@ -10,17 +11,28 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  * sizes the image by that framing: every car fills ~90% of the fixed-height stage, tyres on the
  * contact shadow, at the same scale.
  *
+ * The vehicle_colors renders share that framing, so the swatch row under the stage swaps the
+ * image in place; each card keeps its own selection (first swatch by default).
+ *
  * Hover (or keyboard focus) slides up a quick-spec panel built from the vehicle's Directus data:
  * seats, drivetrain and engine across its published trims. Each card is a stretched link to the
- * showroom page, with a separate link to that page's Key Specifications section and a steering-wheel
- * quick action beside "Explore" that opens the global test-drive modal for that model.
+ * showroom page; controls above it (relative z-10) stay clickable: the swatches, an estimated monthly
+ * payment whose "Calculate" opens the lead modal in financing mode, a steering-wheel quick action
+ * that opens it for a test drive, and "+ Full Specs", which opens the global Quick Specs modal.
  */
 defineProps<{ vehicles: VehicleSummary[] }>();
 
-const cutoutUrl = (vehicle: VehicleSummary) => {
-	const id = directusFileId(vehicle.menu_image) || directusFileId(vehicle.hero_block?.media);
-	return id ? `${getDirectusAssetURL(id)}?width=960&quality=82&format=webp` : '';
-};
+const imageUrl = (id: string) => (id ? `${getDirectusAssetURL(id)}?width=960&quality=82&format=webp` : '');
+const cutoutUrl = (vehicle: VehicleSummary) => imageUrl(directusFileId(vehicle.menu_image) || directusFileId(vehicle.hero_block?.media));
+
+const swatches = (vehicle: VehicleSummary) => [...(vehicle.colors ?? [])].sort((a, b) => a.sort - b.sort);
+
+/** Selected swatch index per vehicle slug. */
+const activeColor = reactive<Record<string, number>>({});
+const activeIndex = (vehicle: VehicleSummary) => activeColor[vehicle.slug] ?? 0;
+
+/** The selected colour's render, falling back to the cutout when the colour has none. */
+const stageUrl = (vehicle: VehicleSummary) => imageUrl(directusFileId(swatches(vehicle)[activeIndex(vehicle)]?.image)) || cutoutUrl(vehicle);
 
 const unique = (values: (string | null | undefined)[]) => [...new Set(values.filter((v): v is string => !!v))];
 
@@ -42,7 +54,28 @@ function quickSpecs(vehicle: VehicleSummary) {
 
 const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 
-const { open: openTestDrive } = useTestDriveModal();
+/** Standard terms (10% down, 60 months, fixed APR) on the starting price. */
+const estimatedMonthly = (vehicle: VehicleSummary) => (vehicle.starting_price ? estimateMonthlyPayment(vehicle.starting_price) : 0);
+
+const { open: openLeadModal } = useTestDriveModal();
+const { open: openQuickSpecs } = useQuickSpecsModal();
+
+const openTestDrive = (vehicle: VehicleSummary) => openLeadModal({ slug: vehicle.slug, title: vehicle.title });
+
+function openFinancing(vehicle: VehicleSummary) {
+	if (!vehicle.starting_price) return;
+	openLeadModal({
+		mode: 'financing',
+		slug: vehicle.slug,
+		title: vehicle.title,
+		financing: {
+			price: vehicle.starting_price,
+			depositPercent: FINANCE_DEFAULT_DEPOSIT_PERCENT,
+			termMonths: FINANCE_DEFAULT_TERM_MONTHS,
+			monthlyPayment: estimatedMonthly(vehicle),
+		},
+	});
+}
 </script>
 
 <template>
@@ -71,9 +104,9 @@ const { open: openTestDrive } = useTestDriveModal();
 									aria-hidden="true"
 								/>
 								<img
-									v-if="cutoutUrl(vehicle)"
-									:src="cutoutUrl(vehicle)"
-									:alt="vehicle.title"
+									v-if="stageUrl(vehicle)"
+									:src="stageUrl(vehicle)"
+									:alt="[vehicle.title, swatches(vehicle)[activeIndex(vehicle)]?.color_name].filter(Boolean).join(' in ')"
 									loading="lazy"
 									class="absolute left-1/2 top-[-38%] h-[180%] w-auto max-w-none -translate-x-1/2 origin-[50%_74%] transition-transform duration-500 group-hover:scale-105"
 								/>
@@ -93,6 +126,27 @@ const { open: openTestDrive } = useTestDriveModal();
 							</dl>
 						</div>
 
+						<!-- Colour swatches: above the stretched link, swap the stage render in place -->
+						<div
+							v-if="swatches(vehicle).length > 1"
+							class="relative z-10 flex justify-center gap-2.5 px-4 pt-4"
+							role="group"
+							:aria-label="`${shortName(vehicle.title)} colours`"
+						>
+							<button
+								v-for="(color, index) in swatches(vehicle)"
+								:key="color.color_name"
+								type="button"
+								class="h-3.5 w-3.5 rounded-full border border-black/15 shadow-inner transition-transform hover:scale-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+								:class="index === activeIndex(vehicle) ? 'scale-110 ring-2 ring-brand-red ring-offset-2 ring-offset-white dark:ring-offset-neutral-900' : ''"
+								:style="{ backgroundColor: color.hex_code }"
+								:title="color.color_name"
+								:aria-label="color.color_name"
+								:aria-pressed="index === activeIndex(vehicle)"
+								@click="activeColor[vehicle.slug] = index"
+							/>
+						</div>
+
 						<div class="flex flex-1 flex-col p-4 md:p-6">
 							<span
 								v-if="vehicle.category"
@@ -102,9 +156,22 @@ const { open: openTestDrive } = useTestDriveModal();
 							</span>
 							<h3 class="text-xl font-bold text-neutral-950 dark:text-white">{{ vehicle.title }}</h3>
 							<p v-if="vehicle.model_year" class="mt-1 text-xs uppercase tracking-widest text-neutral-400">{{ vehicle.model_year }} model</p>
-							<p v-if="vehicle.starting_price" class="mb-4 mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-								From {{ formatTtdPrice(vehicle.starting_price) }}
-							</p>
+							<template v-if="vehicle.starting_price">
+								<p class="mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">From {{ formatTtdPrice(vehicle.starting_price) }}</p>
+								<!-- Financing hook: standard-terms estimate; "Calculate" (above the stretched link) opens the pre-approval modal -->
+								<p class="mb-4 mt-1 flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+									Est. {{ formatTtdPrice(Math.round(estimatedMonthly(vehicle))) }}/mo
+									<button
+										type="button"
+										class="relative z-10 inline-flex cursor-pointer items-center gap-1 font-semibold text-brand-red hover:underline focus:outline-none focus-visible:underline"
+										:aria-label="`Calculate financing for the ${vehicle.title}`"
+										@click="openFinancing(vehicle)"
+									>
+										<Icon name="lucide:calculator" class="size-3.5" aria-hidden="true" />
+										Calculate
+									</button>
+								</p>
+							</template>
 
 							<div class="mt-auto">
 								<div class="flex items-center gap-2">
@@ -123,7 +190,7 @@ const { open: openTestDrive } = useTestDriveModal();
 													type="button"
 													class="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-brand-red/30 bg-red-50/60 text-brand-red shadow-sm transition-all duration-200 hover:border-brand-red hover:bg-brand-red hover:text-white hover:shadow-md focus:outline-none focus-visible:border-brand-red focus-visible:bg-brand-red focus-visible:text-white focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 dark:bg-brand-red/10 dark:text-red-400 dark:hover:text-white dark:focus-visible:ring-offset-neutral-900"
 													:aria-label="`Book Test Drive for ${shortName(vehicle.title)}`"
-													@click="openTestDrive({ slug: vehicle.slug, title: vehicle.title })"
+													@click="openTestDrive(vehicle)"
 												>
 													<!-- Steering wheel: rim, hub and three spokes -->
 													<svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -139,14 +206,15 @@ const { open: openTestDrive } = useTestDriveModal();
 										</Tooltip>
 									</TooltipProvider>
 								</div>
-								<!-- Sits above the stretched link (relative z-10) -->
-								<NuxtLink
-									:to="`/showroom/${vehicle.slug}#specs`"
+								<!-- Sits above the stretched link (relative z-10); opens the Quick Specs modal -->
+								<button
+									type="button"
 									class="relative z-10 mt-3 block w-full text-center text-xs font-semibold text-neutral-500 transition-colors hover:text-black focus:outline-none focus-visible:underline dark:hover:text-white"
-									:aria-label="`Full specifications for the ${vehicle.title}`"
+									:aria-label="`Quick specifications for the ${vehicle.title}`"
+									@click="openQuickSpecs(vehicle)"
 								>
 									+ Full Specs
-								</NuxtLink>
+								</button>
 							</div>
 						</div>
 					</article>

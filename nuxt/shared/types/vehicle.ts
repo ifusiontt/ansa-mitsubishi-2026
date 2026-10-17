@@ -98,12 +98,25 @@ export interface VehiclePage {
 	trims: VehiclePageTrim[];
 }
 
-/** Lightweight published-vehicle index row (GET /api/vehicles) — used by the header mega menu. */
+/** Lightweight published-vehicle index row (GET /api/vehicles) — used by the header mega menu and the homepage fleet cards. */
 export type VehicleSummary = Pick<
 	VehiclePage,
-	'id' | 'slug' | 'title' | 'model_year' | 'starting_price' | 'menu_image' | 'category' | 'seating_capacity' | 'fuel_type'
+	| 'id'
+	| 'slug'
+	| 'title'
+	| 'model_year'
+	| 'starting_price'
+	| 'menu_image'
+	| 'category'
+	| 'seating_capacity'
+	| 'fuel_type'
+	| 'body_type'
+	| 'warranty'
+	| 'brochure_url'
 > & {
 	hero_block: Pick<VehicleHeroBlock, 'media'> | null;
-	/** Spec slice for the homepage cards' quick-spec reveal. */
-	trims: Pick<VehiclePageTrim, 'status' | 'price' | 'engine' | 'drivetrain'>[];
+	/** Swatches for the homepage cards; each image is a render on the same studio framing as menu_image. */
+	colors: Pick<VehiclePageColor, 'sort' | 'color_name' | 'hex_code' | 'image'>[];
+	/** Spec slice for the homepage cards' quick-spec reveal and the Quick Specs modal. */
+	trims: Pick<VehiclePageTrim, 'status' | 'price' | 'engine' | 'transmission' | 'drivetrain'>[];
 };
