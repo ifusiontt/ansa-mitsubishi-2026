@@ -121,7 +121,7 @@ const { open: openTestDrive } = useTestDriveModal();
 											<TooltipTrigger as-child>
 												<button
 													type="button"
-													class="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-zinc-700 transition-colors hover:border-brand-red hover:bg-brand-red hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 dark:border-zinc-700 dark:text-zinc-300 dark:focus-visible:ring-offset-neutral-900"
+													class="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-brand-red/30 bg-red-50/60 text-brand-red shadow-sm transition-all duration-200 hover:border-brand-red hover:bg-brand-red hover:text-white hover:shadow-md focus:outline-none focus-visible:border-brand-red focus-visible:bg-brand-red focus-visible:text-white focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 dark:bg-brand-red/10 dark:text-red-400 dark:hover:text-white dark:focus-visible:ring-offset-neutral-900"
 													:aria-label="`Book Test Drive for ${shortName(vehicle.title)}`"
 													@click="openTestDrive({ slug: vehicle.slug, title: vehicle.title })"
 												>

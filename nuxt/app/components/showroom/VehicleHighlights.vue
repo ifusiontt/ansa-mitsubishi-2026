@@ -81,8 +81,9 @@ const editAttr = (id: number) =>
 					/>
 				</div>
 
-				<div class="flex flex-col justify-center px-8 py-16 sm:px-12 lg:px-24 lg:py-24 xl:px-32">
-					<div class="max-w-xl">
+				<!-- Copy is centred in its half so it sits close to the photo seam instead of the far edge -->
+				<div class="flex items-center">
+					<div class="mx-auto flex w-full max-w-xl flex-col justify-center px-6 py-12 sm:px-10 lg:px-12 lg:py-20 xl:px-16">
 						<p v-if="row.tagline">
 							<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400">
 								{{ row.tagline }}
