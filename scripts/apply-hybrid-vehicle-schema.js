@@ -839,6 +839,8 @@ const PUBLIC_READ_WHITELISTS = {
     'body_type', 'seating_capacity', 'fuel_type', 'warranty', 'overview',
     // hybrid vehicle schema (new):
     'hero_block', 'colors', 'highlights', 'trims', 'menu_image',
+    // scripts/add-spec-fields.mjs:
+    'ground_clearance', 'dimensions', 'torque', 'suspension',
   ],
   // new collection from the hybrid vehicle schema:
   vehicle_colors: ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'color_code', 'image'],

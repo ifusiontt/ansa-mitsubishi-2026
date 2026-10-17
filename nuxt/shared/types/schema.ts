@@ -668,6 +668,14 @@ export interface Vehicle {
 	seating_capacity?: number | null;
 	fuel_type?: string | null;
 	warranty?: string | null;
+	/** @description Minimum ground clearance, e.g. "222 mm". */
+	ground_clearance?: string | null;
+	/** @description Overall length × width × height, e.g. "4,390 × 1,810 × 1,660 mm". */
+	dimensions?: string | null;
+	/** @description Peak torque, e.g. "141 Nm @ 4,000 rpm". Power stays in the trim engine text. */
+	torque?: string | null;
+	/** @description Front / rear suspension, e.g. "MacPherson Strut / Torsion Beam". */
+	suspension?: string | null;
 	/** @description Long-form model overview */
 	overview?: string | null;
 	/** @description Hero block shown at the top of the vehicle detail page */

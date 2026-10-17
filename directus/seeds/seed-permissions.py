@@ -42,6 +42,7 @@ WHITELIST = {
     'vehicles': ['id', 'title', 'slug', 'tagline', 'hero_headline', 'starting_price',
                  'primary_color', 'brochure_url', 'status', 'model_year', 'category', 'menu_image',
                  'body_type', 'seating_capacity', 'fuel_type', 'warranty', 'overview',
+                 'ground_clearance', 'dimensions', 'torque', 'suspension',
                  'hero_block', 'colors', 'highlights', 'trims'],
     'vehicle_colors': ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'color_code', 'image'],
     'vehicle_trims': ['id', 'vehicle', 'vehicle_id', 'vehicle_slug', 'trim_name',

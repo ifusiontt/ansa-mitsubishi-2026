@@ -87,6 +87,11 @@ export interface VehiclePage {
 	seating_capacity: number | null;
 	fuel_type: string | null;
 	warranty: string | null;
+	/** Technical specs (scripts/add-spec-fields.mjs), e.g. "222 mm", "4,390 × 1,810 × 1,660 mm". */
+	ground_clearance: string | null;
+	dimensions: string | null;
+	torque: string | null;
+	suspension: string | null;
 	overview: string | null;
 	/** Optional looping hero background video (full URL). Not yet a Directus field. */
 	hero_video_url?: string | null;
@@ -113,6 +118,10 @@ export type VehicleSummary = Pick<
 	| 'body_type'
 	| 'warranty'
 	| 'brochure_url'
+	| 'ground_clearance'
+	| 'dimensions'
+	| 'torque'
+	| 'suspension'
 > & {
 	hero_block: Pick<VehicleHeroBlock, 'media'> | null;
 	/** Swatches for the homepage cards; each image is a render on the same studio framing as menu_image. */

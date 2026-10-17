@@ -3,12 +3,12 @@ import { DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogPor
 
 /**
  * Global Quick Specs modal, mounted once in layouts/default.vue and opened from the homepage fleet
- * cards via useQuickSpecsModal().open(vehicle). A 2-column at-a-glance grid summarised across the
- * vehicle's published trims (a value that differs per trim is listed once per variant), with the
- * brochure and the full showroom page as next steps.
- *
- * Directus carries no suspension, ground-clearance or dimension fields, so those are left to the
- * brochure rather than shown empty. Overlay sits at z-[70] over the z-[60] sticky header.
+ * cards via useQuickSpecsModal().open(vehicle). A 2-column at-a-glance grid: engine, power,
+ * transmission and drivetrain summarised across the vehicle's published trims (a value that differs
+ * per trim is listed once per variant), and the vehicle-level torque, suspension, seating, ground
+ * clearance and dimensions fields (scripts/add-spec-fields.mjs). A spec without data is skipped.
+ * The brochure and the full showroom page are the next steps.
+ * Overlay sits at z-[70] over the z-[60] sticky header.
  */
 const { isOpen, vehicle, close } = useQuickSpecsModal();
 
@@ -26,24 +26,24 @@ const summary = computed(() =>
 		.join(' · '),
 );
 
-/** "2.4L MIVEC Intercooled Turbo Diesel (135 kW @ 3,500 rpm, 430 Nm)" → power "135 kW", torque "430 Nm". */
+/** "2.4L MIVEC Intercooled Turbo Diesel (135 kW @ 3,500 rpm, 430 Nm)" → "135 kW". */
 const powerOf = (engine: string) => engine.match(/([\d.,]+)\s*(hp|kW|PS)\b/i)?.slice(1, 3).join(' ');
-const torqueOf = (engine: string) => engine.match(/([\d.,]+)\s*Nm\b/i)?.slice(1, 3).join(' ');
 
 const specs = computed(() => {
 	const current = vehicle.value;
 	if (!current) return [];
 	const engines = unique(trims.value.map((trim) => trim.engine));
 	const power = unique(engines.map(powerOf)).join(' / ');
-	const torque = unique(engines.map(torqueOf)).join(' / ');
 
 	return [
 		{ label: 'Engine / Displacement', icon: 'lucide:fuel', value: unique(engines.map((engine) => engine.split(' (')[0])).join(' / ') },
-		{ label: torque ? 'Horsepower & Torque' : 'Horsepower', icon: 'lucide:gauge', value: [power, torque].filter(Boolean).join(' · ') },
+		{ label: 'Horsepower & Torque', icon: 'lucide:gauge', value: [power, current.torque].filter(Boolean).join(' · ') },
 		{ label: 'Transmission', icon: 'lucide:cog', value: unique(trims.value.map((trim) => trim.transmission)).join(' / ') },
 		{ label: 'Drivetrain', icon: 'lucide:settings-2', value: unique(trims.value.map((trim) => trim.drivetrain)).join(' / ') },
+		{ label: 'Suspension', icon: 'lucide:move-vertical', value: current.suspension ?? '' },
 		{ label: 'Seating Capacity', icon: 'lucide:users', value: current.seating_capacity ? `${current.seating_capacity} Passengers` : '' },
-		{ label: 'Warranty', icon: 'lucide:shield-check', value: current.warranty ?? '' },
+		{ label: 'Ground Clearance', icon: 'lucide:arrow-down-to-line', value: current.ground_clearance ?? '' },
+		{ label: 'Dimensions (L × W × H)', icon: 'lucide:ruler', value: current.dimensions ?? '' },
 	].filter((spec) => spec.value);
 });
 
@@ -90,9 +90,6 @@ function focusDialog(event: Event) {
 							</div>
 						</div>
 					</dl>
-					<p class="mt-3 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-						Dimensions, ground clearance and the full technical data are in the brochure.
-					</p>
 
 					<div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<a

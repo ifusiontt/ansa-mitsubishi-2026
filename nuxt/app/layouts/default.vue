@@ -85,9 +85,10 @@ onMounted(() => {
 			:globals="siteData.globals"
 		/>
 		<!-- Opened from any CTA via useTestDriveModal() / the showroom Trims section via useCompareTrims() /
-		     the homepage fleet cards via useQuickSpecsModal() -->
+		     the homepage fleet cards via useQuickSpecsModal() and useFinancingModal() -->
 		<BookTestDriveModal />
 		<CompareTrimsModal />
 		<QuickSpecsModal />
+		<FinancingCalculatorModal />
 	</div>
 </template>

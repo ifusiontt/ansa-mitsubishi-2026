@@ -14,7 +14,7 @@ const FLEET_SLUGS = ['outlander-sport', 'triton', 'xpander-cross', 'xpander'];
  * Server-side equivalent of:
  *   GET /items/vehicles?filter[slug][_in]=<FLEET_SLUGS>&filter[status][_eq]=published
  *     &fields=id,slug,title,model_year,starting_price,menu_image,category,seating_capacity,fuel_type,
- *       body_type,warranty,brochure_url,hero_block.media,colors.sort,colors.color_name,colors.hex_code,colors.image,
+ *       body_type,warranty,brochure_url,ground_clearance,dimensions,torque,suspension,hero_block.media,colors.sort,colors.color_name,colors.hex_code,colors.image,
  *       trims.status,trims.price,trims.engine,trims.transmission,trims.drivetrain
  */
 export default defineEventHandler(async () => {
@@ -34,6 +34,10 @@ export default defineEventHandler(async () => {
 				'body_type',
 				'warranty',
 				'brochure_url',
+				'ground_clearance',
+				'dimensions',
+				'torque',
+				'suspension',
 				{ hero_block: ['media'] },
 				{ colors: ['sort', 'color_name', 'hex_code', 'image'] },
 				{ trims: ['status', 'price', 'engine', 'transmission', 'drivetrain'] },

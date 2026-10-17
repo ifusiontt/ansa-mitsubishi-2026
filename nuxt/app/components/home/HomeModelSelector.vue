@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VehicleSummary } from '#shared/types/vehicle';
-import { FINANCE_DEFAULT_DEPOSIT_PERCENT, FINANCE_DEFAULT_TERM_MONTHS, estimateMonthlyPayment } from '#shared/types/contact';
+import { estimateMonthlyPayment } from '#shared/types/contact';
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 
 /**
@@ -12,13 +12,14 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  * contact shadow, at the same scale.
  *
  * The vehicle_colors renders share that framing, so the swatch row under the stage swaps the
- * image in place; each card keeps its own selection (first swatch by default).
+ * image in place; each card keeps its own selection (first swatch by default). The render does not
+ * scale on hover, so the car stays put while a swatch is picked.
  *
- * Hover (or keyboard focus) slides up a quick-spec panel built from the vehicle's Directus data:
- * seats, drivetrain and engine across its published trims. Each card is a stretched link to the
+ * Under the swatches, a permanent quick-spec bar built from the vehicle's Directus data: seats,
+ * drivetrain and engine across its published trims. Each card is a stretched link to the
  * showroom page; controls above it (relative z-10) stay clickable: the swatches, an estimated monthly
- * payment whose "Calculate" opens the lead modal in financing mode, a steering-wheel quick action
- * that opens it for a test drive, and "+ Full Specs", which opens the global Quick Specs modal.
+ * payment whose "Calculate" opens the two-step financing modal, a steering-wheel quick action that
+ * opens the test-drive modal, and "+ Full Specs", which opens the global Quick Specs modal.
  */
 defineProps<{ vehicles: VehicleSummary[] }>();
 
@@ -59,22 +60,13 @@ const estimatedMonthly = (vehicle: VehicleSummary) => (vehicle.starting_price ? 
 
 const { open: openLeadModal } = useTestDriveModal();
 const { open: openQuickSpecs } = useQuickSpecsModal();
+const { open: openFinancingModal } = useFinancingModal();
 
 const openTestDrive = (vehicle: VehicleSummary) => openLeadModal({ slug: vehicle.slug, title: vehicle.title });
 
 function openFinancing(vehicle: VehicleSummary) {
 	if (!vehicle.starting_price) return;
-	openLeadModal({
-		mode: 'financing',
-		slug: vehicle.slug,
-		title: vehicle.title,
-		financing: {
-			price: vehicle.starting_price,
-			depositPercent: FINANCE_DEFAULT_DEPOSIT_PERCENT,
-			termMonths: FINANCE_DEFAULT_TERM_MONTHS,
-			monthlyPayment: estimatedMonthly(vehicle),
-		},
-	});
+	openFinancingModal({ slug: vehicle.slug, title: vehicle.title, price: vehicle.starting_price });
 }
 </script>
 
@@ -108,22 +100,9 @@ function openFinancing(vehicle: VehicleSummary) {
 									:src="stageUrl(vehicle)"
 									:alt="[vehicle.title, swatches(vehicle)[activeIndex(vehicle)]?.color_name].filter(Boolean).join(' in ')"
 									loading="lazy"
-									class="absolute left-1/2 top-[-38%] h-[180%] w-auto max-w-none -translate-x-1/2 origin-[50%_74%] transition-transform duration-500 group-hover:scale-105"
+									class="absolute left-1/2 top-[-38%] h-[180%] w-auto max-w-none -translate-x-1/2"
 								/>
 							</div>
-
-							<!-- Quick-spec reveal -->
-							<dl
-								v-if="quickSpecs(vehicle).length"
-								class="absolute inset-x-0 bottom-0 flex translate-y-full justify-around gap-2 bg-black/75 p-3 text-xs font-medium text-white backdrop-blur-md transition-transform duration-300 ease-out group-focus-within:translate-y-0 group-hover:translate-y-0 motion-reduce:transition-none"
-								data-quick-specs
-							>
-								<div v-for="spec in quickSpecs(vehicle)" :key="spec.term" class="flex items-center gap-1.5 text-center">
-									<dt class="sr-only">{{ spec.term }}</dt>
-									<Icon :name="spec.icon" class="h-3.5 w-3.5 shrink-0 text-brand-red" aria-hidden="true" />
-									<dd>{{ spec.label }}</dd>
-								</div>
-							</dl>
 						</div>
 
 						<!-- Colour swatches: above the stretched link, swap the stage render in place -->
@@ -147,6 +126,19 @@ function openFinancing(vehicle: VehicleSummary) {
 							/>
 						</div>
 
+						<!-- Quick specs: a permanent, muted bar under the swatches -->
+						<dl
+							v-if="quickSpecs(vehicle).length"
+							class="mx-4 mt-3 flex items-center justify-center gap-3 border-y border-zinc-100 py-1.5 text-xs text-zinc-500 md:mx-6 dark:border-zinc-800 dark:text-zinc-400"
+							data-quick-specs
+						>
+							<div v-for="spec in quickSpecs(vehicle)" :key="spec.term" class="flex items-center gap-1.5 whitespace-nowrap">
+								<dt class="sr-only">{{ spec.term }}</dt>
+								<Icon :name="spec.icon" class="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-500" aria-hidden="true" />
+								<dd>{{ spec.label }}</dd>
+							</div>
+						</dl>
+
 						<div class="flex flex-1 flex-col p-4 md:p-6">
 							<span
 								v-if="vehicle.category"
@@ -158,7 +150,7 @@ function openFinancing(vehicle: VehicleSummary) {
 							<p v-if="vehicle.model_year" class="mt-1 text-xs uppercase tracking-widest text-neutral-400">{{ vehicle.model_year }} model</p>
 							<template v-if="vehicle.starting_price">
 								<p class="mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">From {{ formatTtdPrice(vehicle.starting_price) }}</p>
-								<!-- Financing hook: standard-terms estimate; "Calculate" (above the stretched link) opens the pre-approval modal -->
+								<!-- Financing hook: standard-terms estimate; "Calculate" (above the stretched link) opens the financing modal -->
 								<p class="mb-4 mt-1 flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
 									Est. {{ formatTtdPrice(Math.round(estimatedMonthly(vehicle))) }}/mo
 									<button
