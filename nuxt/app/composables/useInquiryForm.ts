@@ -1,5 +1,5 @@
 import type { z, ZodTypeAny } from 'zod';
-import { VEHICLE_MODEL_OPTIONS, type InquiryType } from '#shared/types/contact';
+import { VEHICLE_MODEL_OPTIONS, type InquiryType, type VehicleModel } from '#shared/types/contact';
 
 /**
  * Dark input styling shared by the service + parts forms. Colours, focus ring and
@@ -116,18 +116,24 @@ export function useInquiryForm<S extends ZodTypeAny>(type: InquiryType, schema: 
 }
 
 /**
- * Maps `?vehicle=` (a slug like `outlander-sport`, `xpander-cross`, or a model name)
- * to a VEHICLE_MODEL_OPTIONS label, for pre-selecting the inquiry form's vehicle.
+ * Maps a slug like `outlander-sport`, `xpander-cross` or `2026-triton`, or a model name
+ * ("Mitsubishi Xpander Cross"), to a VEHICLE_MODEL_OPTIONS label; undefined if none match.
  */
+export function vehicleModelFrom(value: string | null | undefined): VehicleModel | undefined {
+	if (!value) return undefined;
+	const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+	const target = slug(value)
+		.replace(/^\d{4}-/, '') // drop a model-year prefix
+		.replace(/^mitsubishi-/, '');
+	return VEHICLE_MODEL_OPTIONS.find((model) => slug(model) === target);
+}
+
+/** Maps `?vehicle=` to a VEHICLE_MODEL_OPTIONS label, for pre-selecting the inquiry form's vehicle. */
 export function useInquiryVehicleQuery() {
 	const route = useRoute();
-	const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 	return computed(() => {
 		const raw = route.query.vehicle;
-		const value = Array.isArray(raw) ? raw[0] : raw;
-		if (!value) return undefined;
-		const target = slug(value).replace(/^\d{4}-/, ''); // drop a model-year prefix
-		return VEHICLE_MODEL_OPTIONS.find((model) => slug(model) === target);
+		return vehicleModelFrom(Array.isArray(raw) ? raw[0] : raw);
 	});
 }

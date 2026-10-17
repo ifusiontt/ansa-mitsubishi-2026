@@ -12,7 +12,8 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  *
  * Hover (or keyboard focus) slides up a quick-spec panel built from the vehicle's Directus data:
  * seats, drivetrain and engine across its published trims. Each card is a stretched link to the
- * showroom page, with a separate link to that page's Key Specifications section.
+ * showroom page, with a separate link to that page's Key Specifications section and a steering-wheel
+ * quick action beside "Explore" that opens the global test-drive modal for that model.
  */
 defineProps<{ vehicles: VehicleSummary[] }>();
 
@@ -40,6 +41,8 @@ function quickSpecs(vehicle: VehicleSummary) {
 }
 
 const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
+
+const { open: openTestDrive } = useTestDriveModal();
 </script>
 
 <template>
@@ -104,13 +107,38 @@ const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 							</p>
 
 							<div class="mt-auto">
-								<!-- Stretched link: its ::after covers the card, so the whole card opens the showroom page -->
-								<NuxtLink
-									:to="`/showroom/${vehicle.slug}`"
-									class="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-center text-sm font-medium text-neutral-800 transition-colors after:absolute after:inset-0 after:content-[''] hover:text-brand-red focus:outline-none group-hover:border-brand-red group-hover:text-brand-red dark:border-neutral-700 dark:text-white"
-								>
-									Explore {{ shortName(vehicle.title) }}
-								</NuxtLink>
+								<div class="flex items-center gap-2">
+									<!-- Stretched link: its ::after covers the card, so the whole card opens the showroom page -->
+									<NuxtLink
+										:to="`/showroom/${vehicle.slug}`"
+										class="block min-w-0 flex-1 rounded-lg border border-neutral-300 px-4 py-2.5 text-center text-sm font-medium text-neutral-800 transition-colors after:absolute after:inset-0 after:content-[''] hover:text-brand-red focus:outline-none group-hover:border-brand-red group-hover:text-brand-red dark:border-neutral-700 dark:text-white"
+									>
+										Explore {{ shortName(vehicle.title) }}
+									</NuxtLink>
+									<!-- Quick action above the stretched link (relative z-10): book a test drive without leaving the page -->
+									<TooltipProvider :delay-duration="150">
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<button
+													type="button"
+													class="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-zinc-700 transition-colors hover:border-brand-red hover:bg-brand-red hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 dark:border-zinc-700 dark:text-zinc-300 dark:focus-visible:ring-offset-neutral-900"
+													:aria-label="`Book Test Drive for ${shortName(vehicle.title)}`"
+													@click="openTestDrive({ slug: vehicle.slug, title: vehicle.title })"
+												>
+													<!-- Steering wheel: rim, hub and three spokes -->
+													<svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+														<circle cx="12" cy="12" r="9" />
+														<circle cx="12" cy="12" r="2" />
+														<path d="M3.5 10.5 10 12M20.5 10.5 14 12M12 14v7" />
+													</svg>
+												</button>
+											</TooltipTrigger>
+											<TooltipContent side="top" class="border-zinc-800 bg-zinc-900 text-xs font-semibold text-white">
+												Book a test drive
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</div>
 								<!-- Sits above the stretched link (relative z-10) -->
 								<NuxtLink
 									:to="`/showroom/${vehicle.slug}#specs`"

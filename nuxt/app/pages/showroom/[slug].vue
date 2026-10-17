@@ -158,7 +158,7 @@ useSeoMeta({
 		<VehicleHeroStage :vehicle="vehicle" :hero-image="vehicle.hero_block?.media" />
 
 		<!-- Sticky sub-nav: model + price, section jump links, test-drive CTA -->
-		<VehicleHorizonBar :title="vehicle.title" :price="formatPrice(vehicle.starting_price)" />
+		<VehicleHorizonBar :slug="vehicle.slug" :title="vehicle.title" :trim="selectedTrim?.trim_name" :price="formatPrice(vehicle.starting_price)" />
 
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 2 · OVERVIEW — tagline, headline, copy + facts strip

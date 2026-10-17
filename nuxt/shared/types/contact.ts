@@ -1,6 +1,7 @@
 /**
- * Service booking, parts request and quick test-drive contracts, shared by the Vue forms
- * (components/forms/ServiceBookingForm.vue, PartsRequestForm.vue, home/HomeContactBanner.vue) and
+ * Service booking, parts request and test-drive contracts, shared by the Vue forms
+ * (components/forms/ServiceBookingForm.vue, PartsRequestForm.vue, home/HomeContactBanner.vue,
+ * shared/BookTestDriveModal.vue) and
  * server/api/forms/parts-service.post.ts so both sides validate identically.
  *
  * Submissions land in Directus `form_submissions` with `submission_type` and a
@@ -64,13 +65,22 @@ const phoneSchema = z
 	.max(20, 'Enter a valid contact number')
 	.regex(/^[+\d\s().-]+$/, 'Enter a valid contact number');
 
+const emailSchema = z.string().trim().email('Enter a valid email address').max(255);
+
+const dealerSchema = z.enum(dealerIds, { errorMap: () => ({ message: 'Select your nearest dealer' }) });
+
+const requestDateSchema = z
+	.string()
+	.regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a preferred date')
+	.refine((d) => d >= todayInTT(), 'Choose today or a later date');
+
 const vehicleModelSchema = (message: string) => z.enum(VEHICLE_MODEL_OPTIONS, { errorMap: () => ({ message }) });
 
 const contactSchema = z.object({
 	first_name: z.string().trim().min(1, 'First name is required').max(100),
 	last_name: z.string().trim().min(1, 'Last name is required').max(100),
 	phone: phoneSchema,
-	email: z.string().trim().email('Enter a valid email address').max(255),
+	email: emailSchema,
 	vehicle_model: vehicleModelSchema('Select your vehicle model'),
 	registration_number: z
 		.string()
@@ -79,16 +89,13 @@ const contactSchema = z.object({
 		.max(12)
 		.regex(/^[A-Za-z0-9 -]+$/, 'Use letters, numbers and spaces only')
 		.transform((v) => v.toUpperCase()),
-	dealer_id: z.enum(dealerIds, { errorMap: () => ({ message: 'Select your nearest dealer' }) }),
+	dealer_id: dealerSchema,
 });
 
 export const serviceBookingSchema = contactSchema.extend({
 	service_type: z.enum(SERVICE_TYPE_OPTIONS, { errorMap: () => ({ message: 'Select a service type' }) }),
 	vehicle_mileage: numberInput('Enter your current mileage in km').pipe(z.number().min(0).max(999_999, 'Enter a valid mileage')),
-	request_date: z
-		.string()
-		.regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a preferred date')
-		.refine((d) => d >= todayInTT(), 'Choose today or a later date'),
+	request_date: requestDateSchema,
 });
 
 export const partsRequestSchema = contactSchema.extend({
@@ -106,12 +113,23 @@ export const partsRequestSchema = contactSchema.extend({
 	part_description: z.string().trim().min(5, 'Describe the part you need').max(1000),
 });
 
-/** Homepage quick request: name, phone and the model to drive — the sales team follows up by phone. */
+/**
+ * Test-drive request. The homepage quick form sends only name, phone and model (the sales team
+ * follows up by phone); the global booking modal also sends email, branch, date and trim, which
+ * are optional here so both validate against the one server schema.
+ */
 export const testDriveSchema = z.object({
 	full_name: z.string().trim().min(2, 'Enter your name').max(200),
 	phone: phoneSchema,
 	vehicle_model: vehicleModelSchema('Select a model to test drive'),
+	email: emailSchema.optional(),
+	dealer_id: dealerSchema.optional(),
+	request_date: requestDateSchema.optional(),
+	trim: z.string().trim().max(100).optional(),
 });
+
+/** Booking modal: the same request with email, branch and date required (trim stays optional). */
+export const testDriveBookingSchema = testDriveSchema.required({ email: true, dealer_id: true, request_date: true });
 
 export type ServiceBookingInput = z.input<typeof serviceBookingSchema>;
 export type ServiceBooking = z.output<typeof serviceBookingSchema>;
@@ -119,6 +137,7 @@ export type PartsRequestInput = z.input<typeof partsRequestSchema>;
 export type PartsRequest = z.output<typeof partsRequestSchema>;
 export type TestDriveInput = z.input<typeof testDriveSchema>;
 export type TestDrive = z.output<typeof testDriveSchema>;
+export type TestDriveBookingInput = z.input<typeof testDriveBookingSchema>;
 
 /** Request body for POST /api/forms/parts-service. */
 export type InquiryPayload =
@@ -134,7 +153,7 @@ export interface InquiryMetadata {
 	first_name: string;
 	last_name: string;
 	phone: string;
-	/** null for test-drive requests, which only collect name + phone. */
+	/** null for homepage quick test-drive requests, which only collect name + phone. */
 	email: string | null;
 	service_type: ServiceType | null;
 	vehicle_model: VehicleModel;
@@ -146,6 +165,8 @@ export interface InquiryMetadata {
 	part_description: string | null;
 	request_date: string | null;
 	dealer_id: DealerId | null;
+	/** Trim the customer was viewing when they booked a test drive. */
+	trim: string | null;
 }
 
 export function toInquiryMetadata(
@@ -158,13 +179,14 @@ export function toInquiryMetadata(
 			first_name: first,
 			last_name: rest.join(' '),
 			phone: payload.data.phone,
-			email: null,
+			email: payload.data.email ?? null,
 			vehicle_model: payload.data.vehicle_model,
 			registration_number: null,
-			dealer_id: null,
+			dealer_id: payload.data.dealer_id ?? null,
+			trim: payload.data.trim || null,
 			service_type: null,
 			vehicle_mileage: null,
-			request_date: null,
+			request_date: payload.data.request_date ?? null,
 			vehicle_year: null,
 			chassis_number: null,
 			part_number: null,
@@ -181,6 +203,7 @@ export function toInquiryMetadata(
 		vehicle_model: data.vehicle_model,
 		registration_number: data.registration_number,
 		dealer_id: data.dealer_id,
+		trim: null,
 	};
 
 	return payload.type === 'service'

@@ -84,5 +84,7 @@ onMounted(() => {
 			:navigation="siteData.footerNavigation"
 			:globals="siteData.globals"
 		/>
+		<!-- Opened from any CTA via useTestDriveModal() -->
+		<BookTestDriveModal />
 	</div>
 </template>

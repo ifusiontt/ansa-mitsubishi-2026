@@ -13,9 +13,11 @@ const props = defineProps<{
 	labelClass?: string;
 	/** Replaces the default error-text colour (e.g. a brighter red over a photo). */
 	errorClass?: string;
+	/** Id namespace, so two forms on one page (e.g. the test-drive modal) don't share ids. */
+	idPrefix?: string;
 }>();
 
-const id = computed(() => `inquiry-${props.name}`);
+const id = computed(() => `${props.idPrefix ?? 'inquiry'}-${props.name}`);
 const describedBy = computed(() => (props.error ? `${id.value}-error` : props.hint ? `${id.value}-hint` : undefined));
 
 /**

@@ -9,11 +9,12 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  * `hero_block.media` Directus file (UUID or expanded file object), delivered through the
  * Directus asset endpoint as responsive WebP. Framing defaults to `center 60%` so front fascias
  * sit under the copy scrim; `focalPoint` (any CSS object-position) overrides it per model.
- * CTAs smooth-scroll to the page's `#trims` and `#cta` sections.
+ * "Explore Trims" smooth-scrolls to the page's `#trims` section; "Book a Test Drive" opens the
+ * global test-drive modal pre-populated with this vehicle.
  */
 const props = withDefaults(
 	defineProps<{
-		vehicle: Pick<VehiclePage, 'title' | 'tagline' | 'starting_price' | 'model_year' | 'category' | 'hero_video_url' | 'hero_block'>;
+		vehicle: Pick<VehiclePage, 'slug' | 'title' | 'tagline' | 'starting_price' | 'model_year' | 'category' | 'hero_video_url' | 'hero_block'>;
 		heroImage?: VehicleFileRef | null;
 		focalPoint?: string;
 	}>(),
@@ -37,6 +38,8 @@ const startingPrice = computed(() => formatTtdPrice(props.vehicle.starting_price
 function scrollTo(id: string) {
 	document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+const { open: openTestDrive } = useTestDriveModal();
 </script>
 
 <template>
@@ -92,13 +95,13 @@ function scrollTo(id: string) {
 					>
 						Explore Trims &amp; Specs
 					</a>
-					<a
-						href="#cta"
+					<button
+						type="button"
 						class="inline-block rounded-md border border-white/40 bg-white/10 px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-md transition-colors hover:border-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-						@click.prevent="scrollTo('cta')"
+						@click="openTestDrive({ slug: vehicle.slug, title: vehicle.title })"
 					>
 						Book a Test Drive
-					</a>
+					</button>
 				</div>
 			</div>
 		</div>

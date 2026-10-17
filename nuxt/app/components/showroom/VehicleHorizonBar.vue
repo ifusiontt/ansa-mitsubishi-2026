@@ -2,12 +2,16 @@
 /**
  * Sticky showroom sub-nav docked under the site header (NavigationBar is a fixed 148px tall),
  * from `md` up; static on phones like PillTabs. Model + starting price on the left, jump links
- * to the page sections in the centre (lg+), and a "Book Test Drive" CTA that scrolls to #cta.
+ * to the page sections in the centre (lg+), and a "Book Test Drive" CTA that opens the global
+ * test-drive modal with this vehicle and the currently selected trim.
  * The link for the section currently under the bar is highlighted via IntersectionObserver.
  * Target sections carry `scroll-mt-[13.5rem]` so smooth scrolling clears header + bar.
  */
 const props = defineProps<{
+	slug: string;
 	title: string;
+	/** Trim selected in the page's Trims section, passed through to the test-drive modal. */
+	trim?: string;
 	/** Pre-formatted starting price (e.g. "TTD $189,000"); hidden when empty. */
 	price?: string;
 }>();
@@ -21,6 +25,8 @@ const LINKS = [
 ] as const;
 
 const activeId = ref<string>('');
+
+const { open: openTestDrive } = useTestDriveModal();
 
 function scrollToSection(id: string) {
 	document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -74,13 +80,13 @@ onBeforeUnmount(() => observer?.disconnect());
 				</li>
 			</ul>
 
-			<a
-				href="#cta"
+			<button
+				type="button"
 				class="shrink-0 rounded-md bg-brand-red px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
-				@click.prevent="scrollToSection('cta')"
+				@click="openTestDrive({ slug: props.slug, title: props.title, trim: props.trim })"
 			>
 				Book Test Drive
-			</a>
+			</button>
 		</div>
 	</nav>
 </template>
