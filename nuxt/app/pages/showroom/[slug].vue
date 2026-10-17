@@ -2,13 +2,14 @@
 import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 import type { VehiclePageColor, VehiclePage, VehiclePageTrim } from '#shared/types/vehicle';
 import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
+import VehicleFinancingCalculator from '~/components/showroom/VehicleFinancingCalculator.vue';
 import VehicleHighlights from '~/components/showroom/VehicleHighlights.vue';
 import VehicleHeroStage from '~/components/showroom/VehicleHeroStage.vue';
 import VehicleHorizonBar from '~/components/showroom/VehicleHorizonBar.vue';
 
 /**
  * /showroom/[slug] — vehicle page in buyer-journey order: hero → sticky horizon bar → overview →
- * highlights → colours → trims → key specs → brochure → CTA. Every section except the full-bleed
+ * highlights → colours → trims (+ compare modal) → financing → key specs → brochure → CTA. Every section except the full-bleed
  * highlight splits and the centred colour stage shares one 1440px container so their left edges line up.
  *
  * Design tokens and spacing metrics are extracted live from the reference site
@@ -85,6 +86,11 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 
 const selectedTrimIdx = ref(0);
 const selectedTrim = computed<VehiclePageTrim | null>(() => trims.value[selectedTrimIdx.value] ?? null);
+
+// Financing estimate follows the selected trim; falls back to the vehicle's starting price.
+const financePrice = computed(() => selectedTrim.value?.price ?? vehicle.starting_price ?? 0);
+
+const { open: openCompare } = useCompareTrims();
 
 // Contact links pre-filled with the vehicle, intent and (once chosen) trim.
 function contactHref(intent: 'dealer' | 'sales'): string {
@@ -296,9 +302,21 @@ useSeoMeta({
 	     ════════════════════════════════════════════════════════════ -->
 		<section id="trims" class="scroll-mt-[13.5rem] vp-section vp-section--mist" aria-label="Trims and pricing">
 			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-				<header class="vp-section-head">
-					<p class="vp-tagline tracking-wider uppercase">Find Your Fit</p>
-					<h2 class="vp-h2 tracking-wider uppercase">Trims &amp; Pricing</h2>
+				<header class="vp-section-head flex flex-wrap items-end justify-between gap-4">
+					<div>
+						<p class="vp-tagline tracking-wider uppercase">Find Your Fit</p>
+						<h2 class="vp-h2 tracking-wider uppercase">Trims &amp; Pricing</h2>
+					</div>
+					<!-- Only worth comparing with two or more trims -->
+					<button
+						v-if="trims.length > 1"
+						type="button"
+						class="mb-4 inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-5 py-3 text-xs font-bold uppercase tracking-widest text-slate-900 transition-colors hover:border-brand-red hover:text-brand-red focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+						@click="openCompare(vehicle)"
+					>
+						<Icon name="lucide:columns-3" class="size-4" aria-hidden="true" />
+						Compare All Trims
+					</button>
 				</header>
 				<div class="vp-trims">
 					<article
@@ -366,6 +384,24 @@ useSeoMeta({
 						</a>
 					</article>
 				</div>
+			</div>
+		</section>
+
+		<!-- ════════════════════════════════════════════════════════════
+		     PART 5b · FINANCING — monthly payment estimator
+	     ════════════════════════════════════════════════════════════ -->
+		<section v-if="financePrice" id="financing" class="scroll-mt-[13.5rem] vp-section vp-section--white" aria-labelledby="financing-heading">
+			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+				<header class="vp-section-head">
+					<p class="vp-tagline tracking-wider uppercase">Plan Your Purchase</p>
+					<h2 id="financing-heading" class="vp-h2 tracking-wider uppercase">Financing Estimator</h2>
+				</header>
+				<VehicleFinancingCalculator
+					:base-price="financePrice"
+					:vehicle-slug="vehicle.slug"
+					:vehicle-title="vehicle.title"
+					:trim-name="selectedTrim?.trim_name"
+				/>
 			</div>
 		</section>
 

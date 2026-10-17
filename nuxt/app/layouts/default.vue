@@ -84,7 +84,8 @@ onMounted(() => {
 			:navigation="siteData.footerNavigation"
 			:globals="siteData.globals"
 		/>
-		<!-- Opened from any CTA via useTestDriveModal() -->
+		<!-- Opened from any CTA via useTestDriveModal() / the showroom Trims section via useCompareTrims() -->
 		<BookTestDriveModal />
+		<CompareTrimsModal />
 	</div>
 </template>
