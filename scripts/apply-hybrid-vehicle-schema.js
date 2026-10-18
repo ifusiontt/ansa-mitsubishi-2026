@@ -48,7 +48,7 @@
  *          (2_Tone_Front_Left/transparent_webp/outlander_front_left_<code>.webp)
  *          are uploaded and linked by scripts/seed-outlander-vehicle.mjs
  *        - 3 x block_content_items highlights (PERFORMANCE / DESIGN / INTERIOR)
- *        - 3 x vehicle_trims (ES / LE / SEL) linked to the vehicle
+ *        - 3 x vehicle_trims (ES / SE FWD / SEL Premium FWD) linked to the vehicle
  *        - key_features string-array -> {value}-object migration (all trims)
  *
  *   4. VERIFY  — runs the exact public (unauthenticated) query:
@@ -259,9 +259,9 @@ const TRIMS = [
   {
     trim_name: 'ES',
     price: 255000,
-    engine: '2.0L MIVEC 4-Cylinder (149 hp @ 6,000 rpm)',
-    transmission: 'Continuously Variable Transmission (CVT) with 8-Speed Manual Shift Mode',
-    drivetrain: 'FWD',
+    engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
+    transmission: 'CVT Automatic Transmission',
+    drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
     key_features: [
       '7.0-inch Smartphone-link Display Audio with Apple CarPlay & Android Auto',
       'Forward Collision Mitigation (FCM) with Pedestrian Detection',
@@ -272,11 +272,11 @@ const TRIMS = [
     ],
   },
   {
-    trim_name: 'LE',
+    trim_name: 'SE FWD',
     price: 272000,
-    engine: '2.0L MIVEC 4-Cylinder (149 hp @ 6,000 rpm)',
-    transmission: 'Continuously Variable Transmission (CVT) with 8-Speed Manual Shift Mode',
-    drivetrain: 'FWD',
+    engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
+    transmission: 'CVT Automatic Transmission',
+    drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
     key_features: [
       '8.0-inch Smartphone-link Display Audio (SDA) with Wireless Apple CarPlay & Android Auto',
       '8-Way Power Driver Seat with 4-Way Power Lumbar',
@@ -287,11 +287,11 @@ const TRIMS = [
     ],
   },
   {
-    trim_name: 'SEL',
+    trim_name: 'SEL Premium FWD',
     price: 289000,
-    engine: '2.4L MIVEC 4-Cylinder (181 hp @ 6,000 rpm)',
-    transmission: 'Continuously Variable Transmission (CVT) with 8-Speed Manual Shift Mode',
-    drivetrain: 'FWD',
+    engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
+    transmission: 'CVT Automatic Transmission',
+    drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
     key_features: [
       '9.0-inch Smartphone-link Display Audio with Navigation',
       'Multi-Material Leather-Appointed Seating',
@@ -1109,7 +1109,7 @@ async function verify() {
   expect(JSON.stringify(tags) === JSON.stringify(HIGHLIGHTS.map((h) => h.tagline).sort()), 'highlight taglines PERFORMANCE/DESIGN/INTERIOR present');
   expect(Array.isArray(row.trims) && row.trims.length === TRIMS.length, `trims nested array (${row.trims?.length ?? 0}/${TRIMS.length})`);
   const trimNames = (row.trims || []).map((t) => t.trim_name).sort();
-  expect(JSON.stringify(trimNames) === JSON.stringify(TRIMS.map((t) => t.trim_name).sort()), 'trim names ES/LE/SEL present');
+  expect(JSON.stringify(trimNames) === JSON.stringify(TRIMS.map((t) => t.trim_name).sort()), 'trim names ES/SE FWD/SEL Premium FWD present');
   expect(
     (row.trims || []).every((t) => Array.isArray(t.key_features) && t.key_features.every((f) => f && typeof f === 'object' && typeof f.value === 'string')),
     'trim key_features in repeater { value } shape'
@@ -1161,7 +1161,7 @@ async function updateManifest() {
   manifest.active_sprint = {
     phase: 'Hybrid Vehicle Schema Architecture — Complete',
     current_task:
-      'Hybrid vehicle schema applied (vehicle_colors collection; vehicles.hero_block M2O + colors/highlights/trims O2M with list-o2m interfaces; vehicle_trims.key_features converted to list repeater of {value} strings; block_content_items.vehicle M2O). Outlander Sport seeded: hero block "Drive Your Ambition" with generated media, 3 paint colors, 3 highlight blocks, ES/LE/SEL trims. Next: render /showroom/[slug].vue against the nested vehicles payload.',
+      'Hybrid vehicle schema applied (vehicle_colors collection; vehicles.hero_block M2O + colors/highlights/trims O2M with list-o2m interfaces; vehicle_trims.key_features converted to list repeater of {value} strings; block_content_items.vehicle M2O). Outlander Sport seeded: hero block "Drive Your Ambition" with generated media, 3 paint colors, 3 highlight blocks, ES/SE FWD/SEL Premium FWD trims. Next: render /showroom/[slug].vue against the nested vehicles payload.',
     reference_url: 'https://mitsubishi-motors.com.jm/vehicle/2025-outlander-sport/',
   };
   const gotchas = manifest.known_gotchas || [];

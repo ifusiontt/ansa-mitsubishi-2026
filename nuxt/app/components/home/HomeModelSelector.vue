@@ -40,8 +40,8 @@ const unique = (values: (string | null | undefined)[]) => [...new Set(values.fil
 /** Up to three quick specs, e.g. "5 Seats" · "4WD" · "2.4L Turbo Diesel"; a spec without data is skipped. */
 function quickSpecs(vehicle: VehicleSummary) {
 	const trims = (vehicle.trims ?? []).filter((trim) => trim.status === 'published');
-	// "4WD (Super Select 4WD-II)" → "4WD"
-	const drivetrains = unique(trims.map((trim) => trim.drivetrain?.split(' (')[0]?.trim()));
+	// "4WD (Super Select 4WD-II)" / "Front-Wheel Drive (FWD) with Active Yaw Control (AYC)" → "4WD" / "FWD"
+	const drivetrains = unique(trims.map((trim) => trim.drivetrain?.match(/\b[24AFR]WD\b/)?.[0] ?? trim.drivetrain?.split(' (')[0]?.trim()));
 	// "2.0L MIVEC 4-Cylinder (…)" → "2.0"
 	const litres = unique(trims.map((trim) => trim.engine?.match(/(\d\.\d)\s*L/)?.[1])).sort();
 	const engine = litres.length ? `${litres[0]}${litres.length > 1 ? `–${litres.at(-1)}` : ''}L ${vehicle.fuel_type ?? ''}`.trim() : '';
@@ -86,7 +86,7 @@ function openFinancing(vehicle: VehicleSummary) {
 			<ul class="mt-10 flex flex-wrap justify-center gap-6 md:mt-14">
 				<li v-for="vehicle in vehicles" :key="vehicle.id" class="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc((100%-3rem)/3)]">
 					<article
-						class="group relative flex h-full min-h-[420px] md:min-h-[480px] flex-col justify-between overflow-hidden rounded-xl border border-t-2 border-neutral-200/80 border-t-brand-red bg-white shadow-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-brand-red hover:-translate-y-1.5 hover:shadow-xl dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900"
+						class="group relative flex h-full min-h-[420px] md:min-h-[480px] flex-col justify-between overflow-hidden rounded-xl border border-t-2 border-neutral-200/80 border-t-brand-red bg-white shadow-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-brand-red hover:-translate-y-1 hover:shadow-md dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900"
 					>
 						<!-- Studio stage -->
 						<div class="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-b from-neutral-100/70 to-transparent p-4 md:h-52 md:p-6 dark:from-neutral-800/50">

@@ -20,7 +20,7 @@
  *
  * Idempotent: safe to re-run. Files are matched by (folder, filename_download),
  * colors by (vehicle, color_code → color_name), highlights by (vehicle, sort), the parent
- * content block by tagline, and trims are patched only when the name differs.
+ * content block by tagline, and trims are patched only when the name or a spec differs.
  *
  * Usage:  node scripts/seed-outlander-vehicle.mjs
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
@@ -125,12 +125,17 @@ const HIGHLIGHTS = [
 ];
 
 /** trim renames: id → new name (ids are stable from mitsubishi-initial-data.json) */
-const TRIM_RENAMES = { 15: 'SE S-AWC', 16: 'SEL Premium S-AWC' };
+const TRIM_RENAMES = { 15: 'SE FWD', 16: 'SEL Premium FWD' };
 /**
- * Drivetrain per trim id: the S-AWC trims are all-wheel drive (the initial data had them as FWD).
- * "<short> (<detail>)" like the Triton's "4WD (Super Select 4WD-II)"; the homepage cards show the short part.
+ * Powertrain shared by every Outlander Sport trim: the Caribbean 2026 model is built on the regional
+ * Xforce platform (1.5L MIVEC, CVT, front-wheel drive) — not the 2.0/2.4L US-market car the initial
+ * data described. The homepage cards abbreviate the drivetrain to its "FWD" token.
  */
-const TRIM_DRIVETRAINS = { 15: 'AWD (S-AWC)', 16: 'AWD (S-AWC)' };
+const TRIM_SPECS = {
+	engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
+	transmission: 'CVT Automatic Transmission',
+	drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
+};
 
 const BLOCK_TAGLINE = 'Outlander Key Highlights';
 
@@ -457,13 +462,13 @@ for (const spec of HIGHLIGHTS) {
 }
 
 // ---------------------------------------------------------------------------
-// step 5 — trim renames (ES stays; LE → SE S-AWC, SEL → SEL Premium S-AWC) + S-AWC drivetrains
+// step 5 — trim renames (ES stays; LE / SE S-AWC → SE FWD, SEL / SEL Premium S-AWC → SEL Premium FWD) + regional powertrain
 // ---------------------------------------------------------------------------
 
 for (const [id, newName] of Object.entries(TRIM_RENAMES)) {
 	const trims = await search('vehicle_trims', {
 		filter: { id: { _eq: Number(id) } },
-		fields: ['id', 'trim_name', 'drivetrain', 'vehicle'],
+		fields: ['id', 'trim_name', 'vehicle'],
 		limit: 1,
 	});
 	const trim = trims.data?.[0];
@@ -477,11 +482,21 @@ for (const [id, newName] of Object.entries(TRIM_RENAMES)) {
 		await api('PATCH', `/items/vehicle_trims/${id}`, { trim_name: newName });
 		console.log(`trim: renamed #${id} "${trim.trim_name}" → "${newName}"`);
 	}
-	const drivetrain = TRIM_DRIVETRAINS[id];
-	if (drivetrain && trim.drivetrain !== drivetrain) {
-		await api('PATCH', `/items/vehicle_trims/${id}`, { drivetrain });
-		console.log(`trim: drivetrain #${id} "${trim.drivetrain}" → "${drivetrain}"`);
+}
+
+const vehicleTrims = await search('vehicle_trims', {
+	filter: { vehicle: { _eq: vehicle.id } },
+	fields: ['id', 'trim_name', ...Object.keys(TRIM_SPECS)],
+	limit: -1,
+});
+for (const trim of vehicleTrims.data ?? []) {
+	const patch = Object.fromEntries(Object.entries(TRIM_SPECS).filter(([field, value]) => trim[field] !== value));
+	if (!Object.keys(patch).length) {
+		console.log(`trim: specs ok #${trim.id} "${trim.trim_name}"`);
+		continue;
 	}
+	await api('PATCH', `/items/vehicle_trims/${trim.id}`, patch);
+	console.log(`trim: specs #${trim.id} "${trim.trim_name}" → ${Object.keys(patch).join(', ')}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -505,7 +520,7 @@ console.log(`folder            : ${FOLDER_NAME} (${folder.id})`);
 console.log(`files             : ${files.length} in folder (${uploadedCount} new)`);
 console.log(`colors            : ${COLORS.map((c) => c.color_code).join(' / ')} (transparent 2-tone front-left renders)`);
 console.log(`highlights        : ${HIGHLIGHTS.length} (copy + images + parent block)`);
-console.log(`trims             : ES / SE S-AWC / SEL Premium S-AWC`);
+console.log(`trims             : ES / SE FWD / SEL Premium FWD`);
 console.log(`hero media        : ${PICKS.hero}`);
 console.log('sample asset URL  : ' + `${BASE}/assets/${files[0].id}`);
 console.log('DONE');

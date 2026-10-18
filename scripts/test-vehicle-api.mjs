@@ -90,7 +90,7 @@ const EXPECTED_HIGHLIGHTS = [
 	},
 ];
 
-const EXPECTED_TRIMS = ['ES', 'SE S-AWC', 'SEL Premium S-AWC'];
+const EXPECTED_TRIMS = ['ES', 'SE FWD', 'SEL Premium FWD'];
 
 // ---------------------------------------------------------------------------
 // harness
@@ -302,7 +302,7 @@ const trims = [...(vehicle.trims ?? [])].sort((a, b) => a.trim_name.localeCompar
 check(`trims: ${EXPECTED_TRIMS.length} linked`, trims.length === EXPECTED_TRIMS.length, `got ${trims.length}`);
 const trimNames = trims.map((t) => t.trim_name).sort();
 check(
-	'trim names = ES / SE S-AWC / SEL Premium S-AWC',
+	'trim names = ES / SE FWD / SEL Premium FWD',
 	JSON.stringify(trimNames) === JSON.stringify([...EXPECTED_TRIMS].sort()),
 	`got ${JSON.stringify(trimNames)}`,
 );

@@ -26,8 +26,16 @@ const summary = computed(() =>
 		.join(' · '),
 );
 
-/** "2.4L MIVEC Intercooled Turbo Diesel (135 kW @ 3,500 rpm, 430 Nm)" → "135 kW". */
-const powerOf = (engine: string) => engine.match(/([\d.,]+)\s*(hp|kW|PS)\b/i)?.slice(1, 3).join(' ');
+/**
+ * "2.4L MIVEC Intercooled Turbo Diesel (135 kW @ 3,500 rpm, 430 Nm)" → "135 kW";
+ * "1.5L MIVEC … (77 kW / 105 PS, 141 Nm)" → "105 hp (77 kW)" — horsepower leads when both are given.
+ */
+function powerOf(engine: string) {
+	const kw = engine.match(/([\d.,]+)\s*kW\b/i)?.[1];
+	const hp = engine.match(/([\d.,]+)\s*(?:hp|PS)\b/i)?.[1];
+	if (kw && hp) return `${hp} hp (${kw} kW)`;
+	return engine.match(/([\d.,]+)\s*(hp|kW|PS)\b/i)?.slice(1, 3).join(' ');
+}
 
 const specs = computed(() => {
 	const current = vehicle.value;
