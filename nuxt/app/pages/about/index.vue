@@ -224,7 +224,7 @@ useHead(() => ({
 								class="inline-flex items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
 								@click="openTestDrive()"
 							>
-								<Icon name="lucide:steering-wheel" class="size-4" aria-hidden="true" />
+								<Icon name="lucide:key-round" class="size-4" aria-hidden="true" />
 								Book a Test Drive
 							</button>
 							<NuxtLink
