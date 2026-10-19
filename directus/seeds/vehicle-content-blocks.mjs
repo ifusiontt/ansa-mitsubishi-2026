@@ -127,8 +127,8 @@ const VEHICLES = [
 				headline: 'Super Select 4WD-II',
 				description:
 					'Exceptional all-terrain capability with four selectable modes — including 4H full-time 4WD for stability on wet surfaces and outstanding cornering on dry pavement — plus a rear differential lock.',
+				// lifestyle frame set by scripts/upload-lifestyle-assets.mjs — kept on re-runs
 				terms: ['front right', 'front left'],
-				replaceImage: true, // was the same instrument-panel photo as the cockpit item
 			},
 			{
 				tagline: 'POWER',
@@ -157,6 +157,12 @@ const VEHICLES = [
 				headline: 'Premium Double Cab',
 				description: 'Spacious seating built for both demanding job sites and comfortable highway cruising.',
 				terms: ['dcab', 'double cab', 'rear seat', 'seat'],
+			},
+			{
+				tagline: 'UTILITY',
+				headline: 'Built for the Work Site',
+				description: 'A practical cargo bed for materials and gear, backed by 3,500 kg of towing capacity.',
+				terms: ['cargo', 'deck', 'tray'],
 			},
 		],
 	},

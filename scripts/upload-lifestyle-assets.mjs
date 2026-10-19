@@ -112,6 +112,26 @@ const ASSETS = {
 			'Extracted from video/outlander_rear_taillights.png',
 		],
 	},
+	triton: {
+		dir: 'Triton',
+		folder: 'Triton',
+		// All-new (24MY+) imagery only: the 2023-l200-* frames in features/ are the previous generation.
+		// The 3-column/ press shots are WebP files with a .png name (see sniffMime).
+		highlights: {
+			1: { tagline: 'PERFORMANCE', file: 'Extracted from video/triton_mud_headon.png' },
+			2: { tagline: 'POWER', file: 'Extracted from video/triton_dune_drift.png' },
+			4: { tagline: 'CAPABILITY', file: '3-column/24MY_TR_ALL-NEW_RHD_MV_Cockpit_proxy.png' },
+			5: { tagline: 'COMFORT', file: '3-column/24MY_TR_ALL-NEW_RHD_FT_Seatcomfort_proxy.png' },
+			6: { tagline: 'UTILITY', file: '3-column/24MY_TR_ALL-NEW_RHD_MV_Cargo_proxy-1.png' },
+		},
+		gallery: [
+			'Extracted from video/triton_water_splash.png',
+			'features/24MY_TR_ALL-NEW_LHD_FT_Selector_proxy.webp',
+			'3-column/24MY_TR_ALL-NEW_RHD_MV_Hill_proxy.png',
+			'Extracted from video/triton_red_ridge.png',
+			'Extracted from video/triton_sunset_flats.png',
+		],
+	},
 };
 
 let changed = false;
@@ -204,6 +224,13 @@ if (await publicRead('vehicles_gallery')) {
 
 // --- 2. uploads ---------------------------------------------------------------
 const MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
+/** Content type from the file's magic bytes — some library exports carry the wrong extension. */
+function sniffMime(buf, name) {
+	if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+	if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') return 'image/png';
+	if (buf[0] === 0xff && buf[1] === 0xd8) return 'image/jpeg';
+	return MIME[path.extname(name).toLowerCase()] ?? 'application/octet-stream';
+}
 const { data: folders } = await api('GET', '/folders?fields=id,name&limit=-1');
 
 /** Directus file id for a content-library image — reuses an existing upload with the same filename. */
@@ -218,7 +245,7 @@ async function ensureFile(dir, relPath, folderName) {
 	const buf = fs.readFileSync(abs);
 	const form = new FormData();
 	form.append('title', path.basename(name, path.extname(name)));
-	form.append('file', new Blob([buf], { type: MIME[path.extname(name).toLowerCase()] ?? 'application/octet-stream' }), name);
+	form.append('file', new Blob([buf], { type: sniffMime(buf, name) }), name);
 	const res = await fetch(`${BASE}/files`, { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body: form });
 	const text = await res.text();
 	if (!res.ok) throw new Error(`upload ${name} → ${res.status} ${text.slice(0, 300)}`);
