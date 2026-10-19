@@ -4,7 +4,7 @@ import type { VehiclePage } from '#shared/types/vehicle';
  * Vehicle API handler — fetches a single vehicle by slug with its full nested relations.
  *
  * Server-side equivalent of the public Directus endpoint:
- *   GET /items/vehicles?filter[slug][_eq]=:slug&fields=*,hero_block.*,colors.*,highlights.*,trims.*,
+ *   GET /items/vehicles?filter[slug][_eq]=:slug&filter[status][_eq]=published&fields=*,hero_block.*,colors.*,highlights.*,trims.*,
  *     gallery.id,gallery.sort,gallery.directus_files_id.*
  *
  * Uses the public read policy (field whitelist on vehicles + vehicle_colors),
@@ -27,7 +27,8 @@ export default defineEventHandler(async (event) => {
 
 	const vehicles = (await directusServer.request(
 		readItems('vehicles' as any, {
-			filter: { slug: { _eq: slug } },
+			// archived models (e.g. the Xpander) 404 instead of rendering by direct URL
+			filter: { slug: { _eq: slug }, status: { _eq: 'published' } } as any,
 			limit: 1,
 			fields:
 				[
