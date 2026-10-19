@@ -16,11 +16,13 @@ export { aggregate, updateItem, readMe, readUser } from '@directus/sdk';
 
 const {
 	public: { directusUrl },
+	directusServerUrl,
 	// directusServerToken,
 } = useRuntimeConfig();
 
 // By default, we use the Public permissions to fetch content (even on the server side). If you want to restrict public access it's recommended to use the staticToken option.
-const directusServer = createDirectus<Schema>(directusUrl as string, {
+// Server requests go to directusServerUrl (internal network when deployed); asset URLs handed to browsers stay on directusUrl.
+const directusServer = createDirectus<Schema>((directusServerUrl || directusUrl) as string, {
 	globals: {
 		fetch: $fetch,
 	},

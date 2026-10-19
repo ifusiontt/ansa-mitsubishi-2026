@@ -4,11 +4,12 @@ import type { VehiclePage } from '#shared/types/vehicle';
  * Vehicle API handler — fetches a single vehicle by slug with its full nested relations.
  *
  * Server-side equivalent of the public Directus endpoint:
- *   GET /items/vehicles?filter[slug][_eq]=:slug&fields=*,hero_block.*,colors.*,highlights.*,trims.*
+ *   GET /items/vehicles?filter[slug][_eq]=:slug&fields=*,hero_block.*,colors.*,highlights.*,trims.*,
+ *     gallery.id,gallery.sort,gallery.directus_files_id.*
  *
  * Uses the public read policy (field whitelist on vehicles + vehicle_colors),
  * so no static token is required. Nested relations are deep-sorted for stable
- * render order (colors/highlights by `sort`, trims by `price` ascending, then `trim_name`, so the entry trim leads).
+ * render order (colors/highlights/gallery by `sort`, trims by `price` ascending, then `trim_name`, so the entry trim leads).
  *
  * NOTE: `highlights` is the M2O to block_content_items, whose `images` field is
  * an M2M whose items expand to JUNCTION rows in this Directus build. A bare
@@ -29,13 +30,21 @@ export default defineEventHandler(async (event) => {
 			filter: { slug: { _eq: slug } },
 			limit: 1,
 			fields:
-				['*', { hero_block: ['*'] }, { colors: ['*'] }, { highlights: ['*', { images: ['directus_files_id.*'] }] }, { trims: ['*'] }] as any,
+				[
+					'*',
+					{ hero_block: ['*'] },
+					{ colors: ['*'] },
+					{ highlights: ['*', { images: ['directus_files_id.*'] }] },
+					{ trims: ['*'] },
+					{ gallery: ['id', 'sort', 'directus_files_id.*'] },
+				] as any,
 			// 'vehicles' is not in the generated Schema yet, so the Deep type
 			// parameter falls back — cast the deep-sort object explicitly.
 			deep: {
 				colors: { _sort: ['sort'] },
 				highlights: { _sort: ['sort'] },
 				trims: { _sort: ['price', 'trim_name'] },
+				gallery: { _sort: ['sort'] },
 			} as any,
 		}),
 	)) as VehiclePage[];

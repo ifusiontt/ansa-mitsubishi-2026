@@ -17,9 +17,34 @@ dist/
 *.log
 .DS_Store
 
-# Seed script local state (uploaded asset ids)
-scripts/.seed-outlander-assets.json
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Seed script local state (uploaded asset ids, per Directus instance)
+scripts/.seed-*-assets*.json
+scripts/*.tmp.*
 .tmp/
 
-# Directus uploaded file binaries (bind-mounted into the CMS container)
+# graphify knowledge-graph output (regenerated locally)
+graphify-out/
+
+# Directus uploaded file binaries (bind-mounted into the CMS container), and any other uploads dir
 directus/uploads/
+**/uploads/
+
+# Raw footage, extracted video frames and source media binaries — these live in the content
+# library / Directus, never in git. Web-ready site images in nuxt/public/images stay tracked.
+*.mp4
+*.mov
+*.m4v
+*.webm
+*.avi
+*.mkv
+*.psd
+*.tif
+*.tiff
+*.heic
+**/frames/
+**/video-frames/
+**/footage/

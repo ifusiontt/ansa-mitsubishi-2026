@@ -77,9 +77,10 @@ const MIME = {
 /** rel paths (under Outlander_Sport_HEV/) of the images used for records */
 const PICKS = {
 	hero: 'Exterior/DSC04357_Mitsubishi Outlander Sport_Front_Level.webp',
+	// Highlight images by sort. 1 (PERFORMANCE) and 2 (DESIGN) are lifestyle photography set by
+	// scripts/upload-lifestyle-assets.mjs (they were a HYBRID badge close-up and a white-background
+	// rear cutout); a highlight without a pick keeps whatever image it has.
 	highlights: {
-		1: 'Exterior/DSC04390_Mitsubishi Outlander Sport_HEV_closeup.webp',
-		2: 'Exterior/DSC04357_Mitsubishi Outlander Sport_Back Qtr_Level_1.webp',
 		3: 'Interior/BKZ07950_Mitsubishi Outlander Sport_Interior 1.png',
 	},
 };
@@ -403,7 +404,8 @@ if (items.data.length < HIGHLIGHTS.length) {
 // with explicit FKs. Deterministic and idempotent.
 for (const spec of HIGHLIGHTS) {
 	const row = items.data.find((r) => r.sort === spec.sort) ?? items.data[spec.sort - 1];
-	const imgId = fileByRel(PICKS.highlights[spec.sort]);
+	const pick = PICKS.highlights[spec.sort];
+	const imgId = pick ? fileByRel(pick) : null;
 
 	// current junction rows for this item (full objects incl. file FK)
 	const junctions = await search('block_content_items_files', {
@@ -412,7 +414,7 @@ for (const spec of HIGHLIGHTS) {
 		limit: -1,
 	});
 	const currentFileIds = new Set((junctions.data ?? []).map((j) => j.directus_files_id));
-	const wantOnly = currentFileIds.size === 1 && currentFileIds.has(imgId);
+	const wantOnly = !imgId || (currentFileIds.size === 1 && currentFileIds.has(imgId));
 
 	const contentChanged =
 		row.tagline !== spec.tagline ||
@@ -473,6 +475,17 @@ for (const [id, newName] of Object.entries(TRIM_RENAMES)) {
 	});
 	const trim = trims.data?.[0];
 	if (!trim) {
+		// fresh databases (seeded by apply-hybrid-vehicle-schema.js) have different ids but already
+		// carry the target names — only fail when the renamed trim is genuinely missing
+		const named = await search('vehicle_trims', {
+			filter: { vehicle: { _eq: vehicle.id }, trim_name: { _eq: newName } },
+			fields: ['id'],
+			limit: 1,
+		});
+		if (named.data?.[0]) {
+			console.log(`trim: ok #${named.data[0].id} "${newName}" (#${id} not present)`);
+			continue;
+		}
 		console.error(`ERROR: trim #${id} not found`);
 		process.exit(1);
 	}

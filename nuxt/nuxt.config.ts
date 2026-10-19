@@ -44,6 +44,10 @@ export default defineNuxtConfig({
 			// Enabled by default; set to 'false' to disable
 			enableVisualEditing: process.env.NUXT_PUBLIC_ENABLE_VISUAL_EDITING !== 'false',
 		},
+		// Server-only Directus origin for SSR / API-route requests (e.g. the internal Docker hostname
+		// http://srv-captain--mitsubishi-api:8055 on CapRover). Browsers keep using public.directusUrl.
+		// Override at runtime with NUXT_DIRECTUS_SERVER_URL.
+		directusServerUrl: process.env.DIRECTUS_SERVER_URL || process.env.DIRECTUS_URL,
 		directusServerToken: process.env.DIRECTUS_SERVER_TOKEN,
 		// Optional: endpoint that delivers rendered form notification emails (e.g. a Directus Flow webhook).
 		formsEmailWebhookUrl: process.env.FORMS_EMAIL_WEBHOOK_URL,

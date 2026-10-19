@@ -1,0 +1,12 @@
+**/node_modules
+**/.env
+**/.env.*
+nuxt/.nuxt
+nuxt/.output
+nuxt/*.tmp.mjs
+.git
+.tmp
+content-raw
+graphify-out
+directus
+scripts

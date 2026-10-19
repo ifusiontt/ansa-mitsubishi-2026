@@ -70,6 +70,13 @@ export interface VehiclePageTrim {
 	key_features: Array<{ value: string }>;
 }
 
+/** M2M -> directus_files via vehicles_gallery (vehicles.gallery); `directus_files_id` is expanded by /api/vehicles/:slug. */
+export interface VehicleGalleryItem {
+	id: number;
+	sort: number | null;
+	directus_files_id: VehicleFileRef | null;
+}
+
 /** Full nested vehicle payload for /showroom/[slug] */
 export interface VehiclePage {
 	id: number;
@@ -101,6 +108,8 @@ export interface VehiclePage {
 	colors: VehiclePageColor[];
 	highlights: VehicleHighlight[];
 	trims: VehiclePageTrim[];
+	/** Lifestyle photography for the gallery strip (scripts/upload-lifestyle-assets.mjs). */
+	gallery?: VehicleGalleryItem[];
 }
 
 /** Lightweight published-vehicle index row (GET /api/vehicles) — used by the header mega menu and the homepage fleet cards. */

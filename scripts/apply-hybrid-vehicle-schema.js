@@ -841,6 +841,8 @@ const PUBLIC_READ_WHITELISTS = {
     'hero_block', 'colors', 'highlights', 'trims', 'menu_image',
     // scripts/add-spec-fields.mjs:
     'ground_clearance', 'dimensions', 'torque', 'suspension',
+    // scripts/upload-lifestyle-assets.mjs (the vehicles_gallery junction is full-read in seed-permissions.py):
+    'gallery',
   ],
   // new collection from the hybrid vehicle schema:
   vehicle_colors: ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'color_code', 'image'],

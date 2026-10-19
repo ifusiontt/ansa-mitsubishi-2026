@@ -1,6 +1,6 @@
 {
   "project_name": "ANSA Motors Mitsubishi Trinidad Showroom",
-  "last_updated": "2026-10-01T20:43:16.000+00:00",
+  "last_updated": "2026-10-19T14:45:59.406Z",
   "system_state": {
     "directus_version": "12.x",
     "nuxt_version": "4.x",
@@ -11,9 +11,9 @@
     "docker_stack": "directus-mitsubishi-cms, directus-mitsubishi-db, directus-mitsubishi-redis"
   },
   "database_stats": {
-    "total_collections": 39,
-    "total_fields": 404,
-    "total_relations": 88,
+    "total_collections": 41,
+    "total_fields": 427,
+    "total_relations": 93,
     "core_collections": [
       "vehicles",
       "vehicle_trims",
@@ -33,9 +33,9 @@
     "vehicle_slug_route": "/showroom/[slug].vue"
   },
   "active_sprint": {
-    "phase": "Triton + Xpander Cross colour seeding + PSD banner cleanup — Complete",
-    "current_task": "Cleaned the red PSD-layer warning banner from all Triton/Xpander Cross renders and seeded their vehicle_colors palettes. (1) directus/seeds/clean-color-images.py (Pillow, idempotent, --dry-run supported): detects the banner by red-pixel fraction in the top 12% strip (calibrated on the set: banners ~0.24, clean ~0.00, threshold 0.05) and paints the top 12% solid #FFFFFF in place, preserving filename+format. Result: 180 files scanned, 92 filled (all exterior shots), 88 interior shots untouched; post-scan 0 banners remain. (2) directus/seeds/vehicle-colors.mjs (idempotent, re-runnable; final run is a no-op 'already at spec' x8): Triton (vehicle 7) rows 59 Graphite Gray #4A4D52 + U28.webp, 60 Blade Silver #B3B7BB + U33.webp, 77 Jet Black Mica #1C1D21 (no render on disk), 78 White Diamond #F2F4F5 (no render on disk); Xpander Cross (vehicle 8) rows 66 Sunrise Orange #C8501E + side X3M webp, 63 Blade Silver Metallic #B2B6BA + side U33 webp, 62 Quartz White Pearl #F0F2F3 + side W81 webp, 65 Jet Black Mica #18191B + side X37 webp. All 6 webp assets uploaded byte-verified (sha256 CMS==local cleaned) into the Triton (56c46747) / Xpander Cross (fd4a52f7) folders; spec palette owns sort 1-4 per vehicle, pre-existing non-spec swatches renumbered to 5+; vehicles.colors junctions refreshed (7: [59,60,77,78,56,57,58], 8: [62,63,65,66,61,64]). Triton X37/W81 renders do NOT exist in content-raw (only U28/U33 exist) — those two rows intentionally image=NULL. (3) Verification: /items/vehicle_colors returns 7 triton + 6 xpander-cross rows; 8/8 linked assets serve 200 image/*; nuxt typecheck 0 errors (182 project files in program). (4) A parallel agent was seeding the same task mid-run — directus/seeds/_reconcile-colors.mjs (keep as recovery tool) dedupes (vehicle,color_name) collisions keeping the lowest id and re-patches the junctions.",
-    "reference_url": null
+    "phase": "Hybrid Vehicle Schema Architecture — Complete",
+    "current_task": "Hybrid vehicle schema applied (vehicle_colors collection; vehicles.hero_block M2O + colors/highlights/trims O2M with list-o2m interfaces; vehicle_trims.key_features converted to list repeater of {value} strings; block_content_items.vehicle M2O). Outlander Sport seeded: hero block \"Drive Your Ambition\" with generated media, 3 paint colors, 3 highlight blocks, ES/SE FWD/SEL Premium FWD trims. Next: render /showroom/[slug].vue against the nested vehicles payload.",
+    "reference_url": "https://mitsubishi-motors.com.jm/vehicle/2025-outlander-sport/"
   },
   "known_gotchas": [
     "NEVER run 'docker-compose down -v' — it deletes the persistent Postgres volume.",
@@ -53,6 +53,7 @@
     "Query-string filters on this build are broken for strings: filter[field][_eq]=\"text\" silently returns EMPTY and _in 400s; numeric _eq works. Never rely on string filters — read unfiltered (or numerically filtered) and match client-side.",
     "The response cache on this build is unreliable for LIST reads: GET /items/:collection can return stale rows or an EMPTY array (even with cache-buster params) right after write bursts. Single-ITEM reads (/items/:collection/:id) and the vehicles.colors junction read have been consistently fresh — make every identity decision (dedupe, upsert, junction refresh) off single-item reads; treat an empty list on a known-non-empty collection as a stale-cache signature and refuse to create.",
     "M2O fields are IGNORED in POST create payloads (e.g. vehicle_id arrives null on new vehicle_colors rows) — create the row, then PATCH /items/:collection/:id { <m2o_field> } and verify the link with a fresh single-item read.",
-    "Deleting a vehicle_colors row does NOT cascade to the vehicles.colors M2A junction (dangling ids survive and 403 on junction PATCH) — after any colour-row deletion, re-PATCH /items/vehicles/:id { colors: [survivingIds] } (verified ids only)."
+    "Deleting a vehicle_colors row does NOT cascade to the vehicles.colors M2A junction (dangling ids survive and 403 on junction PATCH) — after any colour-row deletion, re-PATCH /items/vehicles/:id { colors: [survivingIds] } (verified ids only).",
+    "Directus 12.3 schema API: GET /schema/snapshot -> POST /schema/diff?mode=merge (partial snapshot with version:2) -> POST /schema/apply (diff body). /schema/state and GET /schema/diff do not exist in 12.x."
   ]
 }

@@ -54,6 +54,14 @@
 		@apply hover:text-accent transition-colors no-underline;
 	}
 
+	/* Scrollable but without a visible scrollbar (gallery filmstrips) */
+	.no-scrollbar {
+		scrollbar-width: none;
+	}
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
 	/* Display headers: Montserrat, uppercase, tracked out (see nuxt.config.ts fonts.families) */
 	.font-display {
 		font-family: 'Montserrat', sans-serif;

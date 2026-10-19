@@ -3,14 +3,16 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
 import type { VehiclePageColor, VehiclePage, VehiclePageTrim } from '#shared/types/vehicle';
 import VehicleColorStage from '~/components/showroom/VehicleColorStage.vue';
 import VehicleFinancingCalculator from '~/components/showroom/VehicleFinancingCalculator.vue';
+import VehicleGalleryStrip from '~/components/showroom/VehicleGalleryStrip.vue';
 import VehicleHighlights from '~/components/showroom/VehicleHighlights.vue';
 import VehicleHeroStage from '~/components/showroom/VehicleHeroStage.vue';
 import VehicleHorizonBar from '~/components/showroom/VehicleHorizonBar.vue';
 
 /**
  * /showroom/[slug] — vehicle page in buyer-journey order: hero → sticky horizon bar → overview →
- * highlights → colours → trims (+ compare modal) → financing → key specs → brochure → CTA. Every section except the full-bleed
- * highlight splits and the centred colour stage shares one 1440px container so their left edges line up.
+ * highlights → gallery → colours → trims (+ compare modal) → financing → key specs → brochure → CTA. Every section except the
+ * full-bleed highlight splits, the gallery filmstrip and the centred colour stage shares one 1440px container so their left
+ * edges line up.
  *
  * Design tokens and spacing metrics are extracted live from the reference site
  * (https://mitsubishi-motors.com.jm/vehicle/2025-outlander-sport/) via
@@ -18,7 +20,7 @@ import VehicleHorizonBar from '~/components/showroom/VehicleHorizonBar.vue';
  * directly in the `.vehicle-page` token block below.
  *
  * Data source: GET /items/vehicles?filter[slug][_eq]=:slug
- *   &fields=*,hero_block.*,colors.*,highlights.*,trims.*
+ *   &fields=*,hero_block.*,colors.*,highlights.*,trims.*,gallery.directus_files_id.*
  * (proxied through server/api/vehicles/[slug].get.ts)
  */
 const route = useRoute();
@@ -164,7 +166,13 @@ useSeoMeta({
 		<VehicleHeroStage :vehicle="vehicle" :hero-image="vehicle.hero_block?.media" />
 
 		<!-- Sticky sub-nav: model + price, section jump links, test-drive CTA -->
-		<VehicleHorizonBar :slug="vehicle.slug" :title="vehicle.title" :trim="selectedTrim?.trim_name" :price="formatPrice(vehicle.starting_price)" />
+		<VehicleHorizonBar
+			:slug="vehicle.slug"
+			:title="vehicle.title"
+			:trim="selectedTrim?.trim_name"
+			:price="formatPrice(vehicle.starting_price)"
+			:has-gallery="!!vehicle.gallery?.some((item) => item.directus_files_id)"
+		/>
 
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 2 · OVERVIEW — tagline, headline, copy + facts strip
@@ -194,6 +202,11 @@ useSeoMeta({
 		     PART 3 · HIGHLIGHTS — wide editorial splits + pillar strip
 	     ════════════════════════════════════════════════════════════ -->
 		<VehicleHighlights :items="vehicle.highlights ?? []" :vehicle-title="displayTitle" :fallback-image="heroMedia" />
+
+		<!-- ════════════════════════════════════════════════════════════
+		     PART 3b · GALLERY — full-bleed lifestyle filmstrip
+	     ════════════════════════════════════════════════════════════ -->
+		<VehicleGalleryStrip :items="vehicle.gallery ?? []" :vehicle-title="displayTitle" />
 
 		<!-- ════════════════════════════════════════════════════════════
 		     PART 4 · COLORS — centred showroom stage + swatches

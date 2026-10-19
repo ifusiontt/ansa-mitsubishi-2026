@@ -43,7 +43,7 @@ WHITELIST = {
                  'primary_color', 'brochure_url', 'status', 'model_year', 'category', 'menu_image',
                  'body_type', 'seating_capacity', 'fuel_type', 'warranty', 'overview',
                  'ground_clearance', 'dimensions', 'torque', 'suspension',
-                 'hero_block', 'colors', 'highlights', 'trims'],
+                 'hero_block', 'colors', 'highlights', 'trims', 'gallery'],
     'vehicle_colors': ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'color_code', 'image'],
     'vehicle_trims': ['id', 'vehicle', 'vehicle_id', 'vehicle_slug', 'trim_name',
                       'status', 'engine', 'transmission', 'drivetrain', 'price',
@@ -70,6 +70,7 @@ FULL_READ = [
     'block_cta_simple',
     'block_cta_simple_buttons', 'block_hero_custom', 'block_hero_custom_files',
     'block_layout_wrapper', 'block_layout_wrapper_sections',
+    'vehicles_gallery',  # vehicles.gallery junction (scripts/upload-lifestyle-assets.mjs)
     'posts', 'redirects', 'form_fields',
 ]
 

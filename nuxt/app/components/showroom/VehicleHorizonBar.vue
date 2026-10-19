@@ -6,6 +6,7 @@
  * test-drive modal with this vehicle and the currently selected trim.
  * The link for the section currently under the bar is highlighted via IntersectionObserver.
  * Target sections carry `scroll-mt-[13.5rem]` so smooth scrolling clears header + bar.
+ * "Gallery" only shows for a vehicle with gallery photos (the section isn't rendered otherwise).
  */
 const props = defineProps<{
 	slug: string;
@@ -14,16 +15,21 @@ const props = defineProps<{
 	trim?: string;
 	/** Pre-formatted starting price (e.g. "TTD $189,000"); hidden when empty. */
 	price?: string;
+	/** Whether the page renders the #gallery section. */
+	hasGallery?: boolean;
 }>();
 
-const LINKS = [
+const ALL_LINKS = [
 	{ id: 'overview', label: 'Overview' },
 	{ id: 'highlights', label: 'Highlights' },
+	{ id: 'gallery', label: 'Gallery' },
 	{ id: 'colors', label: 'Colours' },
 	{ id: 'trims', label: 'Trims' },
 	{ id: 'financing', label: 'Finance' },
 	{ id: 'specs', label: 'Specs' },
 ] as const;
+
+const LINKS = computed(() => ALL_LINKS.filter((link) => link.id !== 'gallery' || props.hasGallery));
 
 const activeId = ref<string>('');
 
@@ -45,7 +51,7 @@ onMounted(() => {
 		},
 		{ rootMargin: '-220px 0px -60% 0px' },
 	);
-	for (const link of LINKS) {
+	for (const link of LINKS.value) {
 		const el = document.getElementById(link.id);
 		if (el) observer.observe(el);
 	}
