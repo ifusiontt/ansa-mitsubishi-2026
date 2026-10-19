@@ -54,6 +54,26 @@
 		@apply hover:text-accent transition-colors no-underline;
 	}
 
+	/*
+	 * Scroll reveal (composables/useScrollReveal.ts): 'armed' hides instantly while off-screen,
+	 * 'shown' carries the transition so items rise in, staggered by --reveal-i. SSR ('static')
+	 * and reduced-motion users always get the plain, visible content.
+	 */
+	@media (prefers-reduced-motion: no-preference) {
+		[data-reveal='armed'] .reveal-item {
+			opacity: 0;
+			transform: translate3d(0, 24px, 0);
+		}
+		[data-reveal='shown'] .reveal-item {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+			transition:
+				opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+				transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+			transition-delay: calc(var(--reveal-i, 0) * 90ms);
+		}
+	}
+
 	/* Scrollable but without a visible scrollbar (gallery filmstrips) */
 	.no-scrollbar {
 		scrollbar-width: none;

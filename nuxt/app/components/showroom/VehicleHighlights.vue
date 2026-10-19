@@ -40,6 +40,10 @@ const splits = computed(() => rows.value.slice(0, SPLIT_COUNT));
 const pillars = computed(() => rows.value.slice(SPLIT_COUNT));
 const pillarCols = computed(() => (pillars.value.length === 1 ? '' : pillars.value.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'));
 
+// Scroll reveal: each story row reveals on its own (ScrollReveal); the pillar strip staggers as one.
+const pillarList = useTemplateRef<HTMLUListElement>('pillarList');
+const pillarReveal = useScrollReveal(pillarList);
+
 const editAttr = (id: number) =>
 	setAttr({ collection: 'block_content_items', item: id, fields: ['tagline', 'headline', 'description', 'images'], mode: 'drawer' });
 </script>
@@ -62,14 +66,19 @@ const editAttr = (id: number) =>
 
 		<!-- Part A · true full-bleed 50/50 editorial splits -->
 		<div class="w-full">
-			<article
+			<ScrollReveal
 				v-for="(row, index) in splits"
 				:key="row.id"
+				as="article"
 				class="grid w-full grid-cols-1 lg:grid-cols-2"
 				:data-directus="editAttr(row.id)"
 			>
-				<!-- Image leads in the DOM (first on mobile); rows 1 and 3 push it right on desktop -->
-				<div class="relative h-[50vh] w-full overflow-hidden bg-zinc-100 lg:h-[70vh] dark:bg-zinc-900" :class="{ 'lg:order-last': index % 2 === 0 }">
+				<!-- Image leads in the DOM (first on mobile); rows 1 and 3 push it right on desktop. The photo lands first, the copy follows. -->
+				<div
+					class="reveal-item relative h-[50vh] w-full overflow-hidden bg-zinc-100 lg:h-[70vh] dark:bg-zinc-900"
+					:class="{ 'lg:order-last': index % 2 === 0 }"
+					style="--reveal-i: 0"
+				>
 					<img
 						v-if="row.imageId"
 						:src="assetUrl(row.imageId, 1600)"
@@ -82,7 +91,7 @@ const editAttr = (id: number) =>
 				</div>
 
 				<!-- Copy is centred in its half so it sits close to the photo seam instead of the far edge -->
-				<div class="flex items-center">
+				<div class="reveal-item flex items-center" style="--reveal-i: 1">
 					<div class="mx-auto flex w-full max-w-xl flex-col justify-center px-6 py-12 sm:px-10 lg:px-12 lg:py-20 xl:px-16">
 						<p v-if="row.tagline">
 							<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400">
@@ -93,16 +102,17 @@ const editAttr = (id: number) =>
 						<p v-if="row.description" class="mt-6 text-base leading-relaxed text-zinc-600 md:text-lg dark:text-zinc-300">{{ row.description }}</p>
 					</div>
 				</div>
-			</article>
+			</ScrollReveal>
 		</div>
 
 		<!-- Part B · cinematic pillar strip -->
 		<div v-if="pillars.length" class="mx-auto mt-16 w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
-			<ul class="grid grid-cols-1 gap-6 lg:gap-8" :class="pillarCols">
+			<ul ref="pillarList" :data-reveal="pillarReveal" class="grid grid-cols-1 gap-6 lg:gap-8" :class="pillarCols">
 				<li
-					v-for="pillar in pillars"
+					v-for="(pillar, i) in pillars"
 					:key="pillar.id"
-					class="group relative min-h-[500px] overflow-hidden rounded-3xl bg-zinc-900 shadow-xl lg:min-h-[560px]"
+					class="reveal-item group relative min-h-[500px] overflow-hidden rounded-3xl bg-zinc-900 shadow-xl lg:min-h-[560px]"
+					:style="{ '--reveal-i': i }"
 					:data-directus="editAttr(pillar.id)"
 				>
 					<img

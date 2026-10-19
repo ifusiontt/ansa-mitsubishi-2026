@@ -43,16 +43,22 @@ function page(direction: 1 | -1) {
 }
 
 onMounted(updateEnds);
+
+// The header, then the whole filmstrip, fade and glide up when the section is reached.
+const section = useTemplateRef<HTMLElement>('section');
+const reveal = useScrollReveal(section);
 </script>
 
 <template>
 	<section
 		v-if="images.length"
 		id="gallery"
+		ref="section"
+		:data-reveal="reveal"
 		class="w-full scroll-mt-[13.5rem] bg-white pb-2 pt-4 lg:pb-4 dark:bg-zinc-950"
 		aria-labelledby="gallery-heading"
 	>
-		<header class="relative mx-auto mb-10 w-full max-w-[1440px] px-4 text-center sm:px-6 lg:px-8">
+		<header class="reveal-item relative mx-auto mb-10 w-full max-w-[1440px] px-4 text-center sm:px-6 lg:px-8" style="--reveal-i: 0">
 			<p>
 				<span class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400">
 					Gallery
@@ -77,7 +83,8 @@ onMounted(updateEnds);
 
 		<ul
 			ref="track"
-			class="no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-8 sm:px-8"
+			style="--reveal-i: 1"
+			class="reveal-item no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-8 sm:px-8"
 			:aria-label="`${vehicleTitle} photo gallery`"
 			@scroll.passive="updateEnds"
 		>

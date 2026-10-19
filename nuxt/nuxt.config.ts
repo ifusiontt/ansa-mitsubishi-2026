@@ -26,6 +26,17 @@ export default defineNuxtConfig({
 
 	css: ['~/assets/css/main.css'],
 
+	// Mitsubishi Three Diamonds favicons (public/). SVG first for modern browsers; .ico (16/32/48) as fallback.
+	app: {
+		head: {
+			link: [
+				{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+				{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+				{ rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+			],
+		},
+	},
+
 	// https://fonts.nuxt.com — Montserrat for display headers (font-display),
 	// Poppins + Inter for body & UI. global: true emits every @font-face in the
 	// shared global stylesheet so header/footer typography loads on all pages.
