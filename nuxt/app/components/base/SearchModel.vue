@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core';
 import { Search } from 'lucide-vue-next';
-import { ComboboxLabel, type ComboboxRootProps } from 'radix-vue';
 
 /**
  * Header Quick Jump: a client-side command palette over a curated, in-memory index — no network
  * round-trip, so results update on every keystroke. Empty query shows Quick Links; otherwise every
  * whitespace-separated term must match an item's title, description or keywords, and matches are
- * grouped by category. radix-vue's Combobox (shadcn Command) supplies the keyboard model: input
- * auto-focus, ArrowUp/ArrowDown highlight, Enter to select, Escape to close. Ctrl/Cmd+K toggles it.
+ * grouped by category.
+ *
+ * The list is plain ARIA listbox markup driven by `activeIndex` — not radix's Combobox, whose own
+ * filtering and highlight tracking raced this computed list (fast typing could leave nothing highlighted,
+ * so Enter did nothing). The radix Dialog still provides the focus trap, Escape and the overlay.
+ * Keys: ArrowUp/ArrowDown move, Enter opens, Escape closes; Ctrl/Cmd+K toggles from anywhere but the input.
  */
 type Category = 'Vehicles' | 'Ownership' | 'Locations';
 
@@ -49,7 +52,8 @@ const ITEMS: QuickJumpItem[] = [
 		category: 'Vehicles',
 		title: 'Xpander Cross',
 		description: '7-seat crossover MPV for the whole family',
-		keywords: ['7 seater', 'family', 'mpv', 'crossover'],
+		// "expander" catches the common spoken spelling of the name
+		keywords: ['xpander', 'expander', 'crossover', '7 seater', 'family', 'mpv'],
 		icon: 'lucide:car-front',
 		to: '/showroom/xpander-cross',
 	},
@@ -59,7 +63,7 @@ const ITEMS: QuickJumpItem[] = [
 		category: 'Ownership',
 		title: 'Book a Service',
 		description: 'Factory-certified technicians and Mitsubishi diagnostics',
-		keywords: ['maintenance', 'oil change', 'repair', 'diagnostics'],
+		keywords: ['book', 'booking', 'service', 'maintenance', 'lube', 'oil change', 'repair', 'diagnostics'],
 		icon: 'lucide:wrench',
 		to: '/service',
 	},
@@ -134,6 +138,8 @@ const CATEGORY_ORDER: Category[] = ['Vehicles', 'Ownership', 'Locations'];
 
 const open = ref(false);
 const searchTerm = ref('');
+const activeIndex = ref(0);
+const input = useTemplateRef<HTMLInputElement>('input');
 const router = useRouter();
 const { open: openTestDrive } = useTestDriveModal();
 
@@ -146,7 +152,7 @@ const score = (item: QuickJumpItem, terms: string[]) => {
 };
 
 const groups = computed<{ heading: string; items: QuickJumpItem[] }[]>(() => {
-	const terms = searchTerm.value.toLowerCase().split(/\s+/).filter(Boolean);
+	const terms = searchTerm.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
 	if (!terms.length) {
 		return [{ heading: 'Quick Links', items: QUICK_LINK_IDS.map((id) => ITEMS.find((item) => item.id === id)!) }];
 	}
@@ -162,14 +168,37 @@ const groups = computed<{ heading: string; items: QuickJumpItem[] }[]>(() => {
 	})).filter((group) => group.items.length);
 });
 
-/**
- * radix keeps the highlighted option across a filter change while its value survives, so the value is
- * scoped to the query: every keystroke then highlights the top result. Selection goes through @select.
- */
-const optionValue = (item: QuickJumpItem) => `${searchTerm.value}::${item.id}`;
+/** Results in display order — what ArrowUp/ArrowDown walk through. */
+const flat = computed(() => groups.value.flatMap((group) => group.items));
+const optionId = (item: QuickJumpItem) => `quick-jump-${item.id}`;
+const activeItem = computed(() => flat.value[activeIndex.value]);
 
-// Filtering happens in `groups`; radix only handles highlight + selection over what is rendered.
-const keepAll: NonNullable<ComboboxRootProps['filterFunction']> = (list) => list;
+// Every new query highlights the top result.
+watch(searchTerm, () => {
+	activeIndex.value = 0;
+});
+
+// Keep the highlighted row visible when arrowing through a scrolled list.
+watch(activeItem, async (item) => {
+	if (!item) return;
+	await nextTick();
+	document.getElementById(optionId(item))?.scrollIntoView({ block: 'nearest' });
+});
+
+function move(step: 1 | -1) {
+	const count = flat.value.length;
+	if (count) activeIndex.value = (activeIndex.value + step + count) % count;
+}
+
+function onInputKeydown(event: KeyboardEvent) {
+	if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+		event.preventDefault(); // keep the caret where it is
+		move(event.key === 'ArrowDown' ? 1 : -1);
+	} else if (event.key === 'Enter' && activeItem.value) {
+		event.preventDefault();
+		select(activeItem.value);
+	}
+}
 
 async function select(item: QuickJumpItem) {
 	open.value = false;
@@ -183,10 +212,10 @@ async function select(item: QuickJumpItem) {
 }
 
 useEventListener('keydown', (event: KeyboardEvent) => {
-	if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-		event.preventDefault();
-		open.value = !open.value;
-	}
+	if (!((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k')) return;
+	event.preventDefault(); // also stops the browser's own Ctrl/Cmd+K (address-bar search)
+	if (event.target === input.value) return; // typing in the palette never toggles it
+	open.value = !open.value;
 });
 
 watch(open, (isOpen) => {
@@ -200,32 +229,67 @@ watch(open, (isOpen) => {
 			<Search class="size-5" />
 		</Button>
 
-		<CommandDialog v-model:open="open">
-			<Command v-model:search-term="searchTerm" :filter-function="keepAll">
+		<Dialog v-model:open="open">
+			<DialogContent class="gap-0 overflow-hidden p-0 shadow-lg">
 				<DialogTitle class="sr-only">Quick Jump</DialogTitle>
 				<DialogDescription class="sr-only">Search vehicles, services and branch locations</DialogDescription>
 
-				<CommandInput
-					placeholder="Search models, services or branches…"
-					class="m-2 p-4 text-base leading-normal focus:outline-none"
-				/>
+				<!-- First focusable element, so the dialog auto-focuses it on open. -->
+				<div class="flex items-center border-b border-input px-4">
+					<Search class="size-5 shrink-0 opacity-50" aria-hidden="true" />
+					<input
+						ref="input"
+						v-model="searchTerm"
+						type="text"
+						role="combobox"
+						aria-expanded="true"
+						aria-controls="quick-jump-list"
+						aria-autocomplete="list"
+						:aria-activedescendant="activeItem ? optionId(activeItem) : undefined"
+						aria-label="Search models, services or branches"
+						placeholder="Search models, services or branches…"
+						autocomplete="off"
+						spellcheck="false"
+						class="h-14 w-full bg-transparent px-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 focus-visible:ring-0"
+						style="box-shadow: none"
+						@keydown="onInputKeydown"
+					/>
+				</div>
 
-				<CommandList class="max-h-[min(460px,60vh)] overflow-auto p-2 text-foreground">
+				<div
+					id="quick-jump-list"
+					role="listbox"
+					aria-label="Results"
+					class="max-h-[min(460px,60vh)] overflow-y-auto p-2 text-foreground"
+				>
 					<p v-if="!groups.length" role="status" class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
 						No matches for “{{ searchTerm }}”. Try a model, service or town.
 					</p>
-					<CommandGroup v-for="group in groups" :key="group.heading" class="pt-1">
-						<ComboboxLabel
+					<div
+						v-for="group in groups"
+						:key="group.heading"
+						role="group"
+						:aria-labelledby="`quick-jump-group-${group.heading}`"
+						class="pt-1"
+					>
+						<p
+							:id="`quick-jump-group-${group.heading}`"
 							class="px-2 pb-1 pt-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400"
 						>
 							{{ group.heading }}
-						</ComboboxLabel>
-						<CommandItem
+						</p>
+						<!-- Options are not focusable: focus stays in the input, aria-activedescendant names the active one. -->
+						<div
 							v-for="item in group.items"
+							:id="optionId(item)"
 							:key="item.id"
-							:value="optionValue(item)"
-							class="flex cursor-pointer items-center gap-3 px-2 py-2.5"
-							@select="select(item)"
+							role="option"
+							:aria-selected="item === activeItem"
+							class="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2.5"
+							:class="item === activeItem ? 'bg-background-muted' : ''"
+							@mousemove="activeIndex = flat.indexOf(item)"
+							@mousedown.prevent
+							@click="select(item)"
 						>
 							<span
 								class="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-red/10 text-brand-red"
@@ -237,10 +301,10 @@ watch(open, (isOpen) => {
 								<span class="block truncate text-sm font-semibold">{{ item.title }}</span>
 								<span class="block truncate text-xs text-zinc-500 dark:text-zinc-400">{{ item.description }}</span>
 							</span>
-						</CommandItem>
-					</CommandGroup>
-				</CommandList>
-			</Command>
-		</CommandDialog>
+						</div>
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
 	</div>
 </template>
