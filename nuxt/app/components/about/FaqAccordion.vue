@@ -51,7 +51,7 @@ const toggle = (id: number) => {
 							]"
 							@click="toggle(faq.id)"
 						>
-							<span class="text-sm font-semibold md:text-base">{{ faq.question }}</span>
+							<span class="text-sm font-bold sm:text-base">{{ faq.question }}</span>
 							<span
 								aria-hidden="true"
 								:class="[
@@ -79,7 +79,7 @@ const toggle = (id: number) => {
 						<div class="overflow-hidden">
 							<!-- Answers are CMS-authored rich text (same trust level as block_richtext). -->
 							<div
-								class="prose prose-sm max-w-2xl px-5 pb-6 leading-relaxed text-zinc-600 prose-p:my-2 prose-p:text-zinc-600 prose-a:text-brand-red prose-strong:text-zinc-900 md:prose-base md:px-6 dark:prose-invert dark:text-zinc-300 dark:prose-p:text-zinc-300 dark:prose-strong:text-white"
+								class="prose max-w-2xl px-5 pb-6 text-sm leading-relaxed text-zinc-600 prose-p:my-2 prose-p:leading-relaxed prose-p:text-zinc-600 prose-li:my-1 prose-a:text-brand-red prose-strong:font-semibold prose-strong:text-zinc-900 sm:text-base md:px-6 dark:prose-invert dark:text-zinc-400 dark:prose-p:text-zinc-400 dark:prose-strong:text-white"
 								v-html="faq.answer"
 							/>
 						</div>

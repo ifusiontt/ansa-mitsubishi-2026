@@ -3,8 +3,8 @@ import PartsServicePage from '~/components/layout/PartsServicePage.vue';
 import ServiceBookingForm from '~/components/forms/ServiceBookingForm.vue';
 
 /**
- * /service — Service Centre tab: trust badge strip above the content, and a roadside-assistance
- * hotline card above the booking form. `?vehicle=<model>` pre-selects the vehicle (e.g. from showroom CTAs).
+ * /service — Service Centre tab: trust badge strip above the content, and an Express Service
+ * (quick lube bay) call-out above the booking form. `?vehicle=<model>` pre-selects the vehicle (e.g. from showroom CTAs).
  */
 const vehicleModel = useInquiryVehicleQuery();
 
@@ -41,21 +41,23 @@ const TRUST_BADGES = [
 			</ul>
 		</template>
 
-		<aside class="mb-6 overflow-hidden rounded-2xl bg-zinc-950 p-6 text-white shadow-xl ring-1 ring-zinc-800" aria-labelledby="roadside-heading">
+		<aside class="mb-6 overflow-hidden rounded-2xl bg-zinc-950 p-6 text-white shadow-xl ring-1 ring-zinc-800" aria-labelledby="express-heading">
 			<div class="flex items-start gap-4">
-				<span class="relative grid size-11 shrink-0 place-items-center rounded-full bg-brand-red" aria-hidden="true">
-					<span class="absolute inset-0 animate-ping rounded-full bg-brand-red/40 motion-reduce:hidden" />
-					<Icon name="lucide:siren" class="relative size-5" />
+				<span class="grid size-11 shrink-0 place-items-center rounded-full bg-brand-red" aria-hidden="true">
+					<Icon name="lucide:wrench" class="size-5" />
 				</span>
 				<div class="min-w-0">
-					<h2 id="roadside-heading" class="text-base font-bold leading-snug md:text-lg">Need Immediate Roadside Assistance?</h2>
-					<p class="mt-1 text-sm text-zinc-400">Breakdown, flat tyre or lockout — call our hotline now.</p>
+					<p class="text-xs font-bold uppercase tracking-widest text-brand-red">Express Service &amp; Quick Lube Bay</p>
+					<h2 id="express-heading" class="mt-1 text-base font-bold leading-snug md:text-lg">Need Routine Maintenance Fast?</h2>
+					<p class="mt-1 text-sm leading-relaxed text-zinc-400">
+						Drop into our Express Service bay for genuine oil changes, tyre rotations, and multi-point inspections with fast factory turnaround.
+					</p>
 					<a
 						href="tel:+18686257231"
 						class="mt-4 inline-flex items-center gap-2 rounded-md bg-brand-red px-5 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
 					>
 						<Icon name="lucide:phone" class="size-4" aria-hidden="true" />
-						+1 (868) 625-7231
+						Call Express Desk: +1 (868) 625-7231
 					</a>
 				</div>
 			</div>

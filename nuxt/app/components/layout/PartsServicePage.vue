@@ -75,7 +75,7 @@ useSeoMeta({
 				<p
 					v-else
 					role="status"
-					class="rounded-2xl border border-zinc-200/80 bg-zinc-50/80 p-8 text-sm text-zinc-600 shadow-sm md:text-base dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
+					class="rounded-2xl border border-zinc-200/80 bg-zinc-50/80 p-8 text-sm leading-relaxed text-zinc-600 shadow-sm sm:text-base dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-400"
 				>
 					Visit or call your nearest ANSA Motors branch — our team is ready to help.
 				</p>

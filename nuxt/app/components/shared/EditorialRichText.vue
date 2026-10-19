@@ -3,7 +3,7 @@ import type { BlockRichtext } from '#shared/types/schema';
 
 /**
  * `block_richtext` item rendered in the secondary-page type scale (About, Service, Parts):
- * red-ruled eyebrow (as in VehicleHeroStage), bold zinc heading, relaxed zinc body copy.
+ * brand-red eyebrow, bold zinc text-2xl heading, relaxed zinc body copy.
  * Replaces the RichText block's display-size Tagline/Headline where content sits in cards
  * or narrow columns. Keeps the Directus visual-editing attributes.
  */
@@ -23,20 +23,14 @@ const attr = (fields: string, mode: 'popover' | 'drawer' = 'popover') =>
 
 <template>
 	<div>
-		<p v-if="data.tagline" class="mb-4" :data-directus="attr('tagline')">
-			<span
-				class="inline-flex items-center gap-2 border-l-2 border-brand-red pl-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400"
-			>
-				{{ data.tagline }}
-			</span>
+		<p v-if="data.tagline" class="mb-3 text-xs font-bold uppercase tracking-widest text-brand-red" :data-directus="attr('tagline')">
+			{{ data.tagline }}
 		</p>
+		<!-- One heading size for both variants, matching the form cards in the sidebar; the variant only sets the level. -->
 		<component
 			:is="variant === 'card' ? 'h3' : 'h2'"
 			v-if="data.headline"
-			:class="[
-				'font-bold tracking-tight text-zinc-900 dark:text-white',
-				variant === 'card' ? 'text-xl md:text-2xl' : 'text-2xl md:text-3xl',
-			]"
+			class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white"
 			:data-directus="attr('headline')"
 		>
 			{{ data.headline }}
@@ -44,7 +38,7 @@ const attr = (fields: string, mode: 'popover' | 'drawer' = 'popover') =>
 		<!-- CMS-authored rich text (same trust level as block_richtext). -->
 		<div
 			v-if="data.content"
-			class="editorial-body mt-4 max-w-2xl text-sm leading-relaxed text-zinc-600 md:text-base dark:text-zinc-300 [&_strong]:text-zinc-900 dark:[&_strong]:text-white"
+			class="editorial-body mt-4 max-w-2xl text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400 [&_strong]:text-zinc-900 dark:[&_strong]:text-white"
 			:data-directus="attr('content', 'drawer')"
 			v-html="data.content"
 		/>
