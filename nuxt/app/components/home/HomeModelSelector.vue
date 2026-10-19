@@ -11,9 +11,9 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  * sizes the image by that framing: every car fills ~90% of the fixed-height stage, tyres on the
  * contact shadow, at the same scale.
  *
- * The vehicle_colors renders share that framing, so the swatch row under the stage swaps the
- * image in place; each card keeps its own selection (first swatch by default). The render does not
- * scale on hover, so the car stays put while a swatch is picked.
+ * The vehicle_colors renders share that framing, so the swatch row under the stage crossfades the
+ * image in place; each card keeps its own selection (first swatch by default). On hover the card
+ * lifts and the render scales slightly; the cards rise in, staggered, on first scroll (useScrollReveal).
  *
  * Under the swatches, a permanent quick-spec bar built from the vehicle's Directus data: seats,
  * drivetrain and engine across its published trims. Each card is a stretched link to the
@@ -53,6 +53,9 @@ function quickSpecs(vehicle: VehicleSummary) {
 	].filter((spec): spec is { term: string; icon: string; label: string } => !!spec);
 }
 
+const modelList = useTemplateRef<HTMLUListElement>('modelList');
+const modelReveal = useScrollReveal(modelList);
+
 const shortName = (title: string) => title.replace(/^Mitsubishi\s+/, '');
 
 /** Standard terms (10% down, 60 months, fixed APR) on the starting price. */
@@ -83,10 +86,16 @@ function openFinancing(vehicle: VehicleSummary) {
 				Engineered for performance, capability, and reliability across Trinidad &amp; Tobago.
 			</p>
 
-			<ul class="mt-10 flex flex-wrap justify-center gap-6 md:mt-14">
-				<li v-for="vehicle in vehicles" :key="vehicle.id" class="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc((100%-3rem)/3)]">
+			<!-- Reveal on the <li>, hover physics on the <article>: the reveal transition (700ms + stagger) must not slow the hover lift. -->
+			<ul ref="modelList" :data-reveal="modelReveal" class="mt-10 flex flex-wrap justify-center gap-6 md:mt-14">
+				<li
+					v-for="(vehicle, i) in vehicles"
+					:key="vehicle.id"
+					class="reveal-item w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc((100%-3rem)/3)]"
+					:style="{ '--reveal-i': i }"
+				>
 					<article
-						class="group relative flex h-full min-h-[420px] md:min-h-[480px] flex-col justify-between overflow-hidden rounded-xl border border-t-2 border-neutral-200/80 border-t-brand-red bg-white shadow-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-brand-red hover:-translate-y-1 hover:shadow-md dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900"
+						class="group relative flex h-full min-h-[420px] md:min-h-[480px] flex-col justify-between overflow-hidden rounded-xl border border-t-2 border-neutral-200/80 border-t-brand-red bg-white shadow-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-brand-red hover:-translate-y-1.5 hover:shadow-xl dark:border-neutral-800 dark:border-t-brand-red dark:bg-neutral-900"
 					>
 						<!-- Studio stage -->
 						<div class="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-b from-neutral-100/70 to-transparent p-4 md:h-52 md:p-6 dark:from-neutral-800/50">
@@ -95,13 +104,26 @@ function openFinancing(vehicle: VehicleSummary) {
 									class="absolute inset-x-0 bottom-[-2%] mx-auto h-5 w-[85%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.1)_45%,transparent_72%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.8)_0%,transparent_72%)]"
 									aria-hidden="true"
 								/>
-								<img
-									v-if="stageUrl(vehicle)"
-									:src="stageUrl(vehicle)"
-									:alt="[vehicle.title, swatches(vehicle)[activeIndex(vehicle)]?.color_name].filter(Boolean).join(' in ')"
-									loading="lazy"
-									class="absolute left-1/2 top-[-38%] h-[180%] w-auto max-w-none -translate-x-1/2"
-								/>
+								<!-- Hover scale lives on this wrapper: a transition-transform on the <img> itself would override
+								     the crossfade's transition-opacity (same property, later in the stylesheet). -->
+								<div class="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-105">
+									<!-- Keyed on the render URL: outgoing and incoming colours overlap (both absolute) and crossfade. -->
+									<Transition
+										enter-active-class="transition-opacity duration-200 ease-out"
+										enter-from-class="opacity-0"
+										leave-active-class="transition-opacity duration-200 ease-in"
+										leave-to-class="opacity-0"
+									>
+										<img
+											v-if="stageUrl(vehicle)"
+											:key="stageUrl(vehicle)"
+											:src="stageUrl(vehicle)"
+											:alt="[vehicle.title, swatches(vehicle)[activeIndex(vehicle)]?.color_name].filter(Boolean).join(' in ')"
+											loading="lazy"
+											class="absolute left-1/2 top-[-38%] h-[180%] w-auto max-w-none -translate-x-1/2"
+										/>
+									</Transition>
+								</div>
 							</div>
 						</div>
 

@@ -20,6 +20,9 @@ const DEFAULT_ITEMS = [
 
 const { setAttr } = useVisualEditing();
 
+const panelList = useTemplateRef<HTMLUListElement>('panelList');
+const panelReveal = useScrollReveal(panelList);
+
 const imageUrl = (item: BlockContentItem) => {
 	const first = item.images?.[0];
 	const id = typeof first === 'object' ? directusFileId(first.directus_files_id) : '';
@@ -46,11 +49,13 @@ const cards = computed(() => {
 	<section class="bg-white py-12 text-neutral-950 dark:bg-black dark:text-white md:py-24 lg:py-32" aria-labelledby="home-value-heading">
 		<h2 id="home-value-heading" class="sr-only">{{ block?.tagline || 'The ANSA Difference' }}</h2>
 		<!-- Full-bleed, edge-to-edge panels -->
-		<ul class="grid w-full max-w-none grid-cols-1 gap-0 px-0 md:grid-cols-3">
+		<!-- The three panels rise together, staggered, as the section scrolls into view (useScrollReveal). -->
+		<ul ref="panelList" :data-reveal="panelReveal" class="grid w-full max-w-none grid-cols-1 gap-0 px-0 md:grid-cols-3">
 			<li
-				v-for="card in cards"
+				v-for="(card, i) in cards"
 				:key="card.key"
-				class="group relative isolate flex min-h-[640px] flex-col justify-end overflow-hidden bg-neutral-900 text-white lg:min-h-[720px] xl:min-h-[840px] 2xl:min-h-[940px]"
+				:style="{ '--reveal-i': i }"
+				class="reveal-item group relative isolate flex min-h-[640px] flex-col justify-end overflow-hidden bg-neutral-900 text-white lg:min-h-[720px] xl:min-h-[840px] 2xl:min-h-[940px]"
 				:data-directus="card.id ? setAttr({ collection: 'block_content_items', item: card.id, fields: ['tagline', 'headline', 'description', 'images'], mode: 'drawer' }) : undefined"
 			>
 				<img

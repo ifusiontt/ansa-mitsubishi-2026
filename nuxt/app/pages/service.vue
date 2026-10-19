@@ -24,21 +24,7 @@ const TRUST_BADGES = [
 		description="Factory-trained technicians, Mitsubishi diagnostics and genuine parts — book your next service with ANSA Motors."
 	>
 		<template #lead>
-			<ul class="grid grid-cols-2 gap-4 lg:grid-cols-4" aria-label="Why service with ANSA Motors">
-				<li
-					v-for="badge in TRUST_BADGES"
-					:key="badge.title"
-					class="flex items-center gap-4 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-sm md:p-5 dark:border-zinc-800 dark:bg-zinc-900/80"
-				>
-					<span class="grid size-11 shrink-0 place-items-center rounded-full bg-brand-red/10 text-brand-red" aria-hidden="true">
-						<Icon :name="badge.icon" class="size-5" />
-					</span>
-					<span class="min-w-0">
-						<span class="block text-sm font-bold text-zinc-900 dark:text-white">{{ badge.title }}</span>
-						<span class="block text-xs text-zinc-500 dark:text-zinc-400">{{ badge.detail }}</span>
-					</span>
-				</li>
-			</ul>
+			<TrustBadgeStrip :badges="TRUST_BADGES" label="Why service with ANSA Motors" />
 		</template>
 
 		<aside class="mb-6 overflow-hidden rounded-2xl bg-zinc-950 p-6 text-white shadow-xl ring-1 ring-zinc-800" aria-labelledby="express-heading">

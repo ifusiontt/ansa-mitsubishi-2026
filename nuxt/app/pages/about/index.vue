@@ -45,6 +45,8 @@ const links: AboutHeroLink[] = [
 	{ key: 'faq', label: 'FAQ', to: { hash: '#faq' } },
 ];
 
+const { open: openTestDrive } = useTestDriveModal();
+
 // Each source degrades independently: a missing page or FAQ list only empties its own tab.
 const [{ data: page }, { data: faqs }] = await Promise.all([
 	useFetch<Page>('/api/pages/one', {
@@ -201,6 +203,41 @@ useHead(() => ({
 				</div>
 			</Container>
 			<PageBuilder v-if="otherBlocks.length" :sections="otherBlocks" class="mt-12 md:mt-20" />
+
+			<!-- Conversion banner: closes the About tab with the two next steps. -->
+			<Container class="mt-12 md:mt-20">
+				<aside
+					class="relative overflow-hidden rounded-3xl bg-zinc-950 px-8 py-12 text-white shadow-xl ring-1 ring-zinc-800 md:px-14 md:py-16"
+					aria-labelledby="about-cta-heading"
+				>
+					<div class="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(ellipse_at_right,rgba(237,0,8,0.18),transparent_70%)]" aria-hidden="true" />
+					<div class="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+						<div class="max-w-2xl">
+							<h2 id="about-cta-heading" class="text-2xl font-bold tracking-tight md:text-3xl">Experience Mitsubishi Ambition in Person</h2>
+							<p class="mt-3 text-sm leading-relaxed text-zinc-400 sm:text-base">
+								Visit any of our four authorised showrooms across Trinidad &amp; Tobago or book a private test drive today.
+							</p>
+						</div>
+						<div class="flex shrink-0 flex-col gap-3 sm:flex-row">
+							<button
+								type="button"
+								class="inline-flex items-center justify-center gap-2 rounded-md bg-brand-red px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-red-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+								@click="openTestDrive()"
+							>
+								<Icon name="lucide:steering-wheel" class="size-4" aria-hidden="true" />
+								Book a Test Drive
+							</button>
+							<NuxtLink
+								to="/contact"
+								class="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-700 px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:border-brand-red hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+							>
+								<Icon name="lucide:map-pin" class="size-4" aria-hidden="true" />
+								Find Nearest Showroom
+							</NuxtLink>
+						</div>
+					</div>
+				</aside>
+			</Container>
 		</section>
 
 		<section v-show="activeTab === 'faq'" id="faq" class="scroll-mt-[13rem] py-12 md:py-20">

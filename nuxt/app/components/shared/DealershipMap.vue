@@ -297,11 +297,12 @@ onBeforeUnmount(() => {
 						</div>
 					</dl>
 
-					<ul v-if="branch.services.length" class="mt-4 flex flex-wrap gap-1.5" aria-label="Services">
+					<!-- Pills carry their own right/bottom margin, so the list has no gap of its own. -->
+					<ul v-if="branch.services.length" class="mt-4" aria-label="Services">
 						<li
 							v-for="service in branch.services"
 							:key="service"
-							class="rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] text-zinc-600 dark:border-zinc-800 dark:text-zinc-300"
+							class="mb-1.5 mr-1.5 inline-block rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
 						>
 							{{ service }}
 						</li>

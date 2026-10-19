@@ -158,17 +158,16 @@ rt_payloads = [
                     '5-Year / 100,000 km manufacturer warranty.</p>'),
     },
     {
-        'tagline': 'Service Centre',
-        'headline': 'Factory-Trained. Factory-Warranty.',
+        'tagline': 'Authorised Care',
+        'headline': 'Factory-Certified Maintenance',
         'alignment': 'center',
-        'content': ('<p>ANSA Motors service centres in Port of Spain, San Fernando, and Chaguanas are staffed by '
-                    'factory-trained technicians with Mitsubishi diagnostic tooling, covering scheduled maintenance, '
-                    'repairs, and factory-warranty work for every model in the lineup.</p>'
-                    '<p><strong>Scheduled maintenance</strong> — oil changes, brake service, inspections, and '
-                    '5-Year / 100,000 km warranty checks at factory intervals.</p>'
-                    '<p><strong>Book a service</strong> — call +1 (868) 625-7231 (Port of Spain), '
-                    '+1 (868) 657-8271 (San Fernando), or +1 (868) 665-5321 (Chaguanas). '
-                    'Hours: Mon–Fri 8:00 AM – 4:30 PM, Sat 8:30 AM – 12:30 PM.</p>'),
+        'content': ('<p>Every ANSA Motors service bay is run by Mitsubishi factory-certified technicians who follow '
+                    'the manufacturer’s procedures, specifications and approved fluids — the same standard your '
+                    'vehicle was built to.</p>'
+                    '<p><strong>Digital service records</strong> — each visit is logged against your vehicle’s VIN, '
+                    'building a complete, verifiable service history that supports your warranty and resale value.</p>'
+                    '<p><strong>Schedule compliance</strong> — we service to the Mitsubishi maintenance schedule for '
+                    'your model and mileage, so your 5-Year / 100,000 km warranty stays fully protected.</p>'),
     },
     {
         'tagline': 'Genuine Parts',
@@ -218,7 +217,10 @@ pages = [
      'seo': {'title': 'Contact', 'meta_description': 'Contact ANSA Mitsubishi — phone, email, and dealership hours.', 'og_image': None}},
 ]
 st, d = req('POST', '/items/pages', pages)
-page_ids = [p['id'] for p in d['data']]
+# Directus returns the created rows ordered by `pages.sort`, not request order, so map ids back by
+# permalink (indexing the response attached the Service/Parts/Contact blocks to the wrong pages).
+page_by_permalink = {p['permalink']: p['id'] for p in d['data']}
+page_ids = [page_by_permalink[p['permalink']] for p in pages]
 print(f'   -> {st} created {len(page_ids)} pages')
 
 # --- 8. page_blocks -------------------------------------------------------
