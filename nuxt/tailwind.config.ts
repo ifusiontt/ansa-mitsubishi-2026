@@ -2,6 +2,9 @@ import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 import typography from '@tailwindcss/typography';
 
+/* Official MMC typeface (nuxt.config.ts fonts.families), its metric-matched fallback (main.css), then system fallbacks */
+const mmcStack = ['MMC', 'MMC Fallback', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'];
+
 const config: Config = {
 	darkMode: 'class',
 	content: [
@@ -14,11 +17,10 @@ const config: Config = {
 	theme: {
 		extend: {
 			fontFamily: {
-				/* Display headers — loaded via @nuxt/fonts (weights 700/800) */
-				display: ['Montserrat', 'sans-serif'],
-				heading: ['Poppins', 'sans-serif'],
-				/* Body & UI — Inter primary, Poppins fallback (loaded via @nuxt/fonts) */
-				sans: ['Inter', 'Poppins', 'sans-serif'],
+				/* Body, UI, headings, vehicle names and specs all render in MMC (400 Regular / 700 Bold) */
+				display: mmcStack,
+				heading: mmcStack,
+				sans: mmcStack,
 				code: ['Fira Mono', 'monospace'],
 			},
 			fontSize: {
@@ -72,28 +74,28 @@ const config: Config = {
 							},
 						},
 						h1: {
-							fontFamily: 'Poppins',
+							fontFamily: mmcStack.join(', '),
 							fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
 							fontWeight: '400',
 							lineHeight: '1.2',
 							marginTop: '1rem',
 						},
 						h2: {
-							fontFamily: 'Poppins',
+							fontFamily: mmcStack.join(', '),
 							fontSize: 'clamp(2rem, 4vw, 2.5rem)',
 							fontWeight: '400',
 							lineHeight: '1.3',
 							marginTop: '1rem',
 						},
 						h3: {
-							fontFamily: 'Poppins',
+							fontFamily: mmcStack.join(', '),
 							fontSize: 'clamp(1.5rem, 3vw, 2rem)',
 							fontWeight: '400',
 							lineHeight: '1.4',
 							marginTop: '0',
 						},
 						p: {
-							fontFamily: 'Inter',
+							fontFamily: mmcStack.join(', '),
 							fontSize: 'clamp(1rem, 2vw, 1.25rem)',
 							fontWeight: '400',
 							lineHeight: '1.75',

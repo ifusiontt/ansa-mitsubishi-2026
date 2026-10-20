@@ -1,3 +1,30 @@
+/*
+ * Metric-matched fallback for the MMC face (nuxt.config.ts fonts.families): Arial resized to MMC's
+ * average glyph width and vertical metrics, so the font-display: swap to MMC causes no layout shift.
+ * Values derived from MMC OFFICE Regular/Bold hhea metrics, size-adjust tuned to rendered width vs Arial
+ * (Liberation Sans is metric-identical).
+ */
+@font-face {
+	font-family: 'MMC Fallback';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+	size-adjust: 103.8%;
+	ascent-override: 96.34%;
+	descent-override: 19.27%;
+	line-gap-override: 0%;
+}
+@font-face {
+	font-family: 'MMC Fallback';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold');
+	size-adjust: 99.52%;
+	ascent-override: 100.48%;
+	descent-override: 20.1%;
+	line-gap-override: 0%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,7 +51,7 @@
 
 @layer base {
 	html {
-		@apply bg-white text-neutral-950 dark:bg-black dark:text-white;
+		@apply bg-white font-sans text-neutral-950 dark:bg-black dark:text-white;
 	}
 }
 
@@ -82,25 +109,11 @@
 		display: none;
 	}
 
-	/* Display headers: Montserrat, uppercase, tracked out (see nuxt.config.ts fonts.families) */
+	/* Display headers: MMC, uppercase, tracked out (font stack from tailwind.config.ts) */
 	.font-display {
-		font-family: 'Montserrat', sans-serif;
+		font-family: theme('fontFamily.display');
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 	}
 }
 
-/*
- * ── Future client font swapping: Mitsubishi 'mmc' face ─────────────────────
- * When the licensed client font becomes available, place it at
- * /public/fonts/mmc.woff2 and uncomment the rule below, then swap the
- * display stack in tailwind.config.ts to: ['MMC', 'Montserrat', 'sans-serif']
- *
- * @font-face {
- *   font-family: 'MMC';
- *   font-style: normal;
- *   font-weight: 400 800;
- *   font-display: swap;
- *   src: url('/fonts/mmc.woff2') format('woff2');
- * }
- */

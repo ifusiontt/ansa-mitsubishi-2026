@@ -520,10 +520,9 @@ useSeoMeta({
      (wp-content/themes/mitsubishi-2/components/assets/index.css)
    · primary red: project brand token #ED0008 (AGENTS.md); the reference
      site's own accent (#ED0000) is superseded per project branding rules.
-   · font stacks: display headings on the brand display face Montserrat
-     (700/800 via @nuxt/fonts, Poppins fallback); body Inter; the reference
-     site's proprietary 'mmc' face and the extractor's 'Times New Roman'
-     fallback (a sampling artifact) are intentionally not adopted.
+   · font stacks: headings and body both on the official MMC typeface
+     (400/700, self-hosted via @nuxt/fonts); the extractor's 'Times New Roman'
+     fallback (a sampling artifact) is intentionally not adopted.
    ════════════════════════════════════════════════════════════════════ */
 .vehicle-page {
 	/* — Typography (extracted: computed 16px/400 body, 32px/700 h1, 24px/700 h2; WP presets) — */
@@ -577,8 +576,8 @@ useSeoMeta({
 	--vp-ar-3-2: 3 / 2;
 	--vp-ar-4-3: 4 / 3;
 
-	--vp-font-heading: 'Montserrat', 'Poppins', sans-serif; /* brand display face (font-display) */
-	--vp-font-body: 'Inter', sans-serif;
+	--vp-font-heading: theme('fontFamily.display'); /* MMC (font-display) */
+	--vp-font-body: theme('fontFamily.sans');
 }
 
 /* — Page base — */

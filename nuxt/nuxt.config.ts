@@ -37,15 +37,12 @@ export default defineNuxtConfig({
 		},
 	},
 
-	// https://fonts.nuxt.com — Montserrat for display headers (font-display),
-	// Poppins + Inter for body & UI. global: true emits every @font-face in the
-	// shared global stylesheet so header/footer typography loads on all pages.
+	// https://fonts.nuxt.com — official Mitsubishi Motors 'MMC' typeface (MMC OFFICE package), self-hosted
+	// from public/fonts/mmc/ via the local provider: MMC-Regular.woff2 → 400, MMC-Bold.woff2 → 700.
+	// global: true emits the @font-face rules (font-display: swap) in the shared stylesheet. The
+	// metric-matched 'MMC Fallback' face that prevents layout shift on swap lives in main.css.
 	fonts: {
-		families: [
-			{ name: 'Montserrat', weights: [700, 800], subsets: ['latin'], global: true },
-			{ name: 'Poppins', weights: [400, 600], subsets: ['latin'], global: true },
-			{ name: 'Inter', weights: [400, 500, 600], subsets: ['latin'], global: true },
-		],
+		families: [{ name: 'MMC', provider: 'local', weights: [400, 700], styles: ['normal'], global: true }],
 	},
 
 	runtimeConfig: {
