@@ -18,8 +18,8 @@
  * The homepage picks blocks by collection + template, so keep those two templates
  * if the content is edited in the CMS.
  *
- * Images are uploaded from the client content library (CONTENT_DIR) once, matched by
- * filename_download afterwards. Override with explicit file ids:
+ * Images are uploaded from the client content library (CONTENT_DIR) — or, for lifestyle
+ * masters, nuxt/public/images/models — once, matched by filename_download afterwards. Override with explicit file ids:
  *   HOME_ASC_FILE=<uuid> node directus/seeds/homepage-blocks.mjs
  *
  * Idempotent. Blocks are matched on the Home page by headline / tagline and missing child
@@ -70,6 +70,8 @@ const search = async (collection, query) => (await api('SEARCH', `/items/${colle
 const CONTENT_DIR =
 	process.env.CONTENT_DIR || path.join(os.homedir(), 'Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026');
 const MODELS = path.join(CONTENT_DIR, '02_Showroom_Models');
+/** Optimised lifestyle masters (scripts/optimize-lifestyle-images.py) ship in the repo, not the content library. */
+const LIFESTYLE = path.join(HERE, '..', '..', 'nuxt', 'public', 'images', 'models');
 
 // --- content ----------------------------------------------------------------
 /** Hero slides, in display order — 1920x800 stills extracted from the launch films. Titles double as alt text. */
@@ -131,10 +133,12 @@ const VALUE_ITEMS = [
 		tagline: 'Heritage',
 		headline: 'Brand Philosophy',
 		description: 'Built on Japanese engineering precision backed by ANSA McAL heritage.',
+		// Same file, title and focal point as scripts/upload-lifestyle-assets.mjs, which also swaps
+		// existing installs off the original headlight close-up (xpander_front_shield.png).
 		image: {
-			file: 'Xpander_Cross/Extracted from video/xpander_front_shield.png',
-			title: 'Mitsubishi Dynamic Shield front fascia and LED headlamp',
-			focal: [1250, 600],
+			file: path.join(LIFESTYLE, 'outlander-sport/lifestyle/outlander-sport-ex-front.webp'),
+			title: 'Mitsubishi Outlander Sport HEV on a city street at night, front three-quarter',
+			focal: [1000, 640],
 		},
 	},
 	{
@@ -179,7 +183,7 @@ const MIME = { '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg',
  * `focal` ([x, y] in source pixels) steers Directus `fit=cover` crops, e.g. 16:9 stills in the 3:4 value cards.
  */
 async function ensureFile({ file: relPath, title, focal }) {
-	const abs = path.join(MODELS, relPath);
+	const abs = path.isAbsolute(relPath) ? relPath : path.join(MODELS, relPath);
 	const name = path.basename(abs);
 	const size = fs.statSync(abs).size;
 	// SEARCH, not GET: a GET list read straight after an upload can come back stale here.

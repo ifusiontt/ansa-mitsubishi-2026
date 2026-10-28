@@ -12,7 +12,7 @@ import {
 	withToken,
 	type QueryFilter,
 } from '@directus/sdk';
-export { aggregate, updateItem, readMe, readUser } from '@directus/sdk';
+export { aggregate, updateItem, readFile, readMe, readUser } from '@directus/sdk';
 
 const {
 	public: { directusUrl },

@@ -6,9 +6,11 @@
  * seeds (seed-outlander-vehicle.mjs, seed-remaining-vehicles.mjs), so a reseed
  * re-binds the same files instead of reverting to the studio renders.
  *
- * Files live in nuxt/public/images/main-hero (the homepage slider uses the same
- * stills). Uploads are idempotent: an existing Directus file with the same
- * filename and size is reused.
+ * Files are the client's EX FRONT lifestyle cuts, optimised by
+ * scripts/optimize-lifestyle-images.py into nuxt/public/images/models/<slug>/lifestyle
+ * (scripts/upload-lifestyle-assets.mjs uploads the same files and sets their focal
+ * points). Uploads are idempotent: an existing Directus file with the same filename
+ * and size is reused.
  */
 
 import fs from 'node:fs';
@@ -16,12 +18,12 @@ import path from 'node:path';
 
 /** vehicle slug → hero still (repo-relative) + Directus folder name. */
 export const HERO_MEDIA = {
-	'outlander-sport': { file: 'nuxt/public/images/main-hero/2025-outlander-sport-glamour-1-2048x1447.webp', folder: 'Outlander Sport' },
-	triton: { file: 'nuxt/public/images/main-hero/24MY_TRITON_ALL-NEW_LHD_MV_Intro_P_proxy.png', folder: 'Triton' },
-	'xpander-cross': { file: 'nuxt/public/images/main-hero/2023-xpander-cross-glamour3-1536x1025.jpg', folder: 'Xpander Cross' },
+	'outlander-sport': { file: 'nuxt/public/images/models/outlander-sport/lifestyle/outlander-sport-ex-front.webp', folder: 'Outlander Sport' },
+	triton: { file: 'nuxt/public/images/models/triton/lifestyle/triton-ex-front.webp', folder: 'Triton' },
+	'xpander-cross': { file: 'nuxt/public/images/models/xpander-cross/lifestyle/xpander-cross-ex-front.webp', folder: 'Xpander Cross' },
 };
 
-/** MIME from the file's magic bytes — the Triton still is WebP data behind a .png name. */
+/** MIME from the file's magic bytes — older stills carried WebP data behind a .png name. */
 function sniffMime(buf) {
 	if (buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WEBP') return 'image/webp';
 	if (buf[0] === 0x89 && buf.subarray(1, 4).toString('ascii') === 'PNG') return 'image/png';

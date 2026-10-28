@@ -8,6 +8,29 @@ export function directusFileId(file: FileRef): string {
 }
 
 /**
+ * CSS object-position for a file's Directus focal point (stored in source pixels), or undefined when the
+ * reference is a bare UUID or has no focal point — callers then keep their default framing.
+ */
+export function focalPosition(file: FileRef): string | undefined {
+	if (!file || typeof file !== 'object') return undefined;
+	const { focal_point_x: x, focal_point_y: y, width, height } = file as Record<string, unknown>;
+	if (typeof x !== 'number' || typeof y !== 'number' || typeof width !== 'number' || typeof height !== 'number') return undefined;
+	if (!width || !height) return undefined;
+	return `${((x / width) * 100).toFixed(1)}% ${((y / height) * 100).toFixed(1)}%`;
+}
+
+/**
+ * Directus transform tiers for lifestyle photography (2048px WebP masters from
+ * scripts/optimize-lifestyle-images.py): hero banner + gallery lightbox, story rows / highlights,
+ * gallery-strip thumbnails.
+ */
+export const LIFESTYLE_TIERS = {
+	hero: { width: 2048, quality: 85 },
+	story: { width: 1200, quality: 82 },
+	thumb: { width: 600, quality: 80 },
+} as const;
+
+/**
  * Directus transform for a transparent colour render on the ~768px colour stage (2x for high-DPI).
  * No trim: the studio canvas keeps each render's camera framing and ground plane intact; sizing is
  * handled by the height-bounded VehicleColorStage.

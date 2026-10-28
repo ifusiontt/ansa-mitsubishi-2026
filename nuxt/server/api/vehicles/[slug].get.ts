@@ -6,6 +6,7 @@ import type { VehiclePage } from '#shared/types/vehicle';
  * Server-side equivalent of the public Directus endpoint:
  *   GET /items/vehicles?filter[slug][_eq]=:slug&filter[status][_eq]=published&fields=*,hero_block.*,colors.*,highlights.*,trims.*,
  *     gallery.id,gallery.sort,gallery.directus_files_id.*
+ *   then GET /files/:hero_block.media?fields=id,width,height,focal_point_x,focal_point_y
  *
  * Uses the public read policy (field whitelist on vehicles + vehicle_colors),
  * so no static token is required. Nested relations are deep-sorted for stable
@@ -17,6 +18,10 @@ import type { VehiclePage } from '#shared/types/vehicle';
  * frontend), so we explicitly request `images.directus_files_id.*` — the nested
  * path through the junction FK resolves the full file object the vehicle page
  * needs (`highlight.images[0].directus_files_id.id`).
+ *
+ * `hero_block.media` is a bare file UUID that does not expand through the public role, so the hero
+ * file's dimensions + focal point (for the hero's object-position) are read in a second request;
+ * if that fails the UUID is kept and the hero falls back to its default framing.
  */
 export default defineEventHandler(async (event) => {
 	const slug = getRouterParam(event, 'slug');
@@ -54,5 +59,13 @@ export default defineEventHandler(async (event) => {
 		throw createError({ statusCode: 404, statusMessage: 'Vehicle not found' });
 	}
 
-	return vehicles[0];
+	const vehicle = vehicles[0]!;
+	const heroMedia = vehicle.hero_block?.media;
+	if (vehicle.hero_block && typeof heroMedia === 'string') {
+		vehicle.hero_block.media = await directusServer
+			.request(readFile(heroMedia, { fields: ['id', 'width', 'height', 'focal_point_x', 'focal_point_y'] }))
+			.catch(() => heroMedia);
+	}
+
+	return vehicle;
 });

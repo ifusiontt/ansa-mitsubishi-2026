@@ -2,40 +2,36 @@
 /**
  * upload-lifestyle-assets.mjs
  *
- * Lifestyle photography for /showroom/[slug]: replaces the letterboxed white-studio highlight images
- * with full-bleed press / video-frame photography and fills the vehicle gallery strip
- * (nuxt/app/components/showroom/VehicleGalleryStrip.vue).
+ * Client lifestyle photography for /showroom/[slug]: five official cuts per model (EX FRONT, EX BACK,
+ * INTERIOR 1–3), optimised to WebP masters by scripts/optimize-lifestyle-images.py into
+ * nuxt/public/images/models/<slug>/lifestyle/. The EX FRONT cut is also the showroom hero
+ * (scripts/lib/hero-media.mjs → sync-vehicle-hero-media.mjs).
  *
  *   1. Schema: `vehicles.gallery` — a sortable files (M2M → directus_files) field through the
  *      `vehicles_gallery` junction — with public read on both. seed-permissions.py and
  *      apply-hybrid-vehicle-schema.js list them too, so a permissions reseed keeps them.
- *   2. Uploads every image in ASSETS from the content library (deduplicated by filename_download:
- *      an existing upload of the same name is reused) into the model's Directus folder.
+ *   2. Uploads every master into the model's Directus folder (deduplicated by filename_download:
+ *      an existing upload of the same name is reused) and keeps its title + focal point current.
+ *      Focal points ([x, y] in master pixels) sit on the vehicle / subject; the hero, highlight and
+ *      gallery crops (object-position) and Directus `fit=cover` crops centre on them.
  *   3. Points the listed highlights (matched by vehicle + sort, checked against tagline) at their
- *      new image. Highlights not listed keep their image — e.g. the Xpander Cross story rows,
- *      which already show matching 2026 cabin photography.
- *   4. Sets each vehicle's gallery to its remaining frames, in order — no image appears twice on
- *      a page (highlights + gallery).
- *   5. Clears the Directus data cache.
- *
- * Curation rules: Xpander Cross uses genuine Xpander Cross imagery only (cladding / roof rails —
- * the standard-Xpander glamour and grille shots are excluded); Outlander Sport uses regional Xforce
- * imagery only (the Xpander Cross "SlippyCorner" frame filed under Outlander_Sport_HEV is excluded),
- * and duplicate exports of one photo are used once. Pillars are tall portrait crops, so they take
- * frames whose subject sits near the centre.
+ *      cut. Highlights not listed keep their image.
+ *   4. Sets each vehicle's gallery to all five cuts, in CUTS order.
+ *   5. Homepage "Brand Philosophy" value card → the Outlander Sport night-city EX FRONT, but only
+ *      while it still shows the seeded headlight close-up (an image picked in Directus is kept).
+ *   6. Clears the Directus data cache.
  *
  * Idempotent: every step checks current state first.
  *
- * Usage:  node scripts/upload-lifestyle-assets.mjs
+ * Usage:  python3 scripts/optimize-lifestyle-images.py && node scripts/upload-lifestyle-assets.mjs
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
- *         CONTENT_DIR (default ~/Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026)
  */
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const MASTERS_DIR = path.join(HERE, '..', 'nuxt', 'public', 'images', 'models');
 
 function loadToken() {
 	const envTok = process.env.DIRECTUS_TOKEN;
@@ -51,9 +47,6 @@ function loadToken() {
 
 const TOKEN = loadToken();
 const BASE = process.env.DIRECTUS_URL || 'http://localhost:8055';
-const CONTENT_DIR =
-	process.env.CONTENT_DIR || path.join(os.homedir(), 'Documents/PERSONAL WORK/2026/Ansa/Mitsubishi/Content/Mitsubishi 2026');
-const MODELS_DIR = path.join(CONTENT_DIR, '02_Showroom_Models');
 
 async function api(method, urlPath, body, { allowMissing = false } = {}) {
 	const res = await fetch(BASE + urlPath, {
@@ -71,68 +64,74 @@ async function api(method, urlPath, body, { allowMissing = false } = {}) {
 const search = async (collection, query) => (await api('SEARCH', `/items/${collection}`, { query })).data;
 
 // --- content ----------------------------------------------------------------
+/** Gallery order; each master is nuxt/public/images/models/<slug>/lifestyle/<slug>-<cut>.webp. */
+const CUTS = ['ex-front', 'ex-back', 'interior-1', 'interior-2', 'interior-3'];
+
 /**
- * Per model: its content-library folder, Directus folder, the highlights to re-image
- * (sort → { tagline, file }) and the gallery frames in display order. Paths are relative
- * to the model's content-library folder.
+ * Per model: Directus folder, display name, each cut's title + focal point (master pixels,
+ * 2047×1156) and the highlights to re-image (sort → { tagline, cut }).
+ * Story-row mapping: exterior stance / utility → ex-back, cockpit & dash → interior-1,
+ * infotainment → interior-2, seating & space → interior-3. Outlander Sport's interior-2 is a
+ * shifter / auto-hold console close-up rather than the touchscreen, so its touchscreen row
+ * (TECHNOLOGY, "Driver-Focused Digital Cockpit") takes interior-1, which shows the screen, and
+ * interior-2 illustrates the "premium materials" INTERIOR row.
  */
 const ASSETS = {
 	'xpander-cross': {
-		dir: 'Xpander_Cross',
 		folder: 'Xpander Cross',
-		highlights: {
-			4: { tagline: 'COMFORT', file: 'Extracted from video/xpander_hero_forest.png' },
-			5: { tagline: 'SAFETY', file: 'Extracted from video/xpander_front_shield.png' },
-			6: { tagline: 'CAPABILITY', file: 'Extracted from video/xpander_ground_clearance.png' },
+		name: 'Mitsubishi Xpander Cross',
+		cuts: {
+			'ex-front': { title: 'on a coastal road, front three-quarter', focal: [1120, 640] },
+			'ex-back': { title: 'on a coastal road, rear three-quarter', focal: [840, 660] },
+			'interior-1': { title: 'cockpit and horizontal dashboard', focal: [1200, 580] },
+			'interior-2': { title: 'Smartphone-link Display Audio touchscreen', focal: [960, 480] },
+			'interior-3': { title: 'three-row seating', focal: [1150, 680] },
 		},
-		gallery: [
-			'22MY_XS_RHD_MV_SlippyCorner-1536x1024 (1).jpg',
-			'Extracted from video/xpander_headlight_led.png',
-			'3-column/2023-xpander-cross-glamour2-1024x682.jpg',
-			'Extracted from video/xpander_taillight_led.png',
-		],
-	},
-	'outlander-sport': {
-		dir: 'Outlander_Sport_HEV',
-		folder: 'Outlander Sport',
 		highlights: {
-			// Story rows: the HYBRID badge close-up and the white-background rear cutout
-			1: { tagline: 'PERFORMANCE', file: 'Extracted from video/outlander_hero_banner.png' },
-			2: { tagline: 'DESIGN', file: '2025-outlander-sport-glamour-1-2048x1447.webp' },
-			4: { tagline: 'TECHNOLOGY', file: 'Extracted from video/outlander_drive_mode_macro.png' },
-			5: { tagline: 'COMFORT', file: '3-column/2025-outlander-sport-glamour-4-1024x640.webp' },
-			6: { tagline: 'HANDLING', file: 'features/2025-outlander-sport-glamour-5.webp' },
+			1: { tagline: 'VERSATILITY', cut: 'interior-3' },
+			2: { tagline: 'INTERIOR', cut: 'interior-1' },
+			3: { tagline: 'TECHNOLOGY', cut: 'interior-2' },
+			6: { tagline: 'CAPABILITY', cut: 'ex-back' },
 		},
-		gallery: [
-			// Aerial frame with the car off-centre: keeps it in view on the wide 16:10 gallery crop
-			'Extracted from video/outlander_asc_curve_clean.png',
-			'features/2025-outlander-sport-glamour-3.webp',
-			'Extracted from video/outlander_steering_badge.png',
-			'3-column/2025-outlander-sport-glamour-2-1024x640.webp',
-			'Extracted from video/outlander_rear_taillights.png',
-		],
 	},
 	triton: {
-		dir: 'Triton',
 		folder: 'Triton',
-		// All-new (24MY+) imagery only: the 2023-l200-* frames in features/ are the previous generation.
-		// The 3-column/ press shots are WebP files with a .png name (see sniffMime).
-		highlights: {
-			1: { tagline: 'PERFORMANCE', file: 'Extracted from video/triton_mud_headon.png' },
-			2: { tagline: 'POWER', file: 'Extracted from video/triton_dune_drift.png' },
-			4: { tagline: 'CAPABILITY', file: '3-column/24MY_TR_ALL-NEW_RHD_MV_Cockpit_proxy.png' },
-			5: { tagline: 'COMFORT', file: '3-column/24MY_TR_ALL-NEW_RHD_FT_Seatcomfort_proxy.png' },
-			6: { tagline: 'UTILITY', file: '3-column/24MY_TR_ALL-NEW_RHD_MV_Cargo_proxy-1.png' },
+		name: 'Mitsubishi Triton',
+		cuts: {
+			'ex-front': { title: 'on a forest trail, front three-quarter', focal: [1060, 640] },
+			'ex-back': { title: 'on a forest trail, rear three-quarter', focal: [1080, 640] },
+			'interior-1': { title: 'cockpit and dashboard', focal: [1230, 600] },
+			'interior-2': { title: '9-inch Smartphone-link Display Audio touchscreen', focal: [1000, 500] },
+			'interior-3': { title: 'double-cab seating', focal: [1100, 650] },
 		},
-		gallery: [
-			'Extracted from video/triton_water_splash.png',
-			'features/24MY_TR_ALL-NEW_LHD_FT_Selector_proxy.webp',
-			'3-column/24MY_TR_ALL-NEW_RHD_MV_Hill_proxy.png',
-			'Extracted from video/triton_red_ridge.png',
-			'Extracted from video/triton_sunset_flats.png',
-		],
+		highlights: {
+			3: { tagline: 'TECHNOLOGY', cut: 'interior-2' },
+			4: { tagline: 'CAPABILITY', cut: 'interior-1' },
+			5: { tagline: 'COMFORT', cut: 'interior-3' },
+			6: { tagline: 'UTILITY', cut: 'ex-back' },
+		},
+	},
+	'outlander-sport': {
+		folder: 'Outlander Sport',
+		name: 'Mitsubishi Outlander Sport HEV',
+		cuts: {
+			'ex-front': { title: 'on a city street at night, front three-quarter', focal: [1000, 640] },
+			'ex-back': { title: 'on a city street at night, rear three-quarter', focal: [965, 620] },
+			'interior-1': { title: 'digital cockpit and touchscreen', focal: [1500, 620] },
+			'interior-2': { title: 'shift selector and electronic parking brake', focal: [870, 560] },
+			'interior-3': { title: 'front and rear seating', focal: [1300, 640] },
+		},
+		highlights: {
+			2: { tagline: 'DESIGN', cut: 'ex-back' },
+			3: { tagline: 'INTERIOR', cut: 'interior-2' },
+			4: { tagline: 'TECHNOLOGY', cut: 'interior-1' },
+			5: { tagline: 'COMFORT', cut: 'interior-3' },
+		},
 	},
 };
+
+/** Homepage value card swapped to a lifestyle cut — only while it still shows `replaces`. */
+const HOME_VALUE_SWAP = { headline: 'Brand Philosophy', replaces: 'xpander_front_shield.png', slug: 'outlander-sport', cut: 'ex-front' };
 
 let changed = false;
 
@@ -223,36 +222,45 @@ if (await publicRead('vehicles_gallery')) {
 }
 
 // --- 2. uploads ---------------------------------------------------------------
-const MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
-/** Content type from the file's magic bytes — some library exports carry the wrong extension. */
-function sniffMime(buf, name) {
-	if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
-	if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') return 'image/png';
-	if (buf[0] === 0xff && buf[1] === 0xd8) return 'image/jpeg';
-	return MIME[path.extname(name).toLowerCase()] ?? 'application/octet-stream';
-}
 const { data: folders } = await api('GET', '/folders?fields=id,name&limit=-1');
 
-/** Directus file id for a content-library image — reuses an existing upload with the same filename. */
-async function ensureFile(dir, relPath, folderName) {
-	const abs = path.join(MODELS_DIR, dir, relPath);
-	const name = path.basename(abs);
-	const found = await api('SEARCH', '/files', {
-		query: { filter: { filename_download: { _eq: name } }, fields: ['id'], sort: ['uploaded_on'], limit: 1 },
-	});
-	if (found.data[0]) return found.data[0].id;
+/**
+ * Directus file id for a lifestyle master — reuses an existing upload with the same filename and
+ * keeps its title, folder and focal point current.
+ */
+async function ensureFile(slug, cut) {
+	const spec = ASSETS[slug];
+	const { title: caption, focal } = spec.cuts[cut];
+	const name = `${slug}-${cut}.webp`;
+	const abs = path.join(MASTERS_DIR, slug, 'lifestyle', name);
+	const title = `${spec.name} ${caption}`;
+	const folderId = folders.find((f) => f.name === spec.folder)?.id ?? null;
+	const wanted = { title, focal_point_x: focal[0], focal_point_y: focal[1], ...(folderId && { folder: folderId }) };
 
-	const buf = fs.readFileSync(abs);
+	const found = await api('SEARCH', '/files', {
+		query: { filter: { filename_download: { _eq: name } }, fields: ['id', ...Object.keys(wanted)], sort: ['uploaded_on'], limit: 1 },
+	});
+	const existing = found.data[0];
+	if (existing) {
+		const patch = Object.fromEntries(Object.entries(wanted).filter(([key, value]) => existing[key] !== value));
+		if (Object.keys(patch).length) {
+			await api('PATCH', `/files/${existing.id}`, patch);
+			console.log(`~ ${name}: ${Object.keys(patch).join(', ')} updated`);
+			changed = true;
+		}
+		return existing.id;
+	}
+
+	if (!fs.existsSync(abs)) throw new Error(`${abs} missing — run scripts/optimize-lifestyle-images.py first`);
 	const form = new FormData();
-	form.append('title', path.basename(name, path.extname(name)));
-	form.append('file', new Blob([buf], { type: sniffMime(buf, name) }), name);
+	form.append('title', title);
+	form.append('file', new Blob([fs.readFileSync(abs)], { type: 'image/webp' }), name);
 	const res = await fetch(`${BASE}/files`, { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body: form });
 	const text = await res.text();
 	if (!res.ok) throw new Error(`upload ${name} → ${res.status} ${text.slice(0, 300)}`);
 	const id = JSON.parse(text).data.id;
-	// This build ignores `folder` in the upload form — set it with a follow-up PATCH (as seed-outlander-vehicle.mjs does).
-	const folder = folders.find((f) => f.name === folderName);
-	if (folder) await api('PATCH', `/files/${id}`, { folder: folder.id });
+	// This build ignores `folder` (and focal points) in the upload form — set them with a follow-up PATCH.
+	await api('PATCH', `/files/${id}`, wanted);
 	console.log(`+ ${name} uploaded`);
 	changed = true;
 	return id;
@@ -264,37 +272,39 @@ for (const [slug, spec] of Object.entries(ASSETS)) {
 	const vehicle = vehicles.find((v) => v.slug === slug);
 	if (!vehicle) throw new Error(`vehicle not found: ${slug}`);
 
+	const fileIds = {};
+	for (const cut of CUTS) fileIds[cut] = await ensureFile(slug, cut);
+
 	// --- 3. highlight images ----------------------------------------------------
 	const rows = await search('block_content_items', {
 		filter: { vehicle: { _eq: vehicle.id } },
 		fields: ['id', 'sort', 'tagline'],
 		limit: -1,
 	});
-	for (const [sort, { tagline, file }] of Object.entries(spec.highlights)) {
+	for (const [sort, { tagline, cut }] of Object.entries(spec.highlights)) {
 		const row = rows.find((r) => r.sort === Number(sort));
 		if (!row || row.tagline !== tagline) {
 			throw new Error(`${slug}: highlight #${sort} is "${row?.tagline}", expected "${tagline}" — check vehicle-content-blocks.mjs`);
 		}
-		const fileId = await ensureFile(spec.dir, file, spec.folder);
+		const fileId = fileIds[cut];
 		const junctions = await search('block_content_items_files', {
 			filter: { block_content_items_id: { _eq: row.id } },
 			fields: ['id', 'directus_files_id'],
 			limit: -1,
 		});
 		if (junctions.length === 1 && junctions[0].directus_files_id === fileId) {
-			console.log(`= ${slug} highlight #${sort} ${tagline}: ${path.basename(file)}`);
+			console.log(`= ${slug} highlight #${sort} ${tagline}: ${cut}`);
 			continue;
 		}
 		// M2M writes through the parent are unreliable on this build — manage the junction rows directly.
 		for (const j of junctions) await api('DELETE', `/items/block_content_items_files/${j.id}`);
 		await api('POST', '/items/block_content_items_files', { block_content_items_id: row.id, directus_files_id: fileId });
-		console.log(`+ ${slug} highlight #${sort} ${tagline} → ${path.basename(file)}`);
+		console.log(`+ ${slug} highlight #${sort} ${tagline} → ${cut}`);
 		changed = true;
 	}
 
 	// --- 4. gallery ---------------------------------------------------------------
-	const wanted = [];
-	for (const file of spec.gallery) wanted.push(await ensureFile(spec.dir, file, spec.folder));
+	const wanted = CUTS.map((cut) => fileIds[cut]);
 	const current = await search('vehicles_gallery', {
 		filter: { vehicles_id: { _eq: vehicle.id } },
 		fields: ['id', 'directus_files_id', 'sort'],
@@ -315,7 +325,31 @@ for (const [slug, spec] of Object.entries(ASSETS)) {
 	changed = true;
 }
 
-// --- 5. cache ---------------------------------------------------------------------
+// --- 5. homepage value card -------------------------------------------------------
+{
+	const { headline, replaces, slug, cut } = HOME_VALUE_SWAP;
+	const [card] = await search('block_content_items', {
+		filter: { headline: { _eq: headline }, vehicle: { _null: true } },
+		fields: ['id', 'images.id', 'images.directus_files_id.id', 'images.directus_files_id.filename_download'],
+		limit: 1,
+	});
+	const fileId = await ensureFile(slug, cut);
+	const current = card?.images ?? [];
+	if (!card) {
+		console.log(`! homepage "${headline}" card not found — run directus/seeds/homepage-blocks.mjs`);
+	} else if (current.length === 1 && current[0].directus_files_id?.id === fileId) {
+		console.log(`= homepage "${headline}": ${slug}-${cut}`);
+	} else if (current.length && !current.some((j) => j.directus_files_id?.filename_download === replaces)) {
+		console.log(`= homepage "${headline}": keeps its Directus-picked image`);
+	} else {
+		for (const j of current) await api('DELETE', `/items/block_content_items_files/${j.id}`);
+		await api('POST', '/items/block_content_items_files', { block_content_items_id: card.id, directus_files_id: fileId });
+		console.log(`+ homepage "${headline}" → ${slug}-${cut}`);
+		changed = true;
+	}
+}
+
+// --- 6. cache ---------------------------------------------------------------------
 // This instance serves stale GET reads after writes (see contact-form.mjs); the Nuxt API reads via GET.
 if (changed) {
 	await api('POST', '/utils/cache/clear');

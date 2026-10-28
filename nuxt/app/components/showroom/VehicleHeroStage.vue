@@ -6,9 +6,11 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  * Full-bleed vehicle hero for /showroom/[slug].
  *
  * Background is the optional `hero_video_url` loop, else `heroImage` — the vehicle's
- * `hero_block.media` Directus file (UUID or expanded file object), delivered through the
- * Directus asset endpoint as responsive WebP. Framing defaults to `center 60%` so front fascias
- * sit under the copy scrim; `focalPoint` (any CSS object-position) overrides it per model.
+ * `hero_block.media` Directus file (UUID or expanded file object; the EX FRONT lifestyle cut),
+ * delivered through the Directus asset endpoint as responsive WebP up to the 2048px hero tier and
+ * preloaded at high priority as the page's LCP element. Framing follows the file's Directus focal
+ * point, else `center 60%` so front fascias sit under the copy scrim; `focalPoint` (any CSS
+ * object-position) overrides both.
  * "Explore Trims" smooth-scrolls to the page's `#trims` section; "Book a Test Drive" opens the
  * global test-drive modal pre-populated with this vehicle.
  */
@@ -21,13 +23,23 @@ const props = withDefaults(
 	{ heroImage: null, focalPoint: undefined },
 );
 
-const HERO_WIDTHS = [960, 1440, 1920, 2560];
-const assetUrl = (id: string, width: number) => `${getDirectusAssetURL(id)}?width=${width}&quality=82&format=webp`;
+const { width: HERO_MAX, quality: HERO_QUALITY } = LIFESTYLE_TIERS.hero;
+const HERO_WIDTHS = [960, 1440, HERO_MAX];
+const assetUrl = (id: string, width: number) => `${getDirectusAssetURL(id)}?width=${width}&quality=${HERO_QUALITY}&format=webp`;
 
 const imageId = computed(() => directusFileId(props.heroImage));
-const imageSrc = computed(() => (imageId.value ? assetUrl(imageId.value, 1920) : ''));
+const imageSrc = computed(() => (imageId.value ? assetUrl(imageId.value, 1440) : ''));
 const imageSrcset = computed(() => (imageId.value ? HERO_WIDTHS.map((w) => `${assetUrl(imageId.value, w)} ${w}w`).join(', ') : undefined));
-const focalStyle = computed(() => (props.focalPoint ? { objectPosition: props.focalPoint } : undefined));
+const focal = computed(() => props.focalPoint ?? focalPosition(props.heroImage));
+const focalStyle = computed(() => (focal.value ? { objectPosition: focal.value } : undefined));
+
+// Preload the still (same srcset as the <img>) so the LCP fetch starts from the document head.
+useHead(() => ({
+	link:
+		imageSrc.value && !props.vehicle.hero_video_url
+			? [{ key: 'vehicle-hero', rel: 'preload', as: 'image', href: imageSrc.value, imagesrcset: imageSrcset.value, imagesizes: '100vw', fetchpriority: 'high' }]
+			: [],
+}));
 
 // "Mitsubishi Triton" → "Triton" for the headline.
 const displayTitle = computed(() => props.vehicle.title.replace(/^mitsubishi\s+/i, ''));

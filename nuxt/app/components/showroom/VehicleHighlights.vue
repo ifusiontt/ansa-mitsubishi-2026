@@ -11,7 +11,9 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  * and the rest form the pillar strip (6 items → 3 + 3, 5 → 3 + 2). The pillar grid uses as many
  * columns as it has pillars (max 3) so a short strip never leaves an empty slot. The heading and
  * pillars sit in the showroom's shared 1440px container; the splits are unconstrained.
- * Content and images are seeded by directus/seeds/vehicle-content-blocks.mjs.
+ * Content is seeded by directus/seeds/vehicle-content-blocks.mjs; the lifestyle images by
+ * scripts/upload-lifestyle-assets.mjs. Photos are served at the story tier (≤1200px, q82) and
+ * cropped around each file's Directus focal point.
  */
 const props = withDefaults(
 	defineProps<{
@@ -27,13 +29,17 @@ const SPLIT_COUNT = 3;
 
 const { setAttr } = useVisualEditing();
 
-const assetUrl = (id: string, width: number) => `${getDirectusAssetURL(id)}?width=${width}&quality=82&format=webp`;
+const { width: STORY_MAX, quality: STORY_QUALITY } = LIFESTYLE_TIERS.story;
+const assetUrl = (id: string, width: number) => `${getDirectusAssetURL(id)}?width=${width}&quality=${STORY_QUALITY}&format=webp`;
 
 const rows = computed(() =>
 	props.items
 		.filter((item) => item.status === 'published')
 		.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
-		.map((item) => ({ ...item, imageId: directusFileId(item.images?.[0]?.directus_files_id) || props.fallbackImage })),
+		.map((item) => {
+			const file = item.images?.[0]?.directus_files_id;
+			return { ...item, imageId: directusFileId(file) || props.fallbackImage, focal: focalPosition(file) };
+		}),
 );
 
 const splits = computed(() => rows.value.slice(0, SPLIT_COUNT));
@@ -81,12 +87,13 @@ const editAttr = (id: number) =>
 				>
 					<img
 						v-if="row.imageId"
-						:src="assetUrl(row.imageId, 1600)"
-						:srcset="`${assetUrl(row.imageId, 800)} 800w, ${assetUrl(row.imageId, 1280)} 1280w, ${assetUrl(row.imageId, 1600)} 1600w, ${assetUrl(row.imageId, 2000)} 2000w`"
+						:src="assetUrl(row.imageId, STORY_MAX)"
+						:srcset="`${assetUrl(row.imageId, 600)} 600w, ${assetUrl(row.imageId, 900)} 900w, ${assetUrl(row.imageId, STORY_MAX)} ${STORY_MAX}w`"
 						sizes="(min-width: 1024px) 50vw, 100vw"
 						:alt="row.headline || vehicleTitle"
 						loading="lazy"
 						class="h-full w-full object-cover"
+						:style="{ objectPosition: row.focal }"
 					/>
 				</div>
 
@@ -117,12 +124,13 @@ const editAttr = (id: number) =>
 				>
 					<img
 						v-if="pillar.imageId"
-						:src="assetUrl(pillar.imageId, 1000)"
-						:srcset="`${assetUrl(pillar.imageId, 640)} 640w, ${assetUrl(pillar.imageId, 1000)} 1000w, ${assetUrl(pillar.imageId, 1400)} 1400w`"
+						:src="assetUrl(pillar.imageId, 900)"
+						:srcset="`${assetUrl(pillar.imageId, 600)} 600w, ${assetUrl(pillar.imageId, 900)} 900w, ${assetUrl(pillar.imageId, STORY_MAX)} ${STORY_MAX}w`"
 						sizes="(min-width: 768px) 33vw, 100vw"
 						alt=""
 						loading="lazy"
 						class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+						:style="{ objectPosition: pillar.focal }"
 					/>
 					<div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/95 via-black/40 to-transparent p-8 text-white">
 						<p v-if="pillar.tagline">

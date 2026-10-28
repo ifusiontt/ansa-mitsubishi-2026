@@ -20,7 +20,7 @@ import VehicleHorizonBar from '~/components/showroom/VehicleHorizonBar.vue';
  * directly in the `.vehicle-page` token block below.
  *
  * Data source: GET /items/vehicles?filter[slug][_eq]=:slug
- *   &fields=*,hero_block.*,colors.*,highlights.*,trims.*,gallery.directus_files_id.*
+ *   &fields=*,hero_block.*,hero_block.media.*,colors.*,highlights.*,trims.*,gallery.directus_files_id.*
  * (proxied through server/api/vehicles/[slug].get.ts)
  */
 const route = useRoute();
