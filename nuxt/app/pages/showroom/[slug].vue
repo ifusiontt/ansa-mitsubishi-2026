@@ -46,6 +46,23 @@ const displayTitle = vehicle.title.replace(/^mitsubishi\s+/i, '');
 /* derived state                                                       */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Overview copy as paragraphs: blank lines in the CMS text win; otherwise a single long block is split
+ * at the sentence end nearest its middle into two balanced paragraphs. Short copy stays one paragraph.
+ */
+const OVERVIEW_SPLIT_MIN = 400;
+const overviewParagraphs = computed(() => {
+	const text = vehicle.overview?.trim() ?? '';
+	const blocks = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+	if (blocks.length !== 1 || text.length < OVERVIEW_SPLIT_MIN) return blocks;
+	// Sentence ends: terminal punctuation followed by whitespace and a capital or digit ("2.4L" is not one).
+	const ends = [...text.matchAll(/[.!?](?=\s+[A-Z0-9])/g)].map((m) => m.index + 1);
+	if (!ends.length) return blocks;
+	const middle = text.length / 2;
+	const cut = ends.reduce((best, end) => (Math.abs(end - middle) < Math.abs(best - middle) ? end : best));
+	return [text.slice(0, cut), text.slice(cut).trim()];
+});
+
 const heroBlock = computed(() => vehicle.hero_block ?? null);
 const heroMedia = computed(() => {
 	const media = heroBlock.value?.media;
@@ -179,14 +196,18 @@ useSeoMeta({
 	     ════════════════════════════════════════════════════════════ -->
 		<section id="overview" class="scroll-mt-[13.5rem] vp-section vp-section--white" aria-labelledby="overview-heading">
 			<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-				<div class="grid gap-6 md:grid-cols-2 md:gap-12 md:items-end">
+				<!-- Top-aligned columns; the kicker and the copy's first line are trimmed to their cap height
+				     (text-box) so both start on the same line despite different font sizes and leading. -->
+				<div class="grid gap-6 md:grid-cols-2 md:items-start md:gap-12">
 					<div>
-						<p v-if="vehicle.tagline" class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2">{{ vehicle.tagline }}</p>
+						<p v-if="vehicle.tagline" class="text-xs font-bold tracking-widest text-brand-red uppercase mb-2 [text-box:trim-start_cap_alphabetic]">{{ vehicle.tagline }}</p>
 						<h2 id="overview-heading" class="text-2xl md:text-4xl font-bold uppercase tracking-wider text-slate-900">
 							{{ vehicle.hero_headline || vehicle.title }}
 						</h2>
 					</div>
-					<p v-if="vehicle.overview" class="text-slate-600 text-sm md:text-base leading-relaxed max-w-xl">{{ vehicle.overview }}</p>
+					<div v-if="overviewParagraphs.length" class="max-w-xl space-y-4 text-left text-sm leading-relaxed text-neutral-600 md:text-base md:leading-7">
+						<p v-for="(paragraph, index) in overviewParagraphs" :key="index" class="first:[text-box:trim-start_cap_alphabetic]">{{ paragraph }}</p>
+					</div>
 				</div>
 
 				<dl class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 pt-8 border-t border-slate-200 mt-8">
