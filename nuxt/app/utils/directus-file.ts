@@ -1,3 +1,5 @@
+import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
+
 /** A Directus file reference as returned by the API — a raw UUID or a resolved file object. */
 type FileRef = string | { id?: string | null } | null | undefined;
 
@@ -41,4 +43,13 @@ export const VEHICLE_RENDER_QUERY = 'width=1536&quality=82&format=webp';
 export function formatTtdPrice(price: number | null | undefined): string {
 	if (price == null) return '';
 	return `TTD $${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(price)}`;
+}
+
+/**
+ * "Download Brochure" link: the vehicle's `brochure` PDF in Directus (/assets/<id>, uploaded by
+ * scripts/upload-brochures.mjs), else the legacy `brochure_url`; '' hides the CTA.
+ */
+export function brochureHref(vehicle: { brochure?: FileRef; brochure_url?: string | null } | null | undefined): string {
+	const id = directusFileId(vehicle?.brochure);
+	return id ? getDirectusAssetURL(id) : (vehicle?.brochure_url ?? '');
 }

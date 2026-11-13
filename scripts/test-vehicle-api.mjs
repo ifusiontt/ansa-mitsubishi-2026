@@ -239,6 +239,19 @@ for (const [field, expected] of scalars) {
 // 2. hero_block
 // ---------------------------------------------------------------------------
 
+// Brochure: vehicles.brochure → the spec-sheet PDF in Directus (scripts/upload-brochures.mjs),
+// brochure_url mirrors its public asset URL (the old ansamitsubishi.com links never resolved).
+{
+	const id = fileUuidFrom(vehicle.brochure);
+	check('brochure file linked', !!id, `got ${JSON.stringify(vehicle.brochure)}`);
+	check('brochure_url = Directus asset URL', vehicle.brochure_url === `${BASE}/assets/${id}`, `got ${vehicle.brochure_url}`);
+	if (id) {
+		const r = await fetch(`${BASE}/assets/${id}`, { headers: { Range: 'bytes=0-4' } });
+		check('brochure PDF downloads (anonymous)', r.ok && (r.headers.get('content-type') || '').startsWith('application/pdf'), `status ${r.status}, ${r.headers.get('content-type')}`);
+		await r.body?.cancel();
+	}
+}
+
 console.log('\n── 2. hero_block ─────────────────────────────────────────────────');
 const hero = vehicle.hero_block;
 check('hero_block resolved (object)', !!hero && typeof hero === 'object', JSON.stringify(hero)?.slice(0, 80));

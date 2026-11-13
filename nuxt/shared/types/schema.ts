@@ -661,6 +661,7 @@ export interface Vehicle {
 	/** @description Brand accent color (hex) */
 	primary_color?: string | null;
 	brochure_url?: string | null;
+	brochure?: DirectusFile | string | null;
 	status?: string | null;
 	model_year?: number | null;
 	category?: string | null;

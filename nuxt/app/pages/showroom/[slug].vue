@@ -64,6 +64,8 @@ const overviewParagraphs = computed(() => {
 });
 
 const heroBlock = computed(() => vehicle.hero_block ?? null);
+// Brochure PDF in Directus (vehicles.brochure), else the legacy brochure_url — '' hides both CTAs.
+const brochureLink = brochureHref(vehicle);
 const heroMedia = computed(() => {
 	const media = heroBlock.value?.media;
 	if (!media) return '';
@@ -407,8 +409,8 @@ useSeoMeta({
 							{{ index === selectedTrimIdx ? `${trim.trim_name} Selected` : `Select ${trim.trim_name}` }}
 						</button>
 						<a
-							v-if="vehicle.brochure_url"
-							:href="vehicle.brochure_url"
+							v-if="brochureLink"
+							:href="brochureLink"
 							target="_blank"
 							rel="noopener"
 							class="text-[11px] font-bold tracking-wider text-slate-500 hover:text-slate-900 uppercase text-center block mt-3 transition-colors"
@@ -475,8 +477,8 @@ useSeoMeta({
 						{{ vehicle.model_year }} {{ vehicle.title }}.
 					</p>
 					<a
-						v-if="vehicle.brochure_url"
-						:href="vehicle.brochure_url"
+						v-if="brochureLink"
+						:href="brochureLink"
 						target="_blank"
 						rel="noopener"
 						class="bg-brand-red hover:bg-brand-red-dark text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-md transition-colors inline-block mt-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"

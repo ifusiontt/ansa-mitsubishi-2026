@@ -13,6 +13,7 @@
  *   vehicles (slug outlander-sport): fuel_type, torque, ground_clearance, overview powertrain sentence
  *   vehicle_trims (all of its trims, drafts included): engine, transmission
  *   its PERFORMANCE highlight (block_content_items): description
+ *   model year in copy: "The 2025 Mitsubishi Outlander Sport HEV" → 2026 (overview + hero block body)
  * Then clears the Directus data cache. Idempotent ("=" when already current).
  *
  * Seeds carrying the same values (keep in sync): apply-hybrid-vehicle-schema.js,
@@ -40,6 +41,8 @@ export const HEV_TRIM = {
 /** Overview: only the powertrain clause changes. */
 const OVERVIEW_OLD = 'refined MIVEC 2.0L/2.4L powertrains with smooth CVT';
 const OVERVIEW_NEW = 'a 1.6L self-charging full-hybrid powertrain with an 85 kW electric motor';
+/** The vehicle is model_year 2026; the seeded copy still said 2025. */
+const year2026 = (text) => (text ?? '').replace(/\bThe 2025 Mitsubishi Outlander Sport\b/g, 'The 2026 Mitsubishi Outlander Sport');
 const PERFORMANCE_OLD = 'A refined MIVEC engine and smooth CVT deliver confident, efficient performance in every drive mode.';
 export const HEV_PERFORMANCE =
 	'A 1.6L self-charging full hybrid pairs its engine with an 85 kW electric motor for 255 Nm of instant torque and efficient performance in every drive mode.';
@@ -90,14 +93,20 @@ async function main() {
 
 	const [vehicle] = await search('vehicles', {
 		filter: { slug: { _eq: SLUG } },
-		fields: ['id', 'title', 'overview', 'highlights', ...Object.keys(HEV_VEHICLE)],
+		fields: ['id', 'title', 'overview', 'highlights', 'hero_block', ...Object.keys(HEV_VEHICLE)],
 		limit: 1,
 	});
 	if (!vehicle) throw new Error(`vehicle "${SLUG}" not found`);
 
-	const overview = (vehicle.overview ?? '').replace(OVERVIEW_OLD, OVERVIEW_NEW);
+	const overview = year2026(vehicle.overview).replace(OVERVIEW_OLD, OVERVIEW_NEW);
 	if (/MIVEC|CVT|1\.5L|2\.0L|2\.4L/i.test(overview)) console.log(`! overview still mentions an old powertrain after the rewrite — review it in Directus`);
 	await sync('vehicles', vehicle, { ...HEV_VEHICLE, overview }, `vehicles ${SLUG}`);
+
+	const heroId = typeof vehicle.hero_block === 'object' ? vehicle.hero_block?.id : vehicle.hero_block;
+	if (heroId) {
+		const [hero] = await search('block_hero_custom', { filter: { id: { _eq: heroId } }, fields: ['id', 'body'], limit: 1 });
+		if (hero) await sync('block_hero_custom', hero, { body: year2026(hero.body) }, 'hero block');
+	}
 
 	const trims = await search('vehicle_trims', { filter: { vehicle: { _eq: vehicle.id } }, fields: ['id', 'trim_name', 'status', ...Object.keys(HEV_TRIM)], limit: -1 });
 	for (const trim of trims) await sync('vehicle_trims', trim, HEV_TRIM, `trim "${trim.trim_name}" (${trim.status})`);

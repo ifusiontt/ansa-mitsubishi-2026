@@ -208,14 +208,14 @@ const VEHICLE = {
   fuel_type: 'Hybrid (HEV)', // brochure p.13: self-charging full hybrid (scripts/apply-hev-powertrain-specs.mjs)
   warranty: '5-Year / 100,000 km Manufacturer Warranty',
   overview:
-    "The 2025 Mitsubishi Outlander Sport HEV brings Outlander-grade ambition to the compact crossover class. A bold Dynamic Shield front end, a 1.6L self-charging full-hybrid powertrain with an 85 kW electric motor, and the full Mitsubishi Safety Sensing suite make it the definitive everyday escape hatch — from Port of Spain commutes to the road to Caronia.",
+    "The 2026 Mitsubishi Outlander Sport HEV brings Outlander-grade ambition to the compact crossover class. A bold Dynamic Shield front end, a 1.6L self-charging full-hybrid powertrain with an 85 kW electric motor, and the full Mitsubishi Safety Sensing suite make it the definitive everyday escape hatch — from Port of Spain commutes to the road to Caronia.",
 };
 
 const HERO_BLOCK = {
   title: 'Outlander Sport HEV — Hero',
   highlight_keyword: 'Outlander Sport HEV',
   headline: 'Drive Your Ambition',
-  body: 'Bold. Capable. Uncompromising. The 2025 Mitsubishi Outlander Sport HEV is engineered to outdrive the limits of the compact crossover class.',
+  body: 'Bold. Capable. Uncompromising. The 2026 Mitsubishi Outlander Sport HEV is engineered to outdrive the limits of the compact crossover class.',
   template: 'hero_immersive',
   variant: 'dark_industrial',
   container_width: 'contained',
@@ -845,6 +845,8 @@ const PUBLIC_READ_WHITELISTS = {
     'ground_clearance', 'dimensions', 'torque', 'suspension',
     // scripts/upload-lifestyle-assets.mjs (the vehicles_gallery junction is full-read in seed-permissions.py):
     'gallery',
+    // scripts/upload-brochures.mjs (spec sheet / brochure PDF):
+    'brochure',
   ],
   // new collection from the hybrid vehicle schema:
   vehicle_colors: ['id', 'sort', 'vehicle_id', 'color_name', 'hex_code', 'color_code', 'image'],

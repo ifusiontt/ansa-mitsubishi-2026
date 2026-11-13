@@ -87,6 +87,8 @@ export interface VehiclePage {
 	starting_price: number | null;
 	primary_color: string | null;
 	brochure_url: string | null;
+	/** Spec sheet / brochure PDF (directus_files UUID) — scripts/upload-brochures.mjs */
+	brochure?: string | null;
 	status: string;
 	model_year: number | null;
 	category: string | null;
@@ -127,6 +129,7 @@ export type VehicleSummary = Pick<
 	| 'body_type'
 	| 'warranty'
 	| 'brochure_url'
+	| 'brochure'
 	| 'ground_clearance'
 	| 'dimensions'
 	| 'torque'

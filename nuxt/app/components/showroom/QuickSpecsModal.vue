@@ -101,8 +101,8 @@ function focusDialog(event: Event) {
 
 					<div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<a
-							v-if="vehicle.brochure_url"
-							:href="vehicle.brochure_url"
+							v-if="brochureHref(vehicle)"
+							:href="brochureHref(vehicle)"
 							target="_blank"
 							rel="noopener"
 							class="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-300 px-6 py-3 text-xs font-bold uppercase tracking-widest text-zinc-800 transition-colors hover:border-brand-red hover:text-brand-red focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 dark:border-zinc-700 dark:text-white dark:focus-visible:ring-offset-zinc-900"
