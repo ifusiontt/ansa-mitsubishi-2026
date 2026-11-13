@@ -49,7 +49,9 @@ export default defineEventHandler(async (event) => {
 			deep: {
 				colors: { _sort: ['sort'] },
 				highlights: { _sort: ['sort'] },
-				trims: { _sort: ['price', 'trim_name'] },
+				// Draft trims (e.g. retired Outlander Sport HEV grades) never reach the showroom page,
+				// its financing calculator or the trim comparator.
+				trims: { _sort: ['price', 'trim_name'], _filter: { status: { _eq: 'published' } } },
 				gallery: { _sort: ['sort'] },
 			} as any,
 		}),

@@ -1,3 +1,7 @@
+# Own project name: the Ford repo also keeps compose in a folder named `directus`, so without this
+# both stacks share project "directus" and `up -d` in one replaces the other's containers.
+name: directus-mitsubishi
+
 services:
   database:
     image: postgis/postgis:15-3.3
@@ -53,3 +57,5 @@ services:
 
 volumes:
   directus-data:
+    # Pinned to the volume created under the old shared project name, so existing data is kept.
+    name: directus_directus-data

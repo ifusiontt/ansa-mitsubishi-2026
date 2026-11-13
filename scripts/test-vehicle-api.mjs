@@ -135,7 +135,8 @@ async function checkAsset(label, uuid) {
 	try {
 		const r = await fetch(`${BASE}/assets/${uuid}`);
 		const ct = r.headers.get('content-type') || '';
-		check(label, r.status === 200 && ct.startsWith('image/'), `status ${r.status}, content-type ${ct || '<none>'}`);
+		check(label, r.status === 200 && /^(image|video)\//.test(ct), `status ${r.status}, content-type ${ct || '<none>'}`);
+		await r.body?.cancel(); // don't download whole films
 	} catch (e) {
 		check(label, false, String(e));
 	}
@@ -210,7 +211,7 @@ if (!vehicle) {
 
 // scalar contract
 const scalars = [
-	['title', 'Mitsubishi Outlander Sport'],
+	['title', 'Mitsubishi Outlander Sport HEV'],
 	['slug', VEHICLE_SLUG],
 	['model_year', '2026'],
 	['status', 'published'],
@@ -218,7 +219,7 @@ const scalars = [
 	['body_type', null],
 	['fuel_type', null],
 	['seating_capacity', null],
-	['starting_price', null],
+	['starting_price', 259000],
 	['warranty', null],
 	['overview', null],
 	['brochure_url', null],
@@ -355,7 +356,8 @@ try {
 	const { r } = await nuxtFetch(`/showroom/${encodeURIComponent(VEHICLE_SLUG)}`);
 	const html = r.status === 200 ? await r.text() : '';
 	check('Nuxt SSR page /showroom/:slug → 200', r.status === 200, `status ${r.status}`);
-	check('SSR page renders vehicle title', html.includes('Mitsubishi Outlander Sport'));
+	check('SSR page renders vehicle title', html.includes('Mitsubishi Outlander Sport HEV'));
+	check('SSR page renders TTD $259,000', html.includes('259,000'));
 	check('SSR page renders highlights section', html.includes('OUTDRIVE THE LIMITS WITH PREVAILING PERFORMANCE') || html.includes('Outdrive The Limits With Prevailing Performance'));
 } catch (e) {
 	check('Nuxt SSR page /showroom/:slug → 200', false, String(e));
@@ -424,8 +426,17 @@ for (const [slug, palette] of Object.entries(EXPECTED_PALETTES)) {
 // ---------------------------------------------------------------------------
 
 console.log('\n── 8. homepage media ─────────────────────────────────────────────');
-const EXPECTED_HERO_STILLS = ['outlander_hero_banner.png', 'triton_hero_banner.png', 'xpander_hero_forest.png'];
-const EXPECTED_ASC_IMAGE = 'outlander_asc_curve_clean.png';
+// UAT Nov 2026: family still (LCP), then each model film followed by its first-frame poster.
+const EXPECTED_HERO_MEDIA = [
+	'mitsubishi-family-hero.webp',
+	'triton-hero.mp4',
+	'triton-hero-poster.webp',
+	'outlander-sport-hev-hero.mp4',
+	'outlander-sport-hev-hero-poster.webp',
+	'xpander-cross-hero.mp4',
+	'xpander-cross-hero-poster.webp',
+];
+const EXPECTED_ASC_IMAGE = 'xpander-cross-ex-back.webp';
 const RETIRED_HEADLINES = ['Mitsubishi 2026 — Built for Trinidad & Tobago', 'Five Models. Every Kind of Drive.'];
 
 const homeFields = [
@@ -449,13 +460,14 @@ const homeBlocks = res.status === 200 ? ((await res.json()).data?.[0]?.blocks ??
 const heroItem = homeBlocks.find((b) => b.collection === 'block_hero_custom')?.item;
 const stills = (heroItem?.media_gallery ?? []).map((j) => j?.directus_files_id).filter(Boolean);
 check(
-	'hero gallery = outlander / triton / xpander stills (in order)',
-	JSON.stringify(stills.map((f) => f.filename_download)) === JSON.stringify(EXPECTED_HERO_STILLS),
+	'hero gallery = family still, then triton / outlander / xpander films + posters (in order)',
+	JSON.stringify(stills.map((f) => f.filename_download)) === JSON.stringify(EXPECTED_HERO_MEDIA),
 	`got ${JSON.stringify(stills.map((f) => f.filename_download))}`,
 );
 for (const f of stills) {
-	check(`hero still ${f.filename_download} is 1920x800`, f.width === 1920 && f.height === 800, `got ${f.width}x${f.height}`);
-	await checkAsset(`hero still ${f.filename_download} serves (anonymous)`, f.id);
+	// films carry no width/height in Directus; stills must be at least 1920 wide for a full-bleed hero
+	if (!f.filename_download.endsWith('.mp4')) check(`hero media ${f.filename_download} is ≥1920 wide`, f.width >= 1920, `got ${f.width}x${f.height}`);
+	await checkAsset(`hero media ${f.filename_download} serves (anonymous)`, f.id);
 }
 
 const ascItem = homeBlocks
@@ -477,21 +489,30 @@ for (const headline of RETIRED_HEADLINES) {
 	check(`retired block "${headline}" not on Home`, !headlinesOnHome.includes(headline));
 }
 
-const HERO_SLIDE_IMAGES = [
-	'/images/main-hero/2025-outlander-sport-glamour-1-2048x1447.webp',
-	'/images/main-hero/24MY_TRITON_ALL-NEW_LHD_MV_Intro_P_proxy.png',
-	'/images/main-hero/2023-xpander-cross-glamour3-1536x1025.jpg',
-];
+// Slide 1 (family still) is server-rendered and preloaded; the three films are created client-side
+// after hydration, so the SSR HTML must carry the still but no <video>.
+const HERO_LCP_IMAGE = '/images/hero/mitsubishi-family-hero.webp';
+const HERO_VIDEOS = ['triton', 'outlander-sport-hev', 'xpander-cross'];
 // Only the active slide's CTA is server-rendered; the rest swap in client-side.
-const HERO_SLIDE_LINKS = ['/showroom/outlander-sport'];
-const ASC_SPOTLIGHT_IMAGE = '/images/features/22MY_XS_RHD_MV_SlippyCorner-1536x1024.jpg';
+const HERO_SLIDE_LINKS = ['#models'];
+const ASC_SPOTLIGHT_IMAGE = '/images/models/xpander-cross/lifestyle/xpander-cross-ex-back.webp';
 
 try {
 	const { r } = await nuxtFetch('/');
 	const html = r.status === 200 ? await r.text() : '';
 	check('Nuxt SSR homepage / → 200', r.status === 200, `status ${r.status}`);
 	// Hero slides and the ASC spotlight still ship from nuxt/public, not Directus.
-	for (const still of HERO_SLIDE_IMAGES) check(`SSR homepage renders hero slide ${still}`, html.includes(still));
+	check('SSR homepage renders hero slide 1 (family still)', html.includes(HERO_LCP_IMAGE));
+	check('SSR homepage preloads the hero LCP still', new RegExp(`<link[^>]+rel="preload"[^>]+${HERO_LCP_IMAGE}|<link[^>]+${HERO_LCP_IMAGE}[^>]+rel="preload"`).test(html));
+	check('SSR homepage defers hero <video> until hydration', !/<video\b/.test(html));
+	check('SSR homepage names Outlander Sport HEV', html.includes('Outlander Sport HEV'));
+	check('SSR homepage drops old "Explore Outlander Sport" CTA', !/Explore Outlander Sport(?! HEV)/i.test(html));
+	for (const slug of HERO_VIDEOS) {
+		for (const file of [`${slug}-hero.mp4`, `${slug}-hero-poster.webp`]) {
+			const { r: v } = await nuxtFetch(`/videos/hero/${file}`);
+			check(`hero media /videos/hero/${file} → 200`, v.status === 200, `status ${v.status}`);
+		}
+	}
 	for (const to of HERO_SLIDE_LINKS) check(`SSR homepage links hero CTA ${to}`, html.includes(`href="${to}"`));
 	check('SSR homepage renders ASC spotlight image', html.includes(ASC_SPOTLIGHT_IMAGE));
 	check('SSR homepage drops retired blocks', !RETIRED_HEADLINES.some((h) => html.includes(h)));

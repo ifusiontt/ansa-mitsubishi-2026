@@ -49,7 +49,7 @@ export const DEALER_OPTIONS = [
 ] as const;
 
 /** Fleet models; labels are stored in `metadata.vehicle_model`. */
-export const VEHICLE_MODEL_OPTIONS = ['Outlander Sport', 'Triton', 'Xpander Cross', 'Xpander'] as const;
+export const VEHICLE_MODEL_OPTIONS = ['Outlander Sport HEV', 'Triton', 'Xpander Cross', 'Xpander'] as const;
 
 export const SERVICE_TYPE_OPTIONS = [
 	'Scheduled Maintenance',

@@ -30,13 +30,17 @@ const { data: dealers } = await useFetch<Dealer[]>('/api/dealers', { key: 'deale
 
 const fields = computed(() => (form.value?.fields ?? []).filter((field): field is FormField => typeof field !== 'string'));
 
-/** Slug-style comparison so `outlander-sport`, `Outlander Sport` and `outlander_sport` all match. */
+/**
+ * Slug-style comparison so `outlander-sport`, `Outlander Sport HEV` and `outlander_sport` all match
+ * (a trailing "HEV" is ignored, so the `outlander-sport` route slug still finds the renamed model).
+ */
 const toSlug = (value: string) =>
 	value
 		.trim()
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+|-+$/g, '');
+		.replace(/^-+|-+$/g, '')
+		.replace(/-hev$/, '');
 
 const normalizeName = (name: string) => name.toLowerCase().replace(/-/g, '_');
 

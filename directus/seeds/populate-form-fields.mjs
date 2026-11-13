@@ -62,7 +62,7 @@ const DEALERS = [
 	{ text: 'Chaguanas', value: 'chaguanas' },
 	{ text: 'Tobago', value: 'tobago' },
 ];
-const VEHICLES = toChoices(['Outlander Sport', 'Triton', 'Xpander Cross', 'Xpander']);
+const VEHICLES = toChoices(['Outlander Sport HEV', 'Triton', 'Xpander Cross', 'Xpander']);
 const SERVICE_TYPES = toChoices([
 	'Scheduled Maintenance',
 	'Oil & Filter Change',

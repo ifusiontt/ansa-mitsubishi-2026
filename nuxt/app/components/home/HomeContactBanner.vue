@@ -16,8 +16,8 @@ import { getDirectusAssetURL } from '@@/server/utils/directus-utils';
  */
 const props = withDefaults(defineProps<{ image?: string | null }>(), { image: null });
 
-/** Xpander Cross studio render, pre-cropped 1000x1400 for the portrait panel. */
-const CONSOLE_IMAGE = '/images/contact/dealership-console-xpander-cross.webp';
+/** Triton EX FRONT from the official 2026 shoot; cropped to the portrait panel on the truck (object-position). */
+const CONSOLE_IMAGE = '/images/models/triton/lifestyle/triton-ex-front.webp';
 
 const BRANCHES = [
 	{ slug: 'port-of-spain', label: 'Port of Spain', role: 'Head Office & Showroom' },
@@ -100,7 +100,7 @@ const { values, errors, loading, status, serverError, touch, submit } = useInqui
 			<div class="relative isolate p-8 text-white md:p-10 lg:col-span-5">
 				<!-- Gradient sits under the photo, so a failed image load still leaves a dark panel -->
 				<div class="absolute inset-0 -z-30 bg-gradient-to-br from-neutral-800 to-neutral-950" aria-hidden="true" />
-				<img :src="imageUrl" alt="" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover brightness-125" />
+				<img :src="imageUrl" alt="" loading="lazy" :class="['absolute inset-0 -z-20 h-full w-full object-cover brightness-125', image ? '' : 'object-[58%_center]']" />
 				<!-- Deep scrim: the photo reads as texture only, so car lines never cross the form fields -->
 				<div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/90 via-black/80 to-black/95" aria-hidden="true" />
 

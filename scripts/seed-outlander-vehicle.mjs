@@ -2,7 +2,7 @@
 /**
  * seed-outlander-vehicle.mjs
  *
- * Populates the "Mitsubishi Outlander Sport" vehicle entry (slug: outlander-sport)
+ * Populates the "Mitsubishi Outlander Sport HEV" vehicle entry (slug: outlander-sport — route kept)
  * in Directus with media, colors, highlights, and trim corrections.
  *
  * Source assets:

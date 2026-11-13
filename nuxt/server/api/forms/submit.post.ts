@@ -7,7 +7,7 @@ interface SubmissionValue {
 	file?: string;
 }
 
-/** Prefer the human-readable choice label (e.g. "Outlander Sport") over its stored value in emails. */
+/** Prefer the human-readable choice label (e.g. "Outlander Sport HEV") over its stored value in emails. */
 function displayValue(field: FormField, value: string): string {
 	const choice = field.choices?.find((option) => option.value === value);
 	return choice?.text ?? value;

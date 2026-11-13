@@ -41,9 +41,9 @@ const ITEMS: QuickJumpItem[] = [
 	{
 		id: 'outlander-sport',
 		category: 'Vehicles',
-		title: 'Outlander Sport',
-		description: 'Compact SUV built on the regional Xforce platform',
-		keywords: ['compact suv', 'crossover', '5 seater'],
+		title: 'Outlander Sport HEV',
+		description: 'Compact hybrid SUV built on the regional Xforce platform',
+		keywords: ['outlander sport', 'hev', 'hybrid', 'compact suv', 'crossover', '5 seater'],
 		icon: 'lucide:car',
 		to: '/showroom/outlander-sport',
 	},

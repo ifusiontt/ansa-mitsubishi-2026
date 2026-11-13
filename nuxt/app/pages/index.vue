@@ -52,7 +52,7 @@ const otherBlocks = computed(() => {
 	return blocks.value.filter((block) => !used.has(block.id));
 });
 
-// Lead vehicle (Outlander Sport) — its hero render backs the hero / spotlight when the CMS has no media.
+// Lead vehicle (Outlander Sport HEV) — its hero render backs the hero / spotlight when the CMS has no media.
 const leadVehicle = computed(() => vehicles.value?.[0]);
 const leadMedia = computed(() => directusFileId(leadVehicle.value?.hero_block?.media));
 

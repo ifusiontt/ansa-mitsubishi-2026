@@ -61,7 +61,7 @@ const socials = computed(() =>
 
 const MODEL_LINKS = [
 	{ label: 'All-New Triton', to: '/showroom/triton' },
-	{ label: 'Outlander Sport', to: '/showroom/outlander-sport' },
+	{ label: 'Outlander Sport HEV', to: '/showroom/outlander-sport' },
 	{ label: 'Xpander Cross', to: '/showroom/xpander-cross' },
 ];
 

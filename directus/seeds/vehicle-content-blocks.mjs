@@ -75,7 +75,7 @@ const getAll = async (urlPath) => (await api('GET', `${urlPath}&limit=-1&cache=f
 const VEHICLES = [
 	{
 		slug: 'outlander-sport',
-		label: 'Outlander Sport',
+		label: 'Outlander Sport HEV',
 		keywords: ['outlander', 'xfh'],
 		items: [
 			{

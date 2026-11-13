@@ -125,10 +125,17 @@ export function useInquiryForm<S extends ZodTypeAny>(
 /**
  * Maps a slug like `outlander-sport`, `xpander-cross` or `2026-triton`, or a model name
  * ("Mitsubishi Xpander Cross"), to a VEHICLE_MODEL_OPTIONS label; undefined if none match.
+ * A trailing "HEV" is ignored on both sides, so the `outlander-sport` route slug still finds
+ * "Outlander Sport HEV".
  */
 export function vehicleModelFrom(value: string | null | undefined): VehicleModel | undefined {
 	if (!value) return undefined;
-	const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+	const slug = (v: string) =>
+		v
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-+|-+$/g, '')
+			.replace(/-hev$/, '');
 	const target = slug(value)
 		.replace(/^\d{4}-/, '') // drop a model-year prefix
 		.replace(/^mitsubishi-/, '');

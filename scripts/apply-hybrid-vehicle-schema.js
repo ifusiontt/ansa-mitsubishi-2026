@@ -40,7 +40,7 @@
  *      vehicle_colors read row. Required so the public nested query works.
  *
  *   3. SEED    — idempotently seeds the "Mitsubishi Outlander Sport" test record:
- *        - vehicles row (title/slug/starting_price 255000 TTD + full context)
+ *        - vehicles row (title/slug/starting_price 259000 TTD + full context)
  *        - block_hero_custom row ("Drive Your Ambition" / "Outlander Sport")
  *          with a generated hero media image (ImageMagick PNG, uploaded once)
  *        - 5 x vehicle_colors — the 2026 2-tone palette (X4Y, X5P, X8W, JH3, XEU);
@@ -193,11 +193,11 @@ const m2oRelationMeta = (manyCollection, manyField, oneCollection, oneField, sor
 /* ------------------------------------------------------------------ */
 
 const VEHICLE = {
-  title: 'Mitsubishi Outlander Sport',
+  title: 'Mitsubishi Outlander Sport HEV',
   slug: 'outlander-sport',
   tagline: 'Compact Crossover Ambition For The Urban Explorer',
   hero_headline: 'Outdrive The Limits In Compact Crossover Form',
-  starting_price: 255000, // TTD
+  starting_price: 259000, // TTD (UAT pricing, Nov 2026)
   primary_color: '#C9A332', // X4Y Energetic Yellow
   brochure_url: 'https://ansamitsubishi.com/brochures/2025-mitsubishi-outlander-sport.pdf',
   status: 'published',
@@ -208,14 +208,14 @@ const VEHICLE = {
   fuel_type: 'Gasoline',
   warranty: '5-Year / 100,000 km Manufacturer Warranty',
   overview:
-    "The 2025 Mitsubishi Outlander Sport brings Outlander-grade ambition to the compact crossover class. A bold Dynamic Shield front end, refined MIVEC 2.0L/2.4L powertrains with smooth CVT, and the full Mitsubishi Safety Sensing suite make it the definitive everyday escape hatch — from Port of Spain commutes to the road to Caronia.",
+    "The 2025 Mitsubishi Outlander Sport HEV brings Outlander-grade ambition to the compact crossover class. A bold Dynamic Shield front end, refined MIVEC 2.0L/2.4L powertrains with smooth CVT, and the full Mitsubishi Safety Sensing suite make it the definitive everyday escape hatch — from Port of Spain commutes to the road to Caronia.",
 };
 
 const HERO_BLOCK = {
-  title: 'Outlander Sport — Hero',
-  highlight_keyword: 'Outlander Sport',
+  title: 'Outlander Sport HEV — Hero',
+  highlight_keyword: 'Outlander Sport HEV',
   headline: 'Drive Your Ambition',
-  body: 'Bold. Capable. Uncompromising. The 2025 Mitsubishi Outlander Sport is engineered to outdrive the limits of the compact crossover class.',
+  body: 'Bold. Capable. Uncompromising. The 2025 Mitsubishi Outlander Sport HEV is engineered to outdrive the limits of the compact crossover class.',
   template: 'hero_immersive',
   variant: 'dark_industrial',
   container_width: 'contained',
@@ -258,7 +258,7 @@ const HIGHLIGHTS = [
 const TRIMS = [
   {
     trim_name: 'ES',
-    price: 255000,
+    price: 259000,
     engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
     transmission: 'CVT Automatic Transmission',
     drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
@@ -274,6 +274,7 @@ const TRIMS = [
   {
     trim_name: 'SE FWD',
     price: 272000,
+    status: 'draft', // retired: Outlander Sport HEV is sold as one grade (ES, TTD 259,000 — UAT Nov 2026)
     engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
     transmission: 'CVT Automatic Transmission',
     drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
@@ -289,6 +290,7 @@ const TRIMS = [
   {
     trim_name: 'SEL Premium FWD',
     price: 289000,
+    status: 'draft', // retired: see SE FWD
     engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
     transmission: 'CVT Automatic Transmission',
     drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
@@ -1048,9 +1050,9 @@ async function seedData() {
       'vehicle_trims',
       { vehicle: String(vehicleId), trim_name: trim.trim_name },
       {
+        status: 'published',
         ...trim,
         vehicle: vehicleId,
-        status: 'published',
         key_features: trim.key_features.map((s) => ({ value: s })),
       },
       `trim "${trim.trim_name}"`

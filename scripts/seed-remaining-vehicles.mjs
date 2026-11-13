@@ -102,7 +102,7 @@ const VEHICLES = [
 		body_type: 'Pickup Truck',
 		fuel_type: 'Turbo Diesel',
 		seating_capacity: 5,
-		starting_price: 295000,
+		starting_price: 339000, // TTD — Fabric 4WD (UAT pricing, Nov 2026)
 		warranty: '5-Year / 100,000 km Manufacturer Warranty',
 		primary_color: '#4A4D52', // U28 Graphite Gray
 		brochure_url: 'https://ansamitsubishi.com/brochures/2026-mitsubishi-triton.pdf',
@@ -158,7 +158,7 @@ const VEHICLES = [
 				engine: '2.4L MIVEC Intercooled Turbo Diesel (135 kW @ 3,500 rpm, 430 Nm)',
 				transmission: '6-Speed Automatic Transmission',
 				drivetrain: '4WD (Super Select 4WD-II)',
-				price: 295000,
+				price: 339000,
 				key_features: [
 					'Super Select 4WD-II with Rear Differential Lock',
 					'265/60R18 All-Season Tyres on 18-inch Alloy Wheels',
@@ -175,7 +175,7 @@ const VEHICLES = [
 				engine: '2.4L MIVEC Intercooled Turbo Diesel (135 kW @ 3,500 rpm, 430 Nm)',
 				transmission: '6-Speed Automatic Transmission',
 				drivetrain: '4WD (Super Select 4WD-II)',
-				price: 295000,
+				price: 359000,
 				key_features: [
 					'Leather Seats with Stitching',
 					'Power Driver Seat',
@@ -199,7 +199,7 @@ const VEHICLES = [
 		body_type: 'Crossover',
 		fuel_type: 'Gasoline',
 		seating_capacity: 7,
-		starting_price: 195000,
+		starting_price: 229000, // TTD (UAT pricing, Nov 2026)
 		warranty: '5-Year / 100,000 km Manufacturer Warranty',
 		primary_color: '#C8501E', // X3M Sunrise Orange Metallic
 		brochure_url: 'https://ansamitsubishi.com/brochures/2026-mitsubishi-xpander-cross.pdf',
@@ -268,7 +268,7 @@ const VEHICLES = [
 				engine: '1.5L 16-Valve DOHC MIVEC 4-Cylinder (4A91, 104.5 PS @ 6,000 rpm, 141 Nm @ 4,000 rpm)',
 				transmission: '4-Speed Automatic Transmission',
 				drivetrain: '2WD (Front-Wheel Drive)',
-				price: 195000,
+				price: 229000,
 				key_features: [
 					'225 mm Ground Clearance with Reinforced Suspension',
 					'Active Yaw Control (AYC) with Active Stability Control (ASC)',

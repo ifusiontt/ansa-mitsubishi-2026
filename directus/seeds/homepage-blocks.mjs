@@ -6,10 +6,12 @@
  *
  *   1. `pages` record for permalink "/" ("Home", published) — created if missing.
  *   2. block_hero_custom — "Smarter. Smoother. Sassier." (hero_immersive, dark_industrial,
- *      full width). `media_gallery` holds the three 1920x800 hero stills HomeHero cycles
- *      through (Outlander Sport, Triton, Xpander Cross); `media` mirrors the first one.
+ *      full width). `media_gallery` holds the hero media HomeHero plays, in slide order: the
+ *      family still, then each brand film followed by its poster (Triton, Outlander Sport HEV,
+ *      Xpander Cross); `media` is the family still. Masters: scripts/optimize-hero-media.sh.
+ *      (HomeHero serves the same files from nuxt/public; the CMS copies keep the library complete.)
  *   3. block_content_block "TECHNOLOGY" (template content_block_template_one) — one
- *      ASC feature-spotlight item over outlander_asc_curve_clean.
+ *      ASC feature-spotlight item over the Xpander Cross EX BACK lifestyle cut.
  *   4. block_content_block "THE ANSA DIFFERENCE" (template features_grid) — three
  *      value-proposition items.
  *   5. page_blocks junction rows linking all three blocks to the Home page (dark background).
@@ -25,7 +27,8 @@
  * Idempotent. Blocks are matched on the Home page by headline / tagline and missing child
  * items by headline. Existing content is left alone except for: the hero gallery + media
  * and the ASC item's image (always re-pointed at the files above), the ASC description
- * (rewritten only while it still holds the retired AYC copy), and the retired blocks.
+ * (rewritten only while it still holds the retired AYC copy), value-card images that still
+ * show a retired pre-2026-shoot still (`replaces`), and the retired blocks.
  *
  * Usage:  node directus/seeds/homepage-blocks.mjs
  * Env:    DIRECTUS_TOKEN / DIRECTUS_URL (falls back to ADMIN_TOKEN in directus/.env)
@@ -72,17 +75,34 @@ const CONTENT_DIR =
 const MODELS = path.join(CONTENT_DIR, '02_Showroom_Models');
 /** Optimised lifestyle masters (scripts/optimize-lifestyle-images.py) ship in the repo, not the content library. */
 const LIFESTYLE = path.join(HERE, '..', '..', 'nuxt', 'public', 'images', 'models');
+/** Homepage hero masters (scripts/optimize-hero-media.sh) also ship in the repo. */
+const PUBLIC = path.join(HERE, '..', '..', 'nuxt', 'public');
 
 // --- content ----------------------------------------------------------------
-/** Hero slides, in display order — 1920x800 stills extracted from the launch films. Titles double as alt text. */
-const HERO_STILLS = [
-	{ file: 'Outlander_Sport_HEV/Extracted from video/outlander_hero_banner.png', title: 'Mitsubishi Outlander Sport in Energetic Yellow on a forest road' },
-	{ file: 'Triton/Extracted from video/triton_hero_banner.png', title: 'Mitsubishi Triton climbing a steep red-earth trail' },
-	{ file: 'Xpander_Cross/Extracted from video/xpander_hero_forest.png', title: 'Mitsubishi Xpander Cross parked in a misty pine forest' },
+/**
+ * Hero media in slide order (HomeHero.vue SLIDES): the family still, then each brand film + its
+ * first-frame poster. Titles double as alt text.
+ */
+const HERO_MEDIA = [
+	{
+		file: path.join(PUBLIC, 'images/hero/mitsubishi-family-hero.webp'),
+		title: 'The 2026 Mitsubishi Xpander Cross, Triton and Outlander Sport HEV on a coastal highway at sunset',
+	},
+	{ file: path.join(PUBLIC, 'videos/hero/triton-hero.mp4'), title: 'Mitsubishi Triton — homepage hero film' },
+	{ file: path.join(PUBLIC, 'videos/hero/triton-hero-poster.webp'), title: 'Mitsubishi Triton — homepage hero film poster' },
+	{ file: path.join(PUBLIC, 'videos/hero/outlander-sport-hev-hero.mp4'), title: 'Mitsubishi Outlander Sport HEV — homepage hero film' },
+	{
+		file: path.join(PUBLIC, 'videos/hero/outlander-sport-hev-hero-poster.webp'),
+		title: 'Mitsubishi Outlander Sport HEV — homepage hero film poster',
+	},
+	{ file: path.join(PUBLIC, 'videos/hero/xpander-cross-hero.mp4'), title: 'Mitsubishi Xpander Cross — homepage hero film' },
+	{ file: path.join(PUBLIC, 'videos/hero/xpander-cross-hero-poster.webp'), title: 'Mitsubishi Xpander Cross — homepage hero film poster' },
 ];
+// Same file, title and focal point as scripts/upload-lifestyle-assets.mjs, so the two never fight.
 const ASC_IMAGE = {
-	file: 'Outlander_Sport_HEV/Extracted from video/outlander_asc_curve_clean.png',
-	title: 'Mitsubishi Outlander Sport rounding a curve on a country road',
+	file: path.join(LIFESTYLE, 'xpander-cross/lifestyle/xpander-cross-ex-back.webp'),
+	title: 'Mitsubishi Xpander Cross on a coastal road, rear three-quarter',
+	focal: [840, 660],
 };
 
 const HERO = {
@@ -146,11 +166,13 @@ const VALUE_ITEMS = [
 		tagline: 'Safety',
 		headline: 'All-Round Advanced Safety Technology',
 		description: 'RISE body construction and active collision mitigation.',
+		// 2026-shoot lifestyle cuts; titles / focal points match upload-lifestyle-assets.mjs.
 		image: {
-			file: 'Xpander_Cross/Extracted from video/xpander_taillight_led.png',
-			title: 'Mitsubishi Xpander Cross LED taillight blade',
-			focal: [480, 620],
+			file: path.join(LIFESTYLE, 'triton/lifestyle/triton-ex-back.webp'),
+			title: 'Mitsubishi Triton on a forest trail, rear three-quarter',
+			focal: [1080, 640],
 		},
+		replaces: 'xpander_taillight_led.png',
 	},
 	{
 		status: 'published',
@@ -158,10 +180,11 @@ const VALUE_ITEMS = [
 		headline: 'In-House ANSA Financing',
 		description: 'Tailored automotive loans and flexible payment structures.',
 		image: {
-			file: 'Triton/Extracted from video/triton_sunset_flats.png',
-			title: 'Mitsubishi Triton on an open road at sunset',
-			focal: [1176, 580],
+			file: path.join(LIFESTYLE, 'xpander-cross/lifestyle/xpander-cross-interior-1.webp'),
+			title: 'Mitsubishi Xpander Cross cockpit and horizontal dashboard',
+			focal: [1200, 580],
 		},
+		replaces: 'triton_sunset_flats.png',
 	},
 ];
 
@@ -176,7 +199,7 @@ if (home) {
 }
 
 // --- 2. media ---------------------------------------------------------------
-const MIME = { '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg' };
+const MIME = { '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.mp4': 'video/mp4' };
 
 /**
  * Directus file id for a content-library image — reuses a same-name, same-size upload and keeps its title current.
@@ -222,7 +245,7 @@ async function ensureFile({ file: relPath, title, focal }) {
 }
 
 const heroStillIds = [];
-for (const still of HERO_STILLS) heroStillIds.push(await ensureFile(still));
+for (const media of HERO_MEDIA) heroStillIds.push(await ensureFile(media));
 const ascMediaId = process.env.HOME_ASC_FILE || (await ensureFile(ASC_IMAGE));
 const valueImageIds = new Map();
 for (const { headline, image } of VALUE_ITEMS) valueImageIds.set(headline, await ensureFile(image));
@@ -271,13 +294,13 @@ const galleryRows = await search('block_hero_custom_files', {
 	limit: -1,
 });
 if (JSON.stringify(galleryRows.map((r) => r.directus_files_id)) === JSON.stringify(heroStillIds)) {
-	console.log(`  = hero gallery already holds the ${heroStillIds.length} stills`);
+	console.log(`  = hero gallery already holds the ${heroStillIds.length} hero files`);
 } else {
 	for (const row of galleryRows) await api('DELETE', `/items/block_hero_custom_files/${row.id}`);
 	for (const fileId of heroStillIds) {
 		await api('POST', '/items/block_hero_custom_files', { block_hero_custom_id: heroId, directus_files_id: fileId });
 	}
-	console.log(`  ~ hero gallery set to ${heroStillIds.length} stills`);
+	console.log(`  ~ hero gallery set to ${heroStillIds.length} hero files`);
 }
 await api('PATCH', `/items/block_hero_custom/${heroId}`, { media: heroStillIds[0] });
 
@@ -325,7 +348,8 @@ async function ensureContentBlock(block, items, imageId) {
 const ascBlockId = await ensureContentBlock(ASC_BLOCK, ASC_ITEMS, ascMediaId);
 await ensureContentBlock(VALUE_BLOCK, VALUE_ITEMS, null);
 
-// Value cards: photograph each pillar that has no image yet — images picked in Directus are kept.
+// Value cards: photograph each pillar that has no image yet, and swap off a retired pre-2026-shoot
+// still (`replaces`) — any other image picked in Directus is kept.
 const [valueBlock] = await search('block_content_block', {
 	filter: { tagline: { _eq: VALUE_BLOCK.tagline }, template: { _eq: VALUE_BLOCK.template } },
 	fields: ['id'],
@@ -334,17 +358,24 @@ const [valueBlock] = await search('block_content_block', {
 if (valueBlock) {
 	const valueItems = await search('block_content_items', {
 		filter: { item: { _eq: valueBlock.id }, headline: { _in: [...valueImageIds.keys()] } },
-		fields: ['id', 'headline', 'images'],
+		fields: ['id', 'headline', 'images.id', 'images.directus_files_id.id', 'images.directus_files_id.filename_download'],
 		limit: -1,
 	});
 	for (const item of valueItems) {
-		if (item.images?.length) {
-			console.log(`  = "${item.headline}" already has an image`);
+		const fileId = valueImageIds.get(item.headline);
+		const { replaces } = VALUE_ITEMS.find((v) => v.headline === item.headline) ?? {};
+		const current = item.images ?? [];
+		if (current.length === 1 && current[0].directus_files_id?.id === fileId) {
+			console.log(`  = "${item.headline}" image current`);
 			continue;
 		}
-		const fileId = valueImageIds.get(item.headline);
+		if (current.length && !(replaces && current.some((j) => j.directus_files_id?.filename_download === replaces))) {
+			console.log(`  = "${item.headline}" keeps its Directus-picked image`);
+			continue;
+		}
+		for (const j of current) await api('DELETE', `/items/block_content_items_files/${j.id}`);
 		await api('POST', '/items/block_content_items_files', { block_content_items_id: item.id, directus_files_id: fileId });
-		console.log(`  + "${item.headline}" image set to ${fileId}`);
+		console.log(`  ${current.length ? '~' : '+'} "${item.headline}" image set to ${fileId}`);
 	}
 }
 
