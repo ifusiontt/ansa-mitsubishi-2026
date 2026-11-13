@@ -36,6 +36,9 @@ directus/uploads/
 # Raw footage, extracted video frames and source media binaries — these live in the content
 # library / Directus, never in git. Web-ready site images in nuxt/public/images stay tracked.
 *.mp4
+# …except the web-optimised hero films (scripts/optimize-hero-media.sh, ~3 MB each): the bundled
+# fallback when the CMS hero gallery has no matching file.
+!nuxt/public/videos/hero/*.mp4
 *.mov
 *.m4v
 *.webm

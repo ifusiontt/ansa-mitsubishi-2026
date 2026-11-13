@@ -38,9 +38,12 @@ interface Slide {
 	/** Short name for the slide picker's aria-label. */
 	label: string;
 	kind: 'image' | 'video';
-	/** Image URL, or the .mp4 for a video slide. */
+	/**
+	 * Image URL, or the .mp4 for a video slide. For video slides this is the bundled fallback; the
+	 * film is served from the Directus file of the same name in the hero `media_gallery` when present.
+	 */
 	src: string;
-	/** Video slides: first-frame still shown until (or instead of) playback. */
+	/** Video slides: first-frame still shown until (or instead of) playback (same CMS-first rule). */
 	poster?: string;
 	/** Literal Tailwind object-position classes (kept whole so the JIT scanner picks them up). */
 	focal?: string;
@@ -106,6 +109,26 @@ const SLIDES: Slide[] = [
 ];
 
 const LCP_IMAGE = SLIDES[0]!.src;
+
+/**
+ * Hero `media_gallery` files keyed by filename (seeded by directus/seeds/homepage-blocks.mjs:
+ * family still, then each film and its poster). Films and posters play from the Directus asset URL;
+ * the bundled /videos/hero file is only the fallback when the CMS has no file of that name.
+ * The family still stays bundled so it can be preloaded from the HTML as the LCP image.
+ */
+const galleryIds = computed(() => {
+	const ids = new Map<string, string>();
+	for (const entry of props.hero.media_gallery ?? []) {
+		const file = typeof entry === 'object' ? entry?.directus_files_id : null;
+		if (file && typeof file === 'object' && file.filename_download) ids.set(file.filename_download, file.id);
+	}
+	return ids;
+});
+function mediaUrl(bundled: string | undefined) {
+	if (!bundled) return undefined;
+	const id = galleryIds.value.get(bundled.split('/').pop()!);
+	return id ? getDirectusAssetURL(id) : bundled;
+}
 
 // Preload the LCP still (immersive template only) so it starts downloading with the HTML.
 useHead(() => (isSplit.value ? {} : { link: [{ rel: 'preload', as: 'image', href: LCP_IMAGE, fetchpriority: 'high', type: 'image/webp' }] }));
@@ -281,8 +304,8 @@ const headlineParts = computed(() => {
 				<video
 					v-else-if="videosReady"
 					:ref="(el) => bindVideo(index, el)"
-					:src="slide.src"
-					:poster="slide.poster"
+					:src="mediaUrl(slide.src)"
+					:poster="mediaUrl(slide.poster)"
 					:aria-label="slide.alt"
 					:loop="!autoplay"
 					preload="none"
