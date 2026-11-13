@@ -205,10 +205,10 @@ const VEHICLE = {
   category: 'Compact Crossover SUV',
   body_type: 'SUV',
   seating_capacity: 5,
-  fuel_type: 'Gasoline',
+  fuel_type: 'Hybrid (HEV)', // brochure p.13: self-charging full hybrid (scripts/apply-hev-powertrain-specs.mjs)
   warranty: '5-Year / 100,000 km Manufacturer Warranty',
   overview:
-    "The 2025 Mitsubishi Outlander Sport HEV brings Outlander-grade ambition to the compact crossover class. A bold Dynamic Shield front end, refined MIVEC 2.0L/2.4L powertrains with smooth CVT, and the full Mitsubishi Safety Sensing suite make it the definitive everyday escape hatch — from Port of Spain commutes to the road to Caronia.",
+    "The 2025 Mitsubishi Outlander Sport HEV brings Outlander-grade ambition to the compact crossover class. A bold Dynamic Shield front end, a 1.6L self-charging full-hybrid powertrain with an 85 kW electric motor, and the full Mitsubishi Safety Sensing suite make it the definitive everyday escape hatch — from Port of Spain commutes to the road to Caronia.",
 };
 
 const HERO_BLOCK = {
@@ -237,7 +237,7 @@ const HIGHLIGHTS = [
     tagline: 'PERFORMANCE',
     headline: 'Outdrive The Limits With Prevailing Performance',
     description:
-      'A refined MIVEC engine and smooth CVT deliver confident, efficient performance in every drive mode.',
+      'A 1.6L self-charging full hybrid pairs its engine with an 85 kW electric motor for 255 Nm of instant torque and efficient performance in every drive mode.',
   },
   {
     sort: 2,
@@ -259,8 +259,8 @@ const TRIMS = [
   {
     trim_name: 'ES',
     price: 259000,
-    engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
-    transmission: 'CVT Automatic Transmission',
+    engine: '1.6L HEV Self-Charging Full Hybrid (engine 79 kW / 134 Nm, electric motor 85 kW / 255 Nm)',
+    transmission: 'Hybrid Drive System (EV, Series & Parallel modes)',
     drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
     key_features: [
       '7.0-inch Smartphone-link Display Audio with Apple CarPlay & Android Auto',
@@ -275,8 +275,8 @@ const TRIMS = [
     trim_name: 'SE FWD',
     price: 272000,
     status: 'draft', // retired: Outlander Sport HEV is sold as one grade (ES, TTD 259,000 — UAT Nov 2026)
-    engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
-    transmission: 'CVT Automatic Transmission',
+    engine: '1.6L HEV Self-Charging Full Hybrid (engine 79 kW / 134 Nm, electric motor 85 kW / 255 Nm)',
+    transmission: 'Hybrid Drive System (EV, Series & Parallel modes)',
     drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
     key_features: [
       '8.0-inch Smartphone-link Display Audio (SDA) with Wireless Apple CarPlay & Android Auto',
@@ -291,8 +291,8 @@ const TRIMS = [
     trim_name: 'SEL Premium FWD',
     price: 289000,
     status: 'draft', // retired: see SE FWD
-    engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
-    transmission: 'CVT Automatic Transmission',
+    engine: '1.6L HEV Self-Charging Full Hybrid (engine 79 kW / 134 Nm, electric motor 85 kW / 255 Nm)',
+    transmission: 'Hybrid Drive System (EV, Series & Parallel modes)',
     drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
     key_features: [
       '9.0-inch Smartphone-link Display Audio with Navigation',

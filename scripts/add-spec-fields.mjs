@@ -61,9 +61,10 @@ const FIELDS = [
 
 const SPECS = {
 	'outlander-sport': {
-		ground_clearance: '222 mm',
+		// 1.6L HEV (brochure p.13): clearance 212 mm; motor 255 Nm, engine 134 Nm
+		ground_clearance: '212 mm',
 		dimensions: '4,390 × 1,810 × 1,660 mm',
-		torque: '141 Nm @ 4,000 rpm',
+		torque: '255 Nm (electric motor) / 134 Nm (1.6L engine)',
 		suspension: 'MacPherson Strut / Torsion Beam',
 	},
 	triton: {

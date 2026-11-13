@@ -53,7 +53,7 @@ const EXPECTED_HIGHLIGHTS = [
 		tagline: 'PERFORMANCE',
 		headline: 'Outdrive The Limits With Prevailing Performance',
 		description:
-			'A refined MIVEC engine and smooth CVT deliver confident, efficient performance in every drive mode.',
+			'A 1.6L self-charging full hybrid pairs its engine with an 85 kW electric motor for 255 Nm of instant torque and efficient performance in every drive mode.',
 	},
 	{
 		sort: 2,
@@ -217,7 +217,7 @@ const scalars = [
 	['status', 'published'],
 	['category', null],
 	['body_type', null],
-	['fuel_type', null],
+	['fuel_type', 'Hybrid (HEV)'],
 	['seating_capacity', null],
 	['starting_price', 259000],
 	['warranty', null],

@@ -107,7 +107,7 @@ const HIGHLIGHTS = [
 		tagline: 'PERFORMANCE',
 		headline: 'Outdrive The Limits With Prevailing Performance',
 		description:
-			'A refined MIVEC engine and smooth CVT deliver confident, efficient performance in every drive mode.',
+			'A 1.6L self-charging full hybrid pairs its engine with an 85 kW electric motor for 255 Nm of instant torque and efficient performance in every drive mode.',
 	},
 	{
 		sort: 2,
@@ -128,13 +128,13 @@ const HIGHLIGHTS = [
 /** trim renames: id → new name (ids are stable from mitsubishi-initial-data.json) */
 const TRIM_RENAMES = { 15: 'SE FWD', 16: 'SEL Premium FWD' };
 /**
- * Powertrain shared by every Outlander Sport trim: the Caribbean 2026 model is built on the regional
- * Xforce platform (1.5L MIVEC, CVT, front-wheel drive) — not the 2.0/2.4L US-market car the initial
- * data described. The homepage cards abbreviate the drivetrain to its "FWD" token.
+ * Powertrain shared by every Outlander Sport HEV trim: the regional Xforce HEV — 1.6L self-charging
+ * full hybrid with an 85 kW electric motor, front-wheel drive (official brochure, Aug 2026; see
+ * scripts/apply-hev-powertrain-specs.mjs) — not the 1.5L MIVEC/CVT petrol car seeded earlier. The homepage cards abbreviate the drivetrain to its "FWD" token.
  */
 const TRIM_SPECS = {
-	engine: '1.5L MIVEC DOHC 16-Valve 4-Cylinder (77 kW / 105 PS, 141 Nm)',
-	transmission: 'CVT Automatic Transmission',
+	engine: '1.6L HEV Self-Charging Full Hybrid (engine 79 kW / 134 Nm, electric motor 85 kW / 255 Nm)',
+	transmission: 'Hybrid Drive System (EV, Series & Parallel modes)',
 	drivetrain: 'Front-Wheel Drive (FWD) with Active Yaw Control (AYC)',
 };
 
